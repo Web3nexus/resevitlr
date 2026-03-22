@@ -1,3 +1,6 @@
+<?php
+use Illuminate\Support\Facades\Route;
+
 // Diagnostic Ping
 Route::get('/ping', function() { return response()->json(['message' => 'pong', 'connection' => config('database.default')]); });
 
