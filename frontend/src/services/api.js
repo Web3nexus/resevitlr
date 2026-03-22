@@ -7,7 +7,7 @@ const getBaseURL = () => {
 
   if (domain && domain !== 'no-domain') {
     const protocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
-    return `${protocol}//${domain}/api`;
+    return `${protocol}//${domain}/tenant-api`;
   }
 
   // On central domain, use the consolidated working prefix

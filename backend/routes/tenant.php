@@ -41,8 +41,8 @@ Route::middleware([
         })->name('login');
     });
 
-    // API Routes for Tenant
-    Route::middleware(['api'])->prefix('api')->group(function () {
+    // API Routes for Tenant (Using tenant-api to bypass Nginx /api blocks)
+    Route::middleware(['api'])->prefix('tenant-api')->group(function () {
         // Public Auth: login and validate token
         Route::middleware('throttle:6,1')->group(function () {
             Route::post('/login', [AuthController::class, 'login']);
@@ -66,8 +66,8 @@ Route::middleware([
                 $rawRole = $user->roles->first()?->name;
                 
                 if (!$rawRole) {
-                    // If no role assigned, check if this is the primary tenant owner
-                    $rawRole = ($user->email === $tenant->owner_email) ? 'restaurant_owner' : 'waitstaff';
+                    // Case-insensitive email check for owner identification
+                    $rawRole = (strtolower($user->email) === strtolower($tenant->owner_email ?? '')) ? 'restaurant_owner' : 'waitstaff';
                 }
                 
                 $normalizedRole = ($rawRole === 'restaurant_owner' || $rawRole === 'owner') ? 'owner' : $rawRole;
