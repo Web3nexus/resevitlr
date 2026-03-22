@@ -19,7 +19,7 @@ i18n
       loadPath: () => {
         const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
         const isCentral = hostname === 'resevit.com' || hostname === 'www.resevit.com' || hostname.includes('.test') && !hostname.includes('.');
-        const prefix = isCentral ? '/central-api' : '/api';
+        const prefix = isCentral ? '/central-api' : '/tenant-api';
         return `${prefix}/public/translations/{{lng}}?v=` + Date.now();
       },
       allowMultiLoading: false,

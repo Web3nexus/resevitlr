@@ -19,6 +19,7 @@ export default function Register() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isCountryOpen, setIsCountryOpen] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState('');
+  const [accountType, setAccountType] = useState('owner');
   
   const [formData, setFormData] = useState({
     name: '',
@@ -52,7 +53,10 @@ export default function Register() {
       });
       if (response.data.success) {
         setIsSuccess(true);
-        setTimeout(() => navigate('/login'), 4000);
+        setTimeout(() => {
+          const protocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
+          window.location.href = `${protocol}//${response.data.domain}/login`;
+        }, 4000);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please check your details and try again.');
@@ -184,7 +188,23 @@ export default function Register() {
                       >
                         {currentStep === 1 && (
                           <div className="space-y-5">
-                            <div className="space-y-2">
+                            <div className="space-y-2 mb-4">
+                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Account Type</label>
+                              <div className="flex gap-4">
+                                <button type="button" onClick={() => setAccountType('owner')} className={`flex-1 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${accountType === 'owner' ? 'bg-blue-500/10 border border-blue-500/50 text-blue-400 ring-4 ring-blue-500/10' : 'bg-slate-950/50 border border-slate-800/80 text-slate-500 hover:text-white'}`}>Business Owner</button>
+                                <button type="button" onClick={() => setAccountType('staff')} className={`flex-1 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all ${accountType === 'staff' ? 'bg-indigo-500/10 border border-indigo-500/50 text-indigo-400 ring-4 ring-indigo-500/10' : 'bg-slate-950/50 border border-slate-800/80 text-slate-500 hover:text-white'}`}>Staff Member</button>
+                              </div>
+                            </div>
+
+                            {accountType === 'staff' ? (
+                               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="py-8 text-center bg-slate-950/50 rounded-2xl border border-slate-800/80 p-6">
+                                 <Building2 className="w-8 h-8 text-slate-600 mx-auto mb-4" />
+                                 <h4 className="text-white font-black mb-2 text-sm uppercase tracking-tight">Staff Registration Restricted</h4>
+                                 <p className="text-xs text-slate-400 leading-relaxed font-medium">Waitstaff, managers, and kitchen staff accounts are provisioned directly by your restaurant's management layer. Please contact your HR or Business Owner for your secure login link.</p>
+                               </motion.div>
+                            ) : (
+                              <>
+                                <div className="space-y-2">
                               <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">{t('staff.name')}</label>
                               <div className="relative group/input">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-700 group-focus-within/input:text-blue-400 transition-colors" />
@@ -215,8 +235,10 @@ export default function Register() {
                                 />
                               </div>
                             </div>
-                          </div>
-                        )}
+                          </>
+                          )}
+                        </div>
+                      )}
 
                         {currentStep === 2 && (
                           <div className="space-y-5">
@@ -337,7 +359,7 @@ export default function Register() {
                         <button 
                           type="button" 
                           onClick={nextStep}
-                          disabled={currentStep === 1 ? (!formData.name || !formData.email) : (!formData.business_name)}
+                          disabled={currentStep === 1 ? (accountType === 'staff' || !formData.name || !formData.email) : (!formData.business_name)}
                           className="flex-[2] bg-blue-600 hover:bg-blue-700 disabled:opacity-30 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 group active:scale-95"
                         >
                           {t('common.continue', 'Continue')}
