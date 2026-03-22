@@ -1,0 +1,342 @@
+{
+  "nav": {
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "docs": "Guides Produit",
+    "blog": "Actualités",
+    "community": "Communauté",
+    "login": "Se connecter",
+    "getStarted": "Commencer"
+  },
+  "hero": {
+    "title": "La Plateforme Intelligente de Fidélisation des Clients pour les Restaurants",
+    "subtitle": "Maximisez le potentiel de votre restaurant grâce aux insights IA, au marketing automatisé et à une expérience client transparente.",
+    "cta": "Essai Gratuit",
+    "badge": "La façon la plus intelligente de gérer votre restaurant",
+    "trial": "Aucune carte de crédit requise • Essai gratuit de 14 jours"
+  },
+  "landing": {
+    "socialProof": "Approuvé par des marques de restaurants en pleine croissance",
+    "feature1": {
+      "title": "Réservations sans Effort",
+      "subtitle": "Acceptez les réservations de table automatiquement sur tous les canaux. Notre moteur de disponibilité intelligent évite les surréservations et assure le bon fonctionnement de votre salle.",
+      "bullet1": "Widgets de réservation en ligne pour votre site web",
+      "bullet2": "Gestion intelligente des tables et de la salle",
+      "bullet3": "Gestion de la liste d'attente et alertes SMS"
+    },
+    "feature2": {
+      "title": "Apprenez à Connaître vos Clients",
+      "subtitle": "Créez automatiquement des profils clients riches. Suivez les préférences, l'historique des visites et les habitudes de dépense pour offrir une expérience personnalisée à chaque fois.",
+      "bullet1": "Suivi des préférences et allergies des clients",
+      "bullet2": "Messages de suivi automatisés",
+      "bullet3": "Récompenses de fidélité et outils de fidélisation"
+    },
+    "bento": {
+      "heading": "Tout ce dont vous avez besoin pour grandir",
+      "subheading": "Conçu pour les restaurateurs, pas pour les services informatiques.",
+      "item1_title": "Réservations Intelligentes",
+      "item1_desc": "Acceptez les réservations 24h/24 et 7j/7 automatiquement",
+      "item2_title": "Gestion des Tables",
+      "item2_desc": "Plan de salle visuel et contrôle de la capacité",
+      "item3_title": "Profils Clients",
+      "item3_desc": "Connaissez vos habitués par leur nom",
+      "item4_title": "Outils Marketing",
+      "item4_desc": "Campagnes email et SMS qui génèrent des retours"
+    },
+    "cta_section": {
+      "title": "Prêt à faire grandir votre restaurant ?",
+      "body": "Rejoignez des centaines de restaurants qui utilisent déjà Resevit. Installez-vous en moins de 5 minutes — aucune compétence technique requise.",
+      "button": "Commencez votre essai gratuit de 14 jours"
+    },
+    "demo": {
+      "guest_note1": "Table pour 4 – Habitué",
+      "guest_note2": "Dîner d'anniversaire – VIP",
+      "guest_note3": "Préfère une table près de la fenêtre"
+    }
+  },
+  "dashboard": {
+    "insights": "Tableau de bord",
+    "reservations": "Réservations",
+    "unifiedChat": "Chat Unifié",
+    "posTerminal": "Terminal PDV",
+    "menuBuilder": "Créateur de Menu",
+    "floorPlan": "Plan de Salle",
+    "staffProfiles": "Profils du Personnel",
+    "financials": "Finances",
+    "aiCommand": "Commande IA",
+    "configuration": "Configuration",
+    "provisioning": "Provisionnement",
+    "logout": "Déconnexion",
+    "orderPortal": "Portail de Commandes",
+    "aiScanner": "Scanner IA",
+    "billingPlan": "Facturation et Plan",
+    "role_admin": "Administrateur",
+    "role_staff": "Personnel",
+    "mgmt_business": "Gestion d'Entreprise",
+    "mgmt_staff": "Accès Personnel",
+    "impersonation": {
+      "active": "Usurpation d'Identité Active",
+      "logged_as": "Vous êtes actuellement connecté en tant que {{name}}",
+      "terminate": "Terminer la Session"
+    },
+    "security_prompt": {
+      "title": "Recommandation de Sécurité",
+      "body": "Protégez votre compte en configurant un code PIN de connexion ou une application d'authentification.",
+      "button": "Sécuriser le Compte"
+    },
+    "time": {
+      "just_now": "À l'instant",
+      "minutes_ago": "il y a {{count}}m",
+      "hours_ago": "il y a {{count}}h",
+      "days_ago": "il y a {{count}}d"
+    }
+  },
+  "register": {
+    "hero_title": "Découvrez le futur des opérations commerciales.",
+    "hero_subtitle": "Rejoignez une communauté mondiale de restaurateurs et de détaillants d'élite qui évoluent plus rapidement grâce à l'infrastructure unifiée de Resevit.",
+    "feature_global_title": "Couverture Mondiale",
+    "feature_global_desc": "Règlements sécurisés en plusieurs devises.",
+    "feature_ai_title": "Infrastructure IA",
+    "feature_ai_desc": "Des analyses prédictives qui évoluent avec vous.",
+    "step_title_1": "Détails Personnels",
+    "step_title_2": "Détails de l'Entreprise",
+    "step_title_3": "Sécurité du Compte",
+    "success_title": "Succès !",
+    "success_body": "Votre infrastructure est en cours de provisionnement. Nous lançons votre accès au tableau de bord maintenant..."
+  },
+  "admin": {
+    "overview": "Vue d'ensemble",
+    "tenants": "Locataires",
+    "subscriptions": "Abonnements",
+    "support": "Assistance",
+    "emailHub": "Centre Email",
+    "contentLandingPage": "Contenu et Page d'Accueil",
+    "systemSettings": "Paramètres Système",
+    "myAccount": "Mon Compte",
+    "superAdminControl": "Contrôle Super Admin",
+    "adminManagement": "Gestion des Administrateurs",
+    "payments": "Paiements"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "loading": "Chargement...",
+    "search": "Rechercher",
+    "status": "Statut",
+    "actions": "Actions",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "yes": "Oui",
+    "no": "Non",
+    "close": "Fermer",
+    "submit": "Soumettre",
+    "update": "Mettre à jour",
+    "back": "Retour",
+    "next": "Suivant",
+    "confirm": "Confirmer",
+    "success": "Succès",
+    "error": "Erreur",
+    "warning": "Avertissement",
+    "info": "Info",
+    "new": "Nouveau",
+    "of": "sur",
+    "notifications": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "noNotifications": "Aucune nouvelle notification",
+    "settings": "Paramètres",
+    "profile": "Profil",
+    "dashboard": "Tableau de bord"
+  },
+  "auth": {
+    "login": "Connexion",
+    "register": "Créer un compte",
+    "logout": "Déconnexion",
+    "email": "Adresse Email",
+    "password": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "rememberMe": "Se souvenir de moi",
+    "signingIn": "Connexion en cours...",
+    "password_hint": "Au moins 8 caractères",
+    "already_have_account": "Vous avez déjà un portail ?",
+    "newToPlatform": "Nouveau sur Resevit ?",
+    "twoFactorDesc": "Vérification de sécurité requise pour accéder à votre tableau de bord.",
+    "adminPortal": "Portail d'Administration",
+    "welcomeBack": "Bon retour",
+    "signInToContinue": "Connectez-vous pour accéder à votre compte Resevit",
+    "twoFactor": "Authentification à Deux Facteurs",
+    "enterCode": "Entrez votre code de vérification",
+    "verify": "Vérifier",
+    "verifying": "Vérification...",
+    "partnerPortal": "Portail Partenaire",
+    "newHere": "Nouveau ici ?",
+    "createAccount": "Créer un compte",
+    "adminLogin": {
+      "title": "Contrôle du Système",
+      "subtitle": "Protocole d'Accès Root Resevit",
+      "adminIdentity": "Identité Admin",
+      "passkey": "Clé d'accès",
+      "authenticate": "Authentifier",
+      "securityPin": "Code PIN de sécurité",
+      "authCode": "Code Authentificateur",
+      "verifyCode": "Code de Vérification de Sécurité",
+      "enterPin": "Entrez votre code PIN à 6 chiffres",
+      "enterAuthCode": "Entrez le code à 6 chiffres de votre application",
+      "enteringCode": "Saisie du code à 6 chiffres envoyé à {{email}}",
+      "verifyAccess": "Vérifier et Accéder à Securegate",
+      "backToIdentity": "Retour à la Vérification d'Identité",
+      "restrictedAccess": "Securegate - Couche d'Accès Restreint"
+    }
+  },
+  "reservations": {
+    "title": "Réservations",
+    "newReservation": "Nouvelle Réservation",
+    "guestName": "Nom du Client",
+    "date": "Date",
+    "time": "Heure",
+    "partySize": "Nombre de Personnes",
+    "status": "Statut",
+    "pending": "En attente",
+    "confirmed": "Confirmé",
+    "cancelled": "Annulé",
+    "completed": "Terminé",
+    "noShow": "Absent",
+    "notes": "Notes",
+    "phone": "Téléphone",
+    "email": "Email",
+    "table": "Table",
+    "duration": "Durée",
+    "specialRequests": "Demandes Spéciales"
+  },
+  "menu": {
+    "title": "Créateur de Menu",
+    "addCategory": "Ajouter une Catégorie",
+    "addItem": "Ajouter un Article",
+    "itemName": "Nom de l'Article",
+    "price": "Prix",
+    "description": "Description",
+    "category": "Catégorie",
+    "available": "Disponible",
+    "unavailable": "Indisponible"
+  },
+  "staff": {
+    "title": "Profils du Personnel",
+    "addMember": "Ajouter un Membre",
+    "name": "Nom",
+    "role": "Rôle",
+    "email": "Email",
+    "phone": "Téléphone",
+    "active": "Actif",
+    "inactive": "Inactif"
+  },
+  "financials": {
+    "title": "Finances",
+    "revenue": "Chiffre d'affaires",
+    "expenses": "Dépenses",
+    "profit": "Bénéfice",
+    "today": "Aujourd'hui",
+    "thisWeek": "Cette Semaine",
+    "thisMonth": "Ce Mois",
+    "export": "Exporter le Rapport"
+  },
+  "settings": {
+    "title": "Configuration",
+    "general": "Général",
+    "notifications": "Notifications",
+    "integrations": "Intégrations",
+    "billing": "Facturation",
+    "security": "Sécurité",
+    "restaurantName": "Nom du Restaurant",
+    "address": "Adresse",
+    "phone": "Téléphone",
+    "email": "Email",
+    "timezone": "Fuseau Horaire",
+    "currency": "Devise",
+    "language": "Langue",
+    "save": "Enregistrer les Modifications"
+  },
+  "pos": {
+    "title": "Terminal PDV",
+    "newOrder": "Nouvelle Commande",
+    "total": "Total",
+    "subtotal": "Sous-total",
+    "tax": "Taxe",
+    "discount": "Remise",
+    "processPayment": "Traiter le Paiement",
+    "cash": "Espèces",
+    "card": "Carte",
+    "splitPayment": "Paiement Partagé",
+    "voidOrder": "Annuler la Commande"
+  },
+  "tables": {
+    "title": "Plan de Salle",
+    "addTable": "Ajouter une Table",
+    "tableNumber": "Numéro de Table",
+    "capacity": "Capacité",
+    "available": "Disponible",
+    "occupied": "Occupé",
+    "reserved": "Réservé"
+  },
+  "messages": {
+    "title": "Chat Unifié",
+    "sendMessage": "Envoyer un message...",
+    "noConversations": "Aucune conversation",
+    "online": "En ligne",
+    "offline": "Hors ligne"
+  },
+  "ai": {
+    "title": "Commande IA",
+    "placeholder": "Demandez à votre assistant IA...",
+    "send": "Envoyer",
+    "thinking": "En train de réfléchir..."
+  },
+  "onboarding": {
+    "title": "Provisionnement",
+    "complete": "Terminer la Configuration",
+    "step": "Étape"
+  },
+  "pricing": {
+    "title": "Tarification Simple et Transparente",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "getStarted": "Commencer",
+    "mostPopular": "Le Plus Populaire",
+    "perMonth": "/mois"
+  },
+  "blog": {
+    "title": "Actualités Resevit",
+    "readMore": "Lire Plus",
+    "publishedOn": "Publié le",
+    "by": "par"
+  },
+  "docs": {
+    "title": "Guides Produit",
+    "searchDocs": "Rechercher des guides...",
+    "allCategories": "Toutes les Catégories"
+  },
+  "help": {
+    "title": "Centre d'Aide",
+    "searchHelp": "Rechercher des réponses...",
+    "contactSupport": "Contacter l'Assistance"
+  },
+  "community": {
+    "title": "Communauté des Restaurateurs",
+    "joinWhatsApp": "Rejoindre le Canal WhatsApp",
+    "joinCommunity": "Rejoindre Notre Communauté"
+  },
+  "about": {
+    "title": "À Propos de Resevit",
+    "ourMission": "Notre Mission",
+    "ourTeam": "Notre Équipe"
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "privacy": "Politique de Confidentialité",
+    "terms": "Conditions d'Utilisation",
+    "about": "À Propos",
+    "product": "Produit",
+    "community": "Communauté"
+  }
+}

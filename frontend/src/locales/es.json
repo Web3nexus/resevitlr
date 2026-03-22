@@ -1,0 +1,326 @@
+{
+  "nav": {
+    "features": "Funcionalidades",
+    "pricing": "Precios",
+    "docs": "Guías del Producto",
+    "blog": "Perspectivas",
+    "community": "Comunidad",
+    "login": "Iniciar sesión",
+    "getStarted": "Comenzar"
+  },
+  "hero": {
+    "title": "La Plataforma Inteligente de Retención de Clientes para Restaurantes",
+    "subtitle": "Maximiza el potencial de tu restaurante con información basada en IA, marketing automatizado y una experiencia de huésped perfecta.",
+    "cta": "Iniciar Prueba Gratuita",
+    "badge": "La forma más inteligente de gestionar tu restaurante",
+    "trial": "No se requiere tarjeta de crédito • Prueba gratuita de 14 días"
+  },
+  "landing": {
+    "socialProof": "Confiado por marcas de restaurantes en crecimiento",
+    "feature1": {
+      "title": "Reservas sin Esfuerzo",
+      "subtitle": "Acepta reservas de mesa automáticamente en todos los canales. Nuestro motor de disponibilidad inteligente evita el exceso de reservas y mantiene tu sala funcionando sin problemas.",
+      "bullet1": "Widgets de reserva en línea para tu sitio web",
+      "bullet2": "Gestión inteligente de mesas y plano de planta",
+      "bullet3": "Gestión de lista de espera y alertas por SMS"
+    },
+    "feature2": {
+      "title": "Conoce a tus Huéspedes",
+      "subtitle": "Crea perfiles de huéspedes detallados automáticamente. Realiza un seguimiento de las preferencias, el historial de visitas y los patrones de gasto para ofrecer una experiencia personalizada en cada ocasión.",
+      "bullet1": "Seguimiento de preferencias y alergias de los huéspedes",
+      "bullet2": "Mensajes de seguimiento automatizados",
+      "bullet3": "Recompensas de fidelidad y herramientas para repetir reservas"
+    },
+    "bento": {
+      "heading": "Todo lo que necesitas para crecer",
+      "subheading": "Diseñado para operadores de restaurantes, no para departamentos de TI.",
+      "item1_title": "Reservas Inteligentes",
+      "item1_desc": "Acepta reservas las 24 horas, los 7 días de la semana automáticamente",
+      "item2_title": "Gestión de Mesas",
+      "item2_desc": "Plano de planta visual y control de capacidad",
+      "item3_title": "Perfiles de Huéspedes",
+      "item3_desc": "Conoce a tus clientes habituales por su nombre",
+      "item4_title": "Herramientas de Marketing",
+      "item4_desc": "Campañas de correo electrónico y SMS que generan retornos"
+    },
+    "cta_section": {
+      "title": "¿Listo para hacer crecer tu restaurante?",
+      "body": "Únete a cientos de restaurantes que ya utilizan Resevit. Configúralo en menos de 5 minutos, sin necesidad de conocimientos técnicos.",
+      "button": "Comienza tu prueba gratuita de 14 días"
+    },
+    "demo": {
+      "guest_note1": "Mesa para 4 – Habitual",
+      "guest_note2": "Cena de aniversario – VIP",
+      "guest_note3": "Prefiere mesa junto a la ventana"
+    }
+  },
+  "dashboard": {
+    "insights": "Información",
+    "reservations": "Reservaciones",
+    "unifiedChat": "Chat Unificado",
+    "posTerminal": "Terminal POS",
+    "menuBuilder": "Constructor de Menú",
+    "floorPlan": "Plano de Piso",
+    "staffProfiles": "Perfiles del Personal",
+    "financials": "Finanzas",
+    "aiCommand": "Comando IA",
+    "configuration": "Configuración",
+    "provisioning": "Aprovisionamiento",
+    "logout": "Cerrar sesión",
+    "orderPortal": "Portal de Pedidos",
+    "aiScanner": "Escáner IA",
+    "billingPlan": "Facturación y Plan",
+    "role_admin": "Administrador",
+    "role_staff": "Personal",
+    "mgmt_business": "Gestión Empresarial",
+    "mgmt_staff": "Acceso del Personal",
+    "impersonation": {
+      "active": "Suplantación Activa",
+      "logged_as": "Has iniciado sesión actualmente como {{name}}",
+      "terminate": "Terminar Sesión"
+    },
+    "security_prompt": {
+      "title": "Recomendación de Seguridad",
+      "body": "Protege tu cuenta configurando un PIN de inicio de sesión o una aplicación de autenticación.",
+      "button": "Asegurar Cuenta"
+    },
+    "time": {
+      "just_now": "Ahora mismo",
+      "minutes_ago": "hace {{count}}m",
+      "hours_ago": "hace {{count}}h",
+      "days_ago": "hace {{count}}d"
+    }
+  },
+  "register": {
+    "hero_title": "Experimenta el futuro de las operaciones comerciales.",
+    "hero_subtitle": "Únete a una comunidad mundial de restauradores y minoristas de élite que están escalando más rápido con la infraestructura unificada de Resevit.",
+    "feature_global_title": "Cobertura Global",
+    "feature_global_desc": "Liquidaciones seguras en múltiples monedas.",
+    "feature_ai_title": "Infraestructura de IA",
+    "feature_ai_desc": "Analítica predictiva que crece contigo.",
+    "step_title_1": "Detalles Personales",
+    "step_title_2": "Detalles del Negocio",
+    "step_title_3": "Seguridad de la Cuenta",
+    "success_title": "¡Éxito!",
+    "success_body": "Tu infraestructura se está aprovisionando. Estamos lanzando tu acceso al panel de control ahora..."
+  },
+  "admin": {
+    "overview": "Resumen",
+    "tenants": "Inquilinos",
+    "subscriptions": "Suscripciones",
+    "support": "Soporte",
+    "emailHub": "Centro de Correo",
+    "contentLandingPage": "Contenido y Página Principal",
+    "systemSettings": "Configuración del Sistema",
+    "myAccount": "Mi Cuenta",
+    "superAdminControl": "Control Súper Admin",
+    "adminManagement": "Gestión de Administradores",
+    "payments": "Pagos"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "loading": "Cargando...",
+    "search": "Buscar",
+    "status": "Estado",
+    "actions": "Acciones",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "yes": "Sí",
+    "no": "No",
+    "close": "Cerrar",
+    "submit": "Enviar",
+    "update": "Actualizar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "confirm": "Confirmar",
+    "success": "Éxito",
+    "error": "Error",
+    "warning": "Advertencia",
+    "info": "Información",
+    "new": "Nuevo",
+    "of": "de",
+    "notifications": "Notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "noNotifications": "Sin nuevas notificaciones",
+    "settings": "Configuración",
+    "profile": "Perfil",
+    "dashboard": "Panel"
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "register": "Crear cuenta",
+    "logout": "Cerrar Sesión",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "rememberMe": "Recuérdame",
+    "signingIn": "Iniciando sesión...",
+    "password_hint": "Al menos 8 caracteres",
+    "already_have_account": "¿Ya tienes un portal?",
+    "newToPlatform": "¿Eres nuevo en Resevit?",
+    "twoFactorDesc": "Se requiere verificación de seguridad para acceder a su tablero.",
+    "adminPortal": "Portal de Administración",
+    "welcomeBack": "Bienvenido de nuevo",
+    "signInToContinue": "Inicia sesión para continuar con tu cuenta Resevit",
+    "twoFactor": "Autenticación de Dos Factores",
+    "enterCode": "Ingresa tu código de verificación",
+    "verify": "Verificar",
+    "verifying": "Verificando...",
+    "partnerPortal": "Portal de Socios",
+    "newHere": "¿Eres nuevo aquí?",
+    "createAccount": "Crea una cuenta"
+  },
+  "reservations": {
+    "title": "Reservaciones",
+    "newReservation": "Nueva Reservación",
+    "guestName": "Nombre del Huésped",
+    "date": "Fecha",
+    "time": "Hora",
+    "partySize": "Tamaño del Grupo",
+    "status": "Estado",
+    "pending": "Pendiente",
+    "confirmed": "Confirmado",
+    "cancelled": "Cancelado",
+    "completed": "Completado",
+    "noShow": "No se Presentó",
+    "notes": "Notas",
+    "phone": "Teléfono",
+    "email": "Correo",
+    "table": "Mesa",
+    "duration": "Duración",
+    "specialRequests": "Solicitudes Especiales"
+  },
+  "menu": {
+    "title": "Constructor de Menú",
+    "addCategory": "Agregar Categoría",
+    "addItem": "Agregar Artículo",
+    "itemName": "Nombre del Artículo",
+    "price": "Precio",
+    "description": "Descripción",
+    "category": "Categoría",
+    "available": "Disponible",
+    "unavailable": "No Disponible"
+  },
+  "staff": {
+    "title": "Perfiles del Personal",
+    "addMember": "Agregar Miembro",
+    "name": "Nombre",
+    "role": "Rol",
+    "email": "Correo",
+    "phone": "Teléfono",
+    "active": "Activo",
+    "inactive": "Inactivo"
+  },
+  "financials": {
+    "title": "Finanzas",
+    "revenue": "Ingresos",
+    "expenses": "Gastos",
+    "profit": "Ganancia",
+    "today": "Hoy",
+    "thisWeek": "Esta Semana",
+    "thisMonth": "Este Mes",
+    "export": "Exportar Informe"
+  },
+  "settings": {
+    "title": "Configuración",
+    "general": "General",
+    "notifications": "Notificaciones",
+    "integrations": "Integraciones",
+    "billing": "Facturación",
+    "security": "Seguridad",
+    "restaurantName": "Nombre del Restaurante",
+    "address": "Dirección",
+    "phone": "Teléfono",
+    "email": "Correo",
+    "timezone": "Zona Horaria",
+    "currency": "Moneda",
+    "language": "Idioma",
+    "save": "Guardar Cambios"
+  },
+  "pos": {
+    "title": "Terminal POS",
+    "newOrder": "Nuevo Pedido",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "tax": "Impuesto",
+    "discount": "Descuento",
+    "processPayment": "Procesar Pago",
+    "cash": "Efectivo",
+    "card": "Tarjeta",
+    "splitPayment": "Pago Dividido",
+    "voidOrder": "Anular Pedido"
+  },
+  "tables": {
+    "title": "Plano de Piso",
+    "addTable": "Agregar Mesa",
+    "tableNumber": "Número de Mesa",
+    "capacity": "Capacidad",
+    "available": "Disponible",
+    "occupied": "Ocupado",
+    "reserved": "Reservado"
+  },
+  "messages": {
+    "title": "Chat Unificado",
+    "sendMessage": "Enviar un mensaje...",
+    "noConversations": "Sin conversaciones aún",
+    "online": "En línea",
+    "offline": "Desconectado"
+  },
+  "ai": {
+    "title": "Comando IA",
+    "placeholder": "Pregúntale a tu asistente IA...",
+    "send": "Enviar",
+    "thinking": "Pensando..."
+  },
+  "onboarding": {
+    "title": "Aprovisionamiento",
+    "complete": "Completar Configuración",
+    "step": "Paso"
+  },
+  "pricing": {
+    "title": "Precios Simples y Transparentes",
+    "monthly": "Mensual",
+    "yearly": "Anual",
+    "getStarted": "Comenzar",
+    "mostPopular": "Más Popular",
+    "perMonth": "/mes"
+  },
+  "blog": {
+    "title": "Perspectivas de Resevit",
+    "readMore": "Leer Más",
+    "publishedOn": "Publicado el",
+    "by": "por"
+  },
+  "docs": {
+    "title": "Guías del Producto",
+    "searchDocs": "Buscar guías...",
+    "allCategories": "Todas las Categorías"
+  },
+  "help": {
+    "title": "Centro de Ayuda",
+    "searchHelp": "Buscar respuestas...",
+    "contactSupport": "Contactar Soporte"
+  },
+  "community": {
+    "title": "Comunidad de Restaurantes",
+    "joinWhatsApp": "Unirse al Canal de WhatsApp",
+    "joinCommunity": "Únete a Nuestra Comunidad"
+  },
+  "about": {
+    "title": "Acerca de Resevit",
+    "ourMission": "Nuestra Misión",
+    "ourTeam": "Nuestro Equipo"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados.",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "about": "Acerca de Nosotros",
+    "product": "Producto",
+    "community": "Comunidad"
+  }
+}

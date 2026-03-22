@@ -1,0 +1,11 @@
+{
+    "welcome": "Bienvenido a Resevit",
+    "success": "Éxito",
+    "error": "Error",
+    "unauthorized": "Acceso no autorizado.",
+    "not_found": "Recurso no encontrado.",
+    "validation_failed": "Los datos proporcionados no eran válidos.",
+    "login_success": "Sesión iniciada correctamente.",
+    "logout_success": "Sesión cerrada correctamente.",
+    "settings_updated": "Configuración actualizada correctamente."
+}
