@@ -53,7 +53,6 @@ export default function SaaSSettingsView() {
     flutterwave_enabled: false,
     flutterwave_public_key: '',
     flutterwave_secret_key: '',
-    flutterwave_secret_key: '',
     flutterwave_encryption_key: '',
     default_currency: 'USD',
     platform_logo_url: '',
