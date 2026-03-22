@@ -43,6 +43,9 @@ Route::middleware([
 
     // API Routes for Tenant (Using tenant-api to bypass Nginx /api blocks)
     Route::middleware(['api'])->prefix('tenant-api')->group(function () {
+        // Public Translations
+        Route::get('/public/translations/{locale}', [\App\Http\Controllers\Api\SuperAdmin\TranslationController::class, 'fetch']);
+
         // Public Auth: login and validate token
         Route::middleware('throttle:6,1')->group(function () {
             Route::post('/login', [AuthController::class, 'login']);

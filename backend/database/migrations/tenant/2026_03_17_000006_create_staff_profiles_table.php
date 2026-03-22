@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->enum('role', ['manager', 'waiter', 'chef', 'cashier'])->default('waiter');
+            $table->string('role')->default('waiter');
             $table->string('pin', 6)->nullable();
             $table->decimal('hourly_rate', 8, 2)->nullable();
             $table->boolean('is_active')->default(true);

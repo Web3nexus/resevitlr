@@ -122,14 +122,16 @@ class AuthController extends Controller
             $centralDomain = config('tenancy.central_domains')[0] ?? 'localhost';
             $tenant->domains()->create(['domain' => $tenantId . '.' . $centralDomain]);
 
-            // Create User associated with Tenant
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role' => 'owner',
-                'tenant_id' => $tenant->id,
-            ]);
+            // Create User associated with Tenant (MUST be inside tenant context)
+            $user = $tenant->run(function () use ($validated, $tenant) {
+                return User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'password' => Hash::make($validated['password']),
+                    'role' => 'owner',
+                    'tenant_id' => $tenant->id,
+                ]);
+            });
 
             // Send Welcome Email
             $template = \App\Models\EmailTemplate::where('slug', 'welcome_email')->first();
@@ -151,6 +153,8 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Registration successful',
+                'tenant_id' => $tenant->id,
+                'domain' => $tenant->domains()->first()->domain,
                 'user' => $user
             ], 201);
         } catch (\Exception $e) {

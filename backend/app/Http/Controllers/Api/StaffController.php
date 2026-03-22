@@ -18,7 +18,7 @@ class StaffController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:staff_profiles',
-            'role' => 'required|in:manager,waiter,chef,cashier',
+            'role' => 'required|in:manager,waiter,chef,cashier,accountant',
             'is_active' => 'boolean',
         ]);
 
@@ -34,8 +34,9 @@ class StaffController extends Controller
             ]
         );
 
-        // Assign the role (Spatie)
-        $user->syncRoles([$validated['role']]);
+        // Assign the role (Spatie) - Dynamically ensure it exists in the tenant DB first
+        $roleRecord = \Spatie\Permission\Models\Role::firstOrCreate(['name' => $validated['role'], 'guard_name' => 'web']);
+        $user->syncRoles([$roleRecord]);
 
         // Send Staff Registration Email
         $template = \App\Models\EmailTemplate::where('slug', 'staff_registration')->first();

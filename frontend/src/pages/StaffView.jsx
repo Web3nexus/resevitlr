@@ -141,6 +141,7 @@ export function StaffView() {
                        <option value="waiter">Waiter</option>
                        <option value="chef">Chef</option>
                        <option value="cashier">Cashier</option>
+                       <option value="accountant">Accountant</option>
                     </select>
                  </div>
                  <div className="flex gap-2 justify-end pt-4">
