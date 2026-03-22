@@ -198,6 +198,9 @@ class AutomationController extends Controller
 
         $finalPrompt = $defaultPrompt . "\n\nBrand Tone: {$tone}\n\n" .
                       "BUSINESS CONTEXT:\n" .
+                      "Business Name: " . (tenant('business_name') ?? 'The Restaurant') . "\n" .
+                      "Phone: " . ($tenantSettings['booking_phone'] ?? 'Not set') . "\n" .
+                      "Email: " . ($tenantSettings['contact_email'] ?? 'Not set') . "\n\n" .
                       "Menu:\n{$menuInfo}\n\n" .
                       "Seating:\n{$tableInfo}\n\n" .
                       "Additional Knowledge:\n{$knowledgeBase}\n\n";
@@ -229,7 +232,16 @@ class AutomationController extends Controller
             return json_decode($response->choices[0]->message->content, true);
         } catch (\Exception $e) {
             Log::error('AI Analysis Failed', ['provider' => $provider, 'error' => $e->getMessage()]);
-            return ['type' => 'error', 'reply' => 'I am currently unable to process your request. Please call the restaurant directly.'];
+            
+            $bookingPhone = \App\Models\TenantSetting::get('booking_phone');
+            $reply = 'I am currently unable to process your request.';
+            if ($bookingPhone) {
+                $reply .= " Please call us directly at {$bookingPhone}.";
+            } else {
+                $reply .= " Please call the restaurant directly.";
+            }
+
+            return ['type' => 'error', 'reply' => $reply];
         }
     }
 

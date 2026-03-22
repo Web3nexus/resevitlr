@@ -161,11 +161,18 @@ class AuthController extends Controller
         }
         [$tokenId, $plaintext] = $parts;
 
-        // Query central DB directly
-        $tokenRow = \Illuminate\Support\Facades\DB::connection('mysql')
-            ->table('personal_access_tokens')
+        // Try current connection first (tenant-aware)
+        $tokenRow = \Illuminate\Support\Facades\DB::table('personal_access_tokens')
             ->where('id', $tokenId)
             ->first();
+
+        // Fallback to central if not found (e.g. for central-to-central impersonation)
+        if (!$tokenRow) {
+            $tokenRow = \Illuminate\Support\Facades\DB::connection('mysql')
+                ->table('personal_access_tokens')
+                ->where('id', $tokenId)
+                ->first();
+        }
 
         if (!$tokenRow) {
             return response()->json(['message' => 'Invalid or expired token.'], 401);
@@ -208,7 +215,7 @@ class AuthController extends Controller
                 'is_owner'  => $isOwner,
                 'tenant_id' => $currentTenant?->id,
                 'plan'      => $currentTenant?->plan ?? 'free',
-                'features'  => $currentTenant?->features ?? ($plan?->features ?? ['basic_ordering', 'menu_management']),
+                'features'  => array_values((array) ($currentTenant?->features ?? ($plan?->features ?? ['basic_ordering', 'menu_management']))),
             ],
         ]);
     }
@@ -248,7 +255,7 @@ class AuthController extends Controller
                 'role'      => $user->role,
                 'tenant_id' => $user->tenant_id,
                 'plan'      => $tenant?->plan ?? 'free',
-                'features'  => $tenant->features ?? ($plan?->features ?? ['basic_ordering', 'menu_management']),
+                'features'  => array_values((array) ($tenant->features ?? ($plan?->features ?? ['basic_ordering', 'menu_management']))),
             ],
         ]);
     }

@@ -9,6 +9,8 @@ export default function SettingsView() {
     restaurant_name: 'Bistrologix Kitchen',
     primary_color: '#2563EB',
     currency_symbol: '$',
+    booking_phone: '',
+    contact_email: '',
     notification_email: 'admin@bistrologix.com',
     auto_responder: true,
     stripe_enabled: false,
@@ -101,6 +103,27 @@ export default function SettingsView() {
                     type="text" 
                     value={settings.currency_symbol}
                     onChange={(e) => setSettings({...settings, currency_symbol: e.target.value})}
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3 font-bold text-slate-700 focus:border-blue-600 transition-all" 
+                  />
+               </div>
+               <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Booking Phone Number</label>
+                  <input 
+                    type="tel" 
+                    value={settings.booking_phone || ''}
+                    onChange={(e) => setSettings({...settings, booking_phone: e.target.value})}
+                    placeholder="+1 (555) 000-0000"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3 font-bold text-slate-700 focus:border-blue-600 transition-all font-mono" 
+                  />
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1.5">Used in AI fallback messages when the AI cannot process a request.</p>
+               </div>
+               <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Contact Email</label>
+                  <input 
+                    type="email" 
+                    value={settings.contact_email || ''}
+                    onChange={(e) => setSettings({...settings, contact_email: e.target.value})}
+                    placeholder="reservations@restaurant.com"
                     className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-3 font-bold text-slate-700 focus:border-blue-600 transition-all" 
                   />
                </div>

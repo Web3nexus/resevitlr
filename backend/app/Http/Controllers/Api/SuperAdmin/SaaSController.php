@@ -373,10 +373,11 @@ class SaaSController extends Controller
 
         tenancy()->end();
 
+        $protocol = request()->getScheme();
         return response()->json([
             'token' => $token,
             'domain' => $domain,
-            'redirect_url' => "https://{$domain}/login?token={$token}&domain={$domain}&impersonate=1"
+            'redirect_url' => "{$protocol}://{$domain}/login?token={$token}&domain={$domain}&impersonate=1"
         ]);
     }
 

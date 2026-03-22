@@ -30,8 +30,10 @@ export function DashboardLayout() {
   }`;
   
   const hasFeature = (feat) => {
-    if (!user?.features) return true; // Default to true if not loaded yet to avoid flickering
-    return user.features.includes(feat);
+    if (!user?.features) return true;
+    if (Array.isArray(user.features)) return user.features.includes(feat);
+    if (typeof user.features === 'object') return !!user.features[feat];
+    return false;
   };
 
   return (
