@@ -48,6 +48,8 @@ Route::middleware([
             Route::post('/login', [AuthController::class, 'login']);
             Route::post('/login/token', [AuthController::class, 'loginWithToken']);
             Route::post('/login/verify-2fa', [AuthController::class, 'verify2FA']);
+            Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+            Route::post('/reset-password', [AuthController::class, 'resetPassword']);
         });
         
         // Protected Routes

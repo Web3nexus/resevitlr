@@ -223,7 +223,7 @@ export default function TenantLogin() {
                 <div className="space-y-2">
                   <div className="flex justify-between items-end mb-1">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">{t('auth.password')}</label>
-                    <a href="#" className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider">{t('auth.forgotPassword')}</a>
+                    <Link to="/forgot-password" title={t('auth.forgotPassword')} className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider">{t('auth.forgotPassword')}</Link>
                   </div>
                   <div className="relative group/input">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within/input:text-blue-400 transition-colors" />

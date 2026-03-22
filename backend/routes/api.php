@@ -16,6 +16,8 @@ Route::middleware('throttle:6,1')->group(function () {
     Route::post('/login/token', [\App\Http\Controllers\Api\AuthController::class, 'loginWithToken']);
     Route::post('/login/verify-2fa', [\App\Http\Controllers\Api\AuthController::class, 'verify2FA']);
     Route::post('/auth/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
+    Route::post('/forgot-password', [\App\Http\Controllers\Api\AuthController::class, 'forgotPassword']);
+    Route::post('/reset-password', [\App\Http\Controllers\Api\AuthController::class, 'resetPassword']);
 });
 
 // Public CMS (Move here for global access)

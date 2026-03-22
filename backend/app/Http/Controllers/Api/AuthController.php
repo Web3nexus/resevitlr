@@ -313,4 +313,93 @@ class AuthController extends Controller
         
         return response()->json(['message' => 'Logged out successfully']);
     }
+
+    /**
+     * Send a password reset link to the user.
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        if ($request->is('central-api/*')) {
+            $user = \App\Models\Admin::where('email', $request->email)->first();
+            $connection = 'mysql';
+        } else {
+            $user = User::where('email', $request->email)->first();
+            $connection = config('database.default');
+        }
+
+        if (!$user) {
+            // We return success to avoid email enumeration
+            return response()->json(['message' => 'If your email is in our system, you will receive a reset link shortly.']);
+        }
+
+        $token = \Illuminate\Support\Str::random(64);
+
+        \Illuminate\Support\Facades\DB::connection($connection)->table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            ['token' => $token, 'created_at' => now()]
+        );
+
+        $template = \App\Models\EmailTemplate::where('slug', 'password_reset')->first();
+        $subject = $template ? $template->subject : 'Reset Your Password';
+        $content = $template ? $template->content : "Hello {name}, click the link below to reset your password: {reset_link}";
+
+        $domain = $request->header('X-Tenant-Domain') ?? $request->getHost();
+        $protocol = $request->getScheme();
+        $resetLink = "{$protocol}://{$domain}/reset-password?token={$token}&email=" . urlencode($user->email);
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SystemMail($subject, $content, [
+                'name' => $user->name,
+                'reset_link' => $resetLink,
+                'platform_name' => \App\Models\SaaSSetting::get('platform_name', 'Resevit')
+            ]));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to send password reset email: " . $e->getMessage());
+        }
+
+        return response()->json(['message' => 'If your email is in our system, you will receive a reset link shortly.']);
+    }
+
+    /**
+     * Reset the user's password using the provided token.
+     */
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required|string',
+            'email'    => 'required|email',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if ($request->is('central-api/*')) {
+            $user = \App\Models\Admin::where('email', $request->email)->first();
+            $connection = 'mysql';
+        } else {
+            $user = User::where('email', $request->email)->first();
+            $connection = config('database.default');
+        }
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        $record = \Illuminate\Support\Facades\DB::connection($connection)->table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->where('token', $request->token)
+            ->first();
+
+        if (!$record || now()->subHours(2)->greaterThan($record->created_at)) {
+            return response()->json(['message' => 'Invalid or expired reset token.'], 400);
+        }
+
+        $user->update(['password' => Hash::make($request->password)]);
+
+        \Illuminate\Support\Facades\DB::connection($connection)->table('password_reset_tokens')
+            ->where('email', $request->email)
+            ->delete();
+
+        return response()->json(['message' => 'Password reset successfully. You can now log in.']);
+    }
 }

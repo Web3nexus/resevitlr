@@ -43,6 +43,8 @@ import CommunityPage from './pages/public/CommunityPage'
 import BlogDetailPage from './pages/public/BlogDetailPage'
 import CustomerStoryDetailPage from './pages/public/CustomerStoryDetailPage'
 import Register from './pages/Register'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import NotFound from './pages/public/NotFound'
 import ErrorBoundary from './components/ErrorBoundary'
 
@@ -70,6 +72,8 @@ function App() {
             {/* Tenant Login / Register */}
             <Route path="/login" element={<TenantLogin />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             
             {/* SaaS Super Admin (Central Domain) */}
             <Route path="/securegate" element={<SecuregateLogin />} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Lock, Shield, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useBranding } from '../hooks/useBranding';
@@ -97,8 +97,11 @@ export default function SecuregateLogin() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">{t('auth.adminLogin.passkey')}</label>
+              <div className="space-y-2">
+                <div className="flex justify-between items-end mb-1">
+                  <label className="block text-sm font-medium text-slate-300 leading-none">{t('auth.adminLogin.passkey')}</label>
+                  <Link to="/forgot-password" title={t('auth.forgotPassword')} className="text-[10px] font-bold text-blue-400 hover:text-blue-300 transition-colors uppercase tracking-wider leading-none">{t('auth.forgotPassword')}</Link>
+                </div>
                 <div className="relative">
                   <input
                     type="password"
