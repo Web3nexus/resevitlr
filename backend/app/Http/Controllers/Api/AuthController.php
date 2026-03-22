@@ -21,9 +21,11 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if ($request->is('central-api/*')) {
+        // Distinguish between Super Admin and Tenant/Staff login
+        if ($request->is('central-api/saas/*')) {
             $user = \App\Models\Admin::where('email', $request->email)->first();
         } else {
+            // This now correctly handles /central-api/login and /api/login
             $user = User::where('email', $request->email)->first();
         }
 
