@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Store, Mail, Lock, Loader2, ArrowRight, ShieldCheck, Sparkles, UserPlus } from 'lucide-react';
@@ -49,7 +50,8 @@ export default function TenantLogin() {
           ? `${window.location.protocol}//resevitweb.test` 
           : '';
           
-        const res = await api.get(`${centralBaseUrl}/central-api/public/tenant-by-domain/${hostname}`);
+        // Remove the /api prefix for central-api calls if we are using the relative api instance
+        const res = await axios.get(`${centralBaseUrl}/central-api/public/tenant-by-domain/${hostname}`);
         if (res.data) {
             setBusinessName(res.data.business_name);
         }
