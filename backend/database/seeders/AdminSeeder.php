@@ -20,10 +20,10 @@ class AdminSeeder extends Seeder
 
         // Create the Landlord
         $landlord = Admin::firstOrCreate(
-            ['email' => 'landlord@securegate.com'],
+            ['email' => 'admin@resevit.com'],
             [
-                'name' => 'System Landlord',
-                'password' => Hash::make('paul1234'),
+                'name' => 'System Administrator',
+                'password' => Hash::make('Admin123!'),
             ]
         );
 

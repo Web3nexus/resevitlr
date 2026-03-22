@@ -16,14 +16,7 @@ return [
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
-    'central_domains' => [
-        '127.0.0.1',
-        'localhost',
-        'resevitlr.test',
-        'resevitweb.test',
-        'resevit.com',
-        'www.resevit.com',
-    ],
+    'central_domains' => array_filter(explode(',', env('CENTRAL_DOMAINS', 'localhost,127.0.0.1,resevitweb.test,resevitlr.test'))),
 
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.
