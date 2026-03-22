@@ -95,7 +95,7 @@ class AuthController extends Controller
             return response()->json(['message' => 'CAPTCHA validation failed. Please try again.'], 400);
         }
 
-        \Illuminate\Support\Facades\DB::beginTransaction();
+        \Illuminate\Support\Facades\DB::connection('mysql')->beginTransaction();
 
         try {
             // Generate a unique tenant ID based on business name
@@ -131,7 +131,7 @@ class AuthController extends Controller
                 'tenant_id' => $tenant->id,
             ]);
 
-            \Illuminate\Support\Facades\DB::commit();
+            \Illuminate\Support\Facades\DB::connection('mysql')->commit();
 
             return response()->json([
                 'success' => true,
@@ -139,7 +139,7 @@ class AuthController extends Controller
                 'user' => $user
             ], 201);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollBack();
+            \Illuminate\Support\Facades\DB::connection('mysql')->rollBack();
             return response()->json(['message' => 'Registration failed: ' . $e->getMessage()], 500);
         }
     }
