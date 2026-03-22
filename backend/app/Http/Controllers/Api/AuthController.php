@@ -158,6 +158,14 @@ class AuthController extends Controller
                 'user' => $user
             ], 201);
         } catch (\Exception $e) {
+            // Rollback: If anything fails after the tenant is created, delete the tenant completely to avoid orphaned/half-done businesses
+            if (isset($tenant) && $tenant) {
+                try {
+                    $tenant->delete();
+                } catch (\Exception $deleteEx) {
+                    \Illuminate\Support\Facades\Log::error("Failed to delete partially created tenant: " . $deleteEx->getMessage());
+                }
+            }
             return response()->json(['message' => 'Registration failed: ' . $e->getMessage()], 500);
         }
     }
