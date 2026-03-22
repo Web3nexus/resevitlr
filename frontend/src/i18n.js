@@ -16,7 +16,12 @@ i18n
     keySeparator: '.',
     nsSeparator: false,
     backend: {
-      loadPath: '/api/public/translations/{{lng}}?v=' + Date.now(),
+      loadPath: () => {
+        const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+        const isCentral = hostname === 'resevit.com' || hostname === 'www.resevit.com' || hostname.includes('.test') && !hostname.includes('.');
+        const prefix = isCentral ? '/central-api' : '/api';
+        return `${prefix}/public/translations/{{lng}}?v=` + Date.now();
+      },
       allowMultiLoading: false,
     },
     react: {
