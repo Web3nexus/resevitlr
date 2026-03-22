@@ -2,11 +2,19 @@ import axios from 'axios';
 
 const getBaseURL = () => {
   const domain = localStorage.getItem('tenant_domain');
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const isCentral = hostname === 'resevit.com' || hostname === 'www.resevit.com' || hostname.includes('.test') && !hostname.includes('.'); // Simplistic central check
+
   if (domain && domain !== 'no-domain') {
-    // Use current page protocol to avoid mixed-content blocks (https pages can't call http)
     const protocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
     return `${protocol}//${domain}/api`;
   }
+
+  // On central domain, use the consolidated working prefix
+  if (isCentral) {
+    return import.meta.env.VITE_CENTRAL_API_BASE_URL || '/central-api';
+  }
+
   return import.meta.env.VITE_API_BASE_URL || '/api';
 };
 

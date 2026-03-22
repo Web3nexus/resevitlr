@@ -11,15 +11,16 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            // Central Admin API
+            // Consolidated Central API (Working Prefix)
             Route::middleware('api')
                 ->prefix('central-api')
-                ->group(base_path('routes/admin.php'));
-                
-            // Global API (Webhooks)
-            Route::middleware('api')
-                ->prefix('api')
-                ->group(base_path('routes/api.php'));
+                ->group(function () {
+                    // SaaS Admin & Public Branding
+                    require base_path('routes/admin.php');
+                    
+                    // Global Webhooks & Public Auth
+                    require base_path('routes/api.php');
+                });
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {

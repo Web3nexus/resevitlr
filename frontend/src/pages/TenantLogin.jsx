@@ -50,8 +50,8 @@ export default function TenantLogin() {
           ? `${window.location.protocol}//resevitweb.test` 
           : '';
           
-        // Remove the /api prefix for central-api calls if we are using the relative api instance
-        const res = await axios.get(`${centralBaseUrl}/central-api/public/tenant-by-domain/${hostname}`);
+        // The 'api' instance already uses the working '/central-api' prefix on central domains now
+        const res = await api.get(`/public/tenant-by-domain/${hostname}`);
         if (res.data) {
             setBusinessName(res.data.business_name);
         }
