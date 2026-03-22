@@ -14,14 +14,14 @@ class TranslationSeeder extends Seeder
     public function run(): void
     {
         $locales = ['en', 'fr', 'de', 'es'];
-        
+
         foreach ($locales as $locale) {
             $path = base_path("../frontend/src/locales/{$locale}.json");
-            
+
             if (File::exists($path)) {
                 $json = File::get($path);
                 $data = json_decode($json, true);
-                
+
                 if ($data) {
                     $this->importTranslations($locale, $data);
                 }
@@ -41,11 +41,13 @@ class TranslationSeeder extends Seeder
                 // If it's a first-level key, it's the 'group'
                 if ($prefix === '') {
                     $this->importTranslations($locale, $value, $key);
-                } else {
+                }
+                else {
                     // Otherwise it's still part of the same group but nested key
                     $this->importTranslations($locale, $value, $fullKey);
                 }
-            } else {
+            }
+            else {
                 // Split the fullKey into group and actual key
                 $parts = explode('.', $fullKey);
                 $group = array_shift($parts);
@@ -58,14 +60,14 @@ class TranslationSeeder extends Seeder
                 }
 
                 Translation::updateOrCreate(
-                    [
-                        'locale' => $locale,
-                        'group' => $group,
-                        'key' => $actualKey,
-                    ],
-                    [
-                        'value' => $value,
-                    ]
+                [
+                    'locale' => $locale,
+                    'group' => $group,
+                    'key' => $actualKey,
+                ],
+                [
+                    'value' => $value,
+                ]
                 );
             }
         }

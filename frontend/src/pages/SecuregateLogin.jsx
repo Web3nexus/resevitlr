@@ -92,7 +92,7 @@ export default function SecuregateLogin() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-slate-600"
-                    placeholder="admin@resevit.com"
+                    placeholder=""
                   />
                 </div>
               </div>
@@ -109,7 +109,7 @@ export default function SecuregateLogin() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl py-3 px-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-slate-600 pr-12"
-                    placeholder="••••••••••••"
+                    placeholder=""
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <Lock className="w-5 h-5 text-slate-500" />
@@ -149,7 +149,7 @@ export default function SecuregateLogin() {
                   value={twoFactorCode}
                   onChange={(e) => setTwoFactorCode(e.target.value)}
                   className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl py-4 px-4 text-center text-2xl font-bold tracking-[0.5em] focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-700"
-                  placeholder="000000"
+                  placeholder=""
                   autoFocus
                 />
               </div>

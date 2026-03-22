@@ -21,6 +21,8 @@ return [
         'localhost',
         'resevitlr.test',
         'resevitweb.test',
+        'resevit.com',
+        'www.resevit.com',
     ],
 
     /**
