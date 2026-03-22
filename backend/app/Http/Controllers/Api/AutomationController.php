@@ -127,6 +127,42 @@ class AutomationController extends Controller
             
             $reply = "I've placed a pending reservation for you on " . $reservation->reservation_time->format('M d, H:i') . ". A representative will confirm shortly!";
             $interactionStatus = 'actioned';
+
+            // Send New Reservation Email (AI Alert)
+            $template = \App\Models\EmailTemplate::where('slug', 'new_reservation')->first();
+            if ($template) {
+                $ownerEmail = tenant('owner_email');
+                if ($ownerEmail) {
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($ownerEmail)->send(new \App\Mail\SystemMail($template->subject, $template->content, [
+                            'reservation_id' => $reservation->id,
+                            'customer_name' => $reservation->customer_name . " (via AI)",
+                            'reservation_date' => $reservation->reservation_time->format('Y-m-d'),
+                            'reservation_time' => $reservation->reservation_time->format('H:i'),
+                            'guest_count' => $reservation->party_size
+                        ]));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error("Failed to send AI reservation email: " . $e->getMessage());
+                    }
+                }
+            }
+        } else {
+            // Send New Message Email (General Inquiry)
+            $template = \App\Models\EmailTemplate::where('slug', 'new_message')->first();
+            if ($template) {
+                $ownerEmail = tenant('owner_email');
+                if ($ownerEmail) {
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($ownerEmail)->send(new \App\Mail\SystemMail($template->subject, $template->content, [
+                            'customer_name' => $sender,
+                            'source' => $platform,
+                            'message_preview' => \Illuminate\Support\Str::limit($messageText, 100)
+                        ]));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error("Failed to send AI inquiry email: " . $e->getMessage());
+                    }
+                }
+            }
         }
 
         // --- DISPATCH LOGIC ---

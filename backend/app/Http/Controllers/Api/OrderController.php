@@ -61,6 +61,26 @@ class OrderController extends Controller
 
             $order->update(['total_amount' => $total]);
 
+            // Send New Order Email
+            $template = \App\Models\EmailTemplate::where('slug', 'new_order')->first();
+            if ($template) {
+                $businessName = tenant('business_name') ?? 'Your Business';
+                $ownerEmail = tenant('owner_email');
+                if ($ownerEmail) {
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($ownerEmail)->send(new \App\Mail\SystemMail($template->subject, $template->content, [
+                            'order_number' => $order->id,
+                            'total_amount' => number_format($total, 2),
+                            'business_name' => $businessName,
+                            'items_count' => count($validated['items']),
+                            'source' => 'POS Checkout'
+                        ]));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error("Failed to send order email: " . $e->getMessage());
+                    }
+                }
+            }
+
             // Dispatch real notification
             NotificationController::dispatch(
                 'order',

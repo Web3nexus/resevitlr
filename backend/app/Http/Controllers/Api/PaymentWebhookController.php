@@ -115,6 +115,30 @@ class PaymentWebhookController extends Controller
             $tenant->save();
             
             Log::info("Tenant {$tenantId} subscription updated via {$provider}");
+
+            // Send Payment Success Email
+            $template = \App\Models\EmailTemplate::where('slug', 'payment_success')->first();
+            if ($template) {
+                $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
+                $plan = \App\Models\SubscriptionPlan::where('stripe_plan_id', $subscriptionId)
+                    ->orWhere('paystack_plan_id', $subscriptionId)
+                    ->orWhere('flutterwave_plan_id', $subscriptionId)
+                    ->first();
+                
+                $planName = $plan ? $plan->name : 'Premium';
+
+                try {
+                    \Illuminate\Support\Facades\Mail::to($tenant->owner_email)->send(new \App\Mail\SystemMail($template->subject, $template->content, [
+                        'business_name' => $tenant->business_name,
+                        'plan_name' => $planName,
+                        'invoice_id' => $subscriptionId,
+                        'amount' => 'Check Dashboard',
+                        'platform_name' => $platformName
+                    ]));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to send payment success email to tenant {$tenantId}: " . $e->getMessage());
+                }
+            }
         }
     }
 }

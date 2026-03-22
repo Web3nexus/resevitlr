@@ -37,6 +37,26 @@ class StaffController extends Controller
         // Assign the role (Spatie)
         $user->syncRoles([$validated['role']]);
 
+        // Send Staff Registration Email
+        $template = \App\Models\EmailTemplate::where('slug', 'staff_registration')->first();
+        if ($template) {
+            $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
+            $businessName = tenant('business_name') ?? 'Your Business';
+            $loginUrl = 'https://' . (tenant('id') ? tenant('id') . '.' : '') . (config('tenancy.central_domains')[0] ?? 'resevit.com') . '/login';
+
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SystemMail($template->subject, $template->content, [
+                    'name' => $user->name,
+                    'business_name' => $businessName,
+                    'platform_name' => $platformName,
+                    'login_url' => $loginUrl,
+                    'pin' => 'password123' // Matching the temp password
+                ]));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to send staff registration email: " . $e->getMessage());
+            }
+        }
+
         return response()->json([
             'message' => 'Staff member and user account created successfully.',
             'staff' => $staff,

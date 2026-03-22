@@ -129,6 +129,23 @@ class AuthController extends Controller
                 'tenant_id' => $tenant->id,
             ]);
 
+            // Send Welcome Email
+            $template = \App\Models\EmailTemplate::where('slug', 'welcome_email')->first();
+            $subject = $template ? $template->subject : 'Welcome to Resevit';
+            $content = $template ? $template->content : "Hello {name}, your account has been created successfully. Welcome to {platform_name}!";
+            
+            $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
+            
+            try {
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SystemMail($subject, $content, [
+                    'name' => $user->name,
+                    'platform_name' => $platformName,
+                    'business_name' => $validated['business_name']
+                ]));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to send welcome email: " . $e->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Registration successful',

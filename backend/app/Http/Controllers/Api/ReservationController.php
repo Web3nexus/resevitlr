@@ -34,6 +34,22 @@ class ReservationController extends Controller
 
         $reservation = Reservation::create($validated);
 
+        // Send New Reservation Email
+        $template = \App\Models\EmailTemplate::where('slug', 'new_reservation')->first();
+        if ($template) {
+            try {
+                \Illuminate\Support\Facades\Mail::to($validated['customer_email'])->send(new \App\Mail\SystemMail($template->subject, $template->content, [
+                    'reservation_id' => $reservation->id,
+                    'customer_name' => $reservation->customer_name,
+                    'reservation_date' => $reservation->reservation_time->format('Y-m-d'),
+                    'reservation_time' => $reservation->reservation_time->format('H:i'),
+                    'guest_count' => $reservation->party_size
+                ]));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to send reservation email: " . $e->getMessage());
+            }
+        }
+
         // Dispatch real notification
         NotificationController::dispatch(
             'reservation',
