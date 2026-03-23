@@ -53,28 +53,32 @@ class AuthController extends Controller
         }
 
         // Authenticate within the tenant's database
-        $result = $tenant->run(function() use ($request, $tenant) {
+        $authData = $tenant->run(function() use ($request) {
             $user = User::where('email', $request->email)->first();
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return null;
             }
-            return $user;
+            return [
+                'id' => $user->id,
+                'email' => $user->email,
+                'name' => $user->name,
+                'two_factor_method' => $user->two_factor_method ?: 'none',
+                'array_data' => $user->toArray()
+            ];
         });
 
-        if (!$result) {
+        if (!$authData) {
             return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
         }
 
-        $user = $result;
-
         // Check 2FA preference (handle null or empty string as 'none')
-        $twoFactorMethod = $user->two_factor_method ?: 'none';
+        $twoFactorMethod = $authData['two_factor_method'];
         
         if ($twoFactorMethod !== 'none') {
             if ($twoFactorMethod === 'email') {
                 $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-                $tenant->run(function() use ($user, $code) {
-                    User::where('id', $user->id)->update([
+                $tenant->run(function() use ($authData, $code) {
+                    User::where('id', $authData['id'])->update([
                         'two_factor_code' => $code,
                         'two_factor_expires_at' => now()->addMinutes(10),
                     ]);
@@ -82,10 +86,10 @@ class AuthController extends Controller
 
                 try {
                     $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
-                    \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SystemMail(
+                    \Illuminate\Support\Facades\Mail::to($authData['email'])->send(new \App\Mail\SystemMail(
                         'Your Security Code',
                         'Your security verification code is: {code}',
-                        ['name' => $user->name, 'code' => $code, 'platform_name' => $platformName]
+                        ['name' => $authData['name'], 'code' => $code, 'platform_name' => $platformName]
                     ));
                 } catch (\Exception $e) {
                     \Illuminate\Support\Facades\Log::error("Failed to send 2FA email: " . $e->getMessage());
@@ -95,12 +99,13 @@ class AuthController extends Controller
             return response()->json([
                 'requires_2fa' => true,
                 'method'       => $twoFactorMethod,
-                'email'        => $user->email,
+                'email'        => $authData['email'],
             ]);
         }
 
         // Issue token within tenant context and return tenant domain for redirect
-        $tokenData = $tenant->run(function() use ($user) {
+        $tokenData = $tenant->run(function() use ($authData) {
+            $user = User::find($authData['id']);
             $token = $user->createToken('auth-token')->plainTextToken;
             return $token;
         });
@@ -109,7 +114,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token'         => $tokenData,
-            'user'          => $user->toArray(),
+            'user'          => $authData['array_data'],
             'tenant_domain' => $tenantDomain,
         ]);
     }
