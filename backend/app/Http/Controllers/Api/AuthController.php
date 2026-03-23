@@ -67,9 +67,11 @@ class AuthController extends Controller
 
         $user = $result;
 
-        // Check 2FA preference
-        if ($user->two_factor_method !== 'none') {
-            if ($user->two_factor_method === 'email') {
+        // Check 2FA preference (handle null or empty string as 'none')
+        $twoFactorMethod = $user->two_factor_method ?: 'none';
+        
+        if ($twoFactorMethod !== 'none') {
+            if ($twoFactorMethod === 'email') {
                 $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
                 $tenant->run(function() use ($user, $code) {
                     User::where('id', $user->id)->update([
@@ -92,7 +94,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'requires_2fa' => true,
-                'method'       => $user->two_factor_method,
+                'method'       => $twoFactorMethod,
                 'email'        => $user->email,
             ]);
         }

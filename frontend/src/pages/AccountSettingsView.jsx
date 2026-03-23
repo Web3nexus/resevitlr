@@ -48,7 +48,10 @@ export default function AccountSettingsView() {
               name: res.data.name || '', 
               email: res.data.email || '',
               email_verified_at: res.data.email_verified_at,
-              is_developer: res.data.is_developer
+              is_developer: res.data.is_developer,
+              business_name: res.data.business_name || '',
+              business_owner_name: res.data.business_owner_name || '',
+              business_owner_email: res.data.business_owner_email || ''
             });
             setOriginalEmail(res.data.email);
             setTwoFactorMethod(res.data.two_factor_method || 'none');
@@ -334,6 +337,32 @@ export default function AccountSettingsView() {
                     )}
                 </div>
               </div>
+
+              {profile.business_name && (
+                  <div className="mt-8 pt-6 border-t border-slate-100 space-y-5">
+                      <h3 className="font-black text-slate-800 uppercase tracking-tight text-sm">Business Identity</h3>
+                      <div className="grid grid-cols-2 gap-5">
+                          <div className="space-y-2">
+                              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Business Name</label>
+                              <input 
+                                  type="text" 
+                                  value={profile.business_name} 
+                                  disabled
+                                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 font-bold text-slate-800 text-sm outline-none opacity-70 cursor-not-allowed" 
+                              />
+                          </div>
+                          <div className="space-y-2">
+                              <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Business Owner Email</label>
+                              <input 
+                                  type="email" 
+                                  value={profile.business_owner_email} 
+                                  disabled
+                                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 font-bold text-slate-800 text-sm outline-none opacity-70 cursor-not-allowed" 
+                              />
+                          </div>
+                      </div>
+                  </div>
+              )}
 
               <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                 <SaveButton saving={saving} saved={saved} onClick={handleUpdateProfile} />

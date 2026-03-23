@@ -17,7 +17,10 @@ class ProfileController extends \App\Http\Controllers\Controller
             'email_verified_at' => $user->email_verified_at,
             'is_developer' => $user->is_developer ?? false,
             'role' => ($user instanceof \App\Models\Admin) ? 'admin' : ($user->roles->first()?->name ?? 'staff'),
-            'two_factor_method' => $user->two_factor_method ?? 'none'
+            'two_factor_method' => $user->two_factor_method ?? 'none',
+            'business_name' => function_exists('tenant') && tenant() ? tenant()->business_name : null,
+            'business_owner_name' => function_exists('tenant') && tenant() ? tenant()->owner_name : null,
+            'business_owner_email' => function_exists('tenant') && tenant() ? tenant()->owner_email : null,
         ]);
     }
 

@@ -71,14 +71,14 @@ export default function BillingView() {
     <div className="max-w-6xl mx-auto space-y-8 pb-20">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
-          <h1 className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
-            <CreditCard className="w-8 h-8 text-blue-500" />
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+            <CreditCard className="w-8 h-8 text-blue-600" />
             Billing & Subscription
           </h1>
-          <p className="text-slate-400 mt-2 text-lg">Manage your commercial plan and payment methods.</p>
+          <p className="text-slate-500 mt-2 text-lg">Manage your commercial plan and payment methods.</p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700/50 p-4 rounded-2xl flex items-center gap-4">
+        <div className="bg-white border border-slate-200 p-4 rounded-2xl flex items-center gap-4 shadow-sm">
           <div>
             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Regional Gateway</p>
             <div className="flex items-center gap-2">
@@ -86,11 +86,11 @@ export default function BillingView() {
               <select 
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                className="bg-transparent text-white font-bold text-sm outline-none cursor-pointer"
+                className="bg-transparent text-slate-800 font-bold text-sm outline-none cursor-pointer"
               >
-                <option value="" disabled className="bg-slate-900">Select Country</option>
+                <option value="" disabled className="bg-white">Select Country</option>
                 {COUNTRIES.map(country => (
-                  <option key={country.code} value={country.code} className="bg-slate-900">
+                  <option key={country.code} value={country.code} className="bg-white">
                     {country.name}
                   </option>
                 ))}
@@ -136,8 +136,8 @@ export default function BillingView() {
       {/* Plan Selection */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {(Array.isArray(plans) ? plans : []).map((plan) => (
-          <div key={plan.id} className={`bg-slate-800/30 border-2 rounded-3xl p-8 flex flex-col transition-all group relative ${
-            status?.plan_slug === plan.slug ? 'border-blue-500 bg-blue-500/5' : 'border-slate-700/50 hover:border-slate-600'
+          <div key={plan.id} className={`bg-white border-2 rounded-3xl p-8 flex flex-col transition-all group relative shadow-sm ${
+            status?.plan_slug === plan.slug ? 'border-blue-500 bg-blue-50/50 shadow-md' : 'border-slate-200 hover:border-slate-300'
           }`}>
             {plan.slug === 'pro' && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-full shadow-lg">
@@ -146,9 +146,9 @@ export default function BillingView() {
             )}
 
             <div className="mb-8">
-              <h3 className="text-xl font-black text-white mb-2">{plan.name}</h3>
+              <h3 className="text-xl font-black text-slate-900 mb-2">{plan.name}</h3>
               <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-white">${plan.monthly_price}</span>
+                <span className="text-3xl font-black text-slate-900">${plan.monthly_price}</span>
                 <span className="text-slate-500 text-sm">/month</span>
               </div>
             </div>
@@ -157,7 +157,7 @@ export default function BillingView() {
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">What's included</p>
               <ul className="space-y-3">
                 {Array.isArray(plan.features) && plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-slate-300">
+                  <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
                     <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                     <span className="capitalize">{feature.replace(/_/g, ' ')}</span>
                   </li>
@@ -170,8 +170,8 @@ export default function BillingView() {
               disabled={status?.plan_slug === plan.slug || subscribing === plan.slug}
               className={`w-full py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
                 status?.plan_slug === plan.slug 
-                  ? 'bg-slate-700 text-slate-500 cursor-default' 
-                  : 'bg-white text-slate-900 hover:bg-blue-500 hover:text-white active:scale-95 shadow-xl shadow-white/5'
+                  ? 'bg-slate-100 text-slate-400 cursor-default' 
+                  : 'bg-slate-100 text-slate-900 hover:bg-blue-600 hover:text-white active:scale-95 transition-colors'
               }`}
             >
               {subscribing === plan.slug ? (
@@ -188,10 +188,10 @@ export default function BillingView() {
         ))}
 
         {/* Custom Corporate Box */}
-        <div className="bg-slate-900 border-2 border-dashed border-slate-800 rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4">
+        <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4">
           <Zap className="w-10 h-10 text-amber-500" />
           <div>
-            <h3 className="text-lg font-bold text-white">Enterprise Flex</h3>
+            <h3 className="text-lg font-bold text-slate-900">Enterprise Flex</h3>
             <p className="text-slate-500 text-sm mt-1">Need a specialized setup for 50+ locations?</p>
           </div>
           <button className="text-blue-400 font-bold text-xs uppercase tracking-widest hover:text-blue-300 transition-colors">
