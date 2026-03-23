@@ -45,8 +45,8 @@ export default function AccountSettingsView() {
         try {
             const res = await activeApi.get('/profile');
             setProfile({ 
-              name: res.data.name, 
-              email: res.data.email,
+              name: res.data.name || '', 
+              email: res.data.email || '',
               email_verified_at: res.data.email_verified_at,
               is_developer: res.data.is_developer
             });
@@ -65,9 +65,10 @@ export default function AccountSettingsView() {
     setLoadingSessions(true);
     try {
       const res = await activeApi.get('/profile/sessions');
-      setSessions(res.data);
+      setSessions(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Failed to fetch sessions", err);
+      setSessions([]);
     } finally {
       setLoadingSessions(false);
     }

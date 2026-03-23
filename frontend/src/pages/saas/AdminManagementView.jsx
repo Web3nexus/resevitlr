@@ -124,10 +124,10 @@ export default function AdminManagementView() {
     }
   };
 
-  const filteredAdmins = admins.filter(a => 
-    a.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    a.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAdmins = Array.isArray(admins) ? admins.filter(a => 
+    a?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    a?.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) : [];
 
   return (
     <div className="space-y-6">
@@ -230,7 +230,7 @@ export default function AdminManagementView() {
                         <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 text-[9px] font-bold uppercase tracking-tight border border-amber-500/20">
                             All System Functions Enabled
                         </span>
-                    ) : admin.permissions?.length > 0 ? (
+                    ) : Array.isArray(admin.permissions) && admin.permissions.length > 0 ? (
                         admin.permissions.map(p => (
                             <span key={p} className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 text-[9px] font-bold uppercase tracking-tight border border-blue-500/20">
                                 {p.replace('manage_', '').replace('_', ' ')}

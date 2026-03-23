@@ -166,10 +166,11 @@ export default function TenantManagementView() {
     }
   };
 
-  const filteredTenants = Array.isArray(tenants) ? tenants.filter(t => 
-    t?.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    t?.id?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) : [];
+  const filteredTenants = (tenants || []).filter(tenant =>
+    tenant.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tenant.owner_email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    tenant.id?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -591,10 +592,10 @@ export default function TenantManagementView() {
                  <div className="space-y-3">
                     {isStaffLoading ? (
                         [1,2,3].map(i => <div key={i} className="h-16 bg-slate-800/20 rounded-2xl animate-pulse border border-slate-800" />)
-                    ) : tenantStaff.length === 0 ? (
+                    ) : (tenantStaff || []).length === 0 ? (
                         <p className="p-8 text-center text-slate-600 text-sm border-2 border-dashed border-slate-800 rounded-3xl">No staff records found in tenant database.</p>
                     ) : (
-                        tenantStaff.map(staff => (
+                        (tenantStaff || []).map(staff => (
                            <div key={staff.id} className="p-4 rounded-2xl bg-slate-800/10 border border-slate-800 flex items-center gap-4 group hover:bg-slate-800/30 transition-colors">
                               <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-400 uppercase font-black text-xs border border-blue-600/20">
                                  {staff?.name?.substring(0,2) || '??'}

@@ -81,7 +81,7 @@ export function StaffView() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {staff.length > 0 ? staff.map(member => (
+            {Array.isArray(staff) && staff.length > 0 ? staff.map(member => (
               <tr key={member.id} className="hover:bg-slate-50/50 transition-colors group">
                 <td className="px-8 py-5">
                   <div className="flex items-center gap-4">

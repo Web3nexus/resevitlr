@@ -10,16 +10,15 @@ class ProfileController extends \App\Http\Controllers\Controller
     public function index(\Illuminate\Http\Request $request)
     {
         $user = $request->user();
-        $data = $user->toArray();
-        $data['email_verified_at'] = $user->email_verified_at;
-        $data['is_developer'] = $user->is_developer ?? false;
-        
-        if ($user instanceof \App\Models\Admin) {
-            $data['role'] = 'admin';
-        } else {
-            $data['role'] = $user->roles->first()?->name ?? 'waitstaff';
-        }
-        return response()->json($data);
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
+            'is_developer' => $user->is_developer ?? false,
+            'role' => ($user instanceof \App\Models\Admin) ? 'admin' : ($user->roles->first()?->name ?? 'staff'),
+            'two_factor_method' => $user->two_factor_method ?? 'none'
+        ]);
     }
 
     /**

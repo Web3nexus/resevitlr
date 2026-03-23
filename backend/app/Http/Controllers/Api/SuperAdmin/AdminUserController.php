@@ -15,16 +15,9 @@ class AdminUserController extends Controller
      */
     public function index(Request $request)
     {
-        $user = $request->user();
-        
+        // Show all admins to all super admins to prevent "email already taken" confusion.
+        // Special developer badges are handled in the frontend.
         $query = Admin::role('super_admin');
-
-        // Developer Visibility Logic:
-        // 1. If current user is developer, they see themselves + all other admins.
-        // 2. If current user is NOT developer, they see all other admins EXCEPT developers.
-        if (!$user->is_developer) {
-            $query->where('is_developer', false);
-        }
 
         return response()->json($query->get());
     }
