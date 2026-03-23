@@ -89,7 +89,7 @@ export function DashboardLayout() {
         </div>
         <div className={`p-4 border-t border-slate-800 flex ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
            <button onClick={logout} className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-2'} text-slate-500 hover:text-red-400 w-full font-medium transition-colors`} title={t('dashboard.logout')}>
-             <LogOut size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.logout')}</span>}
+             <LogOut size={18} className="shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.logout')}</span>}
            </button>
         </div>
       </aside>
@@ -316,7 +316,7 @@ function NotificationItem({ notification, onRead }) {
         <div className="text-[9px] font-bold text-slate-400 mt-0.5 truncate">{notification.message}</div>
         <div className="text-[8px] font-black text-slate-300 uppercase tracking-widest mt-1">{timeAgo(notification.created_at)}</div>
       </div>
-      {isUnread && <div className="h-2 w-2 rounded-full bg-blue-600 flex-shrink-0"></div>}
+      {isUnread && <div className="h-2 w-2 rounded-full bg-blue-600 shrink-0"></div>}
     </div>
   );
 }
