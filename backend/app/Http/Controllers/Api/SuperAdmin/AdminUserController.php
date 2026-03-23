@@ -100,22 +100,36 @@ class AdminUserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, $id)
+    public function destroy(string $id)
     {
         $admin = Admin::findOrFail($id);
-        
-        // Prevent deleting developers
+
         if ($admin->is_developer) {
-            return response()->json(['message' => 'Developer accounts cannot be deleted.'], 403);
+            return response()->json(['message' => 'Cannot delete developer account'], 403);
         }
 
-        // Prevent deleting yourself
-        if ($admin->id === $request->user()->id) {
-            return response()->json(['message' => 'You cannot delete your own account.'], 403);
+        if ($admin->id === auth()->id()) {
+            return response()->json(['message' => 'Cannot delete your own account'], 403);
         }
 
         $admin->delete();
 
-        return response()->json(null, 204);
+        return response()->json(['message' => 'Admin deleted successfully']);
+    }
+
+    public function toggle2FA(Request $request, string $id)
+    {
+        $admin = Admin::findOrFail($id);
+        
+        $request->validate(['enabled' => 'required|boolean']);
+        
+        $admin->update([
+            'two_factor_method' => $request->enabled ? 'email' : 'none'
+        ]);
+        
+        return response()->json([
+            'message' => 'Admin 2FA updated successfully.',
+            'two_factor_enabled' => $request->enabled
+        ]);
     }
 }

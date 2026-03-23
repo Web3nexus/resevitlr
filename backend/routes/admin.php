@@ -41,6 +41,8 @@ Route::middleware(['auth:sanctum'])->prefix('saas')->group(function () {
     // Admin Management
     Route::get('/admins', [AdminUserController::class, 'index']);
     Route::post('/admins', [AdminUserController::class, 'store']);
+    Route::put('/admins/{id}', [AdminUserController::class, 'update']);
+    Route::patch('/admins/{id}/2fa', [AdminUserController::class, 'toggle2FA']);
     Route::delete('/admins/{id}', [AdminUserController::class, 'destroy']);
     
     // Tenant Management

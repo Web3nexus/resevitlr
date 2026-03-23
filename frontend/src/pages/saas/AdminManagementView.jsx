@@ -114,6 +114,16 @@ export default function AdminManagementView() {
     setIsDeleteModalOpen(true);
   };
 
+  const toggle2FA = async (id, currentStatus) => {
+    try {
+      await api.patch(`/saas/admins/${id}/2fa`, { enabled: !currentStatus });
+      fetchAdmins();
+    } catch (err) {
+      console.error('Failed to toggle 2FA:', err);
+      alert('Failed to update 2FA status.');
+    }
+  };
+
   const filteredAdmins = admins.filter(a => 
     a.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     a.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -196,6 +206,21 @@ export default function AdminManagementView() {
             </div>
 
             <div className="space-y-3">
+                <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-widest text-slate-500 border-b border-slate-700 pb-2 mb-3">
+                    <span>2FA Status</span>
+                    <button 
+                        onClick={() => toggle2FA(admin.id, admin.two_factor_method !== 'none')}
+                        className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md transition-all ${
+                            admin.two_factor_method !== 'none' 
+                            ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' 
+                            : 'bg-slate-700/50 text-slate-400 border border-slate-700'
+                        }`}
+                    >
+                        {admin.two_factor_method !== 'none' ? <ShieldCheck size={10} /> : <Shield size={10} />}
+                        {admin.two_factor_method !== 'none' ? 'Active' : 'Disabled'}
+                    </button>
+                </div>
+
                 <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-widest text-slate-500 border-b border-slate-700 pb-2 mb-3">
                     <span>Feature Access</span>
                     <span>{admin.is_developer ? AVAILABLE_PERMISSIONS.length : (admin.permissions?.length || 0)} / {AVAILABLE_PERMISSIONS.length}</span>
