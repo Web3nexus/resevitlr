@@ -97,9 +97,7 @@ export default function SaaSSettingsView() {
             { id: 'security', label: 'Security & Auth', icon: Shield },
             { id: 'smtp', label: 'Email (SMTP)', icon: Mail },
             { id: 'ai', label: 'AI Engine', icon: Bot },
-             { id: 'content', label: 'Landing Page', icon: Layout },
-            { id: 'plans', label: 'Subscription Plans', icon: Package },
-            { id: 'social', label: 'Social Webhooks', icon: MessageSquare },
+             { id: 'social', label: 'Social Webhooks', icon: MessageSquare },
             { id: 'legal', label: 'Legal & Privacy', icon: FileText },
             { id: 'external_links', label: 'Social & Community', icon: ExternalLink },
             { id: 'database', label: 'Database Routing', icon: Database },
@@ -704,27 +702,6 @@ export default function SaaSSettingsView() {
                         />
                     </div>
                  </div>
-              </div>
-            )}
-
-            {activeTab === 'plans' && (
-              <div className="py-12 text-center space-y-6">
-                <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto text-blue-400">
-                  <Package className="w-10 h-10" />
-                </div>
-                <div className="max-w-xs mx-auto space-y-2">
-                  <h3 className="text-xl font-bold text-white">Advanced Plan Control</h3>
-                  <p className="text-sm text-slate-400">
-                    Subscription tiers and feature gating have moved to their own dedicated management area.
-                  </p>
-                </div>
-                <Link 
-                  to="/securegate/plans" 
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all group"
-                >
-                  Go to Plan Management
-                  <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Link>
               </div>
             )}
 
