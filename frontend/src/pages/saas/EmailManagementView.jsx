@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Plus, Trash2, Save, FileText, Info, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import api from '../../services/centralApi';
+import ConfirmationModal from '../../components/common/ConfirmationModal';
 
 const DEFAULT_TEMPLATES = [
   { slug: '2fa_code', subject: 'Your Security Code', variables: ['code', 'name'] },
@@ -13,6 +14,8 @@ export default function EmailManagementView() {
   const [editingTemplate, setEditingTemplate] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [templateToDelete, setTemplateToDelete] = useState(null);
 
   useEffect(() => {
     fetchTemplates();
@@ -43,13 +46,17 @@ export default function EmailManagementView() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure? This will delete the template and system will revert to hardcoded defaults.")) return;
     try {
       await api.delete(`/saas/email-templates/${id}`);
       setTemplates(templates.filter(t => t.id !== id));
     } catch (error) {
       alert("Error deleting template.");
     }
+  };
+
+  const confirmDelete = (id) => {
+    setTemplateToDelete(id);
+    setIsDeleteModalOpen(true);
   };
 
   if (isLoading) return <div className="p-8 text-slate-500 flex items-center gap-2"><Loader2 className="animate-spin" /> Loading templates...</div>;
@@ -90,7 +97,7 @@ export default function EmailManagementView() {
                   <FileText className="w-4 h-4" />
                 </button>
                 <button 
-                  onClick={() => handleDelete(template.id)}
+                  onClick={() => confirmDelete(template.id)}
                   className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -223,6 +230,16 @@ export default function EmailManagementView() {
           </div>
         </div>
       )}
+
+      <ConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => handleDelete(templateToDelete)}
+        title="Delete Email Template?"
+        message="This will permanently delete the custom template. The system will revert to using hardcoded defaults for this email type."
+        confirmText="Delete Template"
+        type="danger"
+      />
     </div>
   );
 }

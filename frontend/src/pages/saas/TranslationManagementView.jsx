@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2, X, Globe, Save, Loader2, AlertCircle } from 'lucide-react';
 import api from '../../services/centralApi';
+import ConfirmationModal from '../../components/common/ConfirmationModal';
 
 export default function TranslationManagementView() {
   const [translations, setTranslations] = useState([]);
@@ -17,6 +18,8 @@ export default function TranslationManagementView() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [translationToDelete, setTranslationToDelete] = useState(null);
 
   const locales = [
     { code: 'en', name: 'English' },
@@ -79,7 +82,6 @@ export default function TranslationManagementView() {
   };
 
   const deleteTranslation = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this translation key?")) return;
     try {
       await api.delete(`/saas/translations/${id}`);
       fetchTranslations();
@@ -87,6 +89,11 @@ export default function TranslationManagementView() {
       console.error("Failed to delete translation", error);
       alert("Failed to delete translation.");
     }
+  };
+
+  const confirmDelete = (id) => {
+    setTranslationToDelete(id);
+    setIsDeleteModalOpen(true);
   };
 
   const filteredTranslations = translations.filter(t => 
@@ -196,7 +203,7 @@ export default function TranslationManagementView() {
                             <Edit className="w-4 h-4" />
                         </button>
                         <button 
-                          onClick={() => deleteTranslation(t.id)}
+                          onClick={() => confirmDelete(t.id)}
                           className="p-2 hover:bg-slate-800 text-slate-400 hover:text-red-400 rounded-lg transition-colors" title="Delete"
                         >
                             <Trash2 className="w-4 h-4" />
@@ -341,6 +348,16 @@ export default function TranslationManagementView() {
           </div>
         </div>
       )}
+
+      <ConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => deleteTranslation(translationToDelete)}
+        title="Delete Translation Key?"
+        message="This will permanently delete this translation key for the selected locale. If this key is used in the frontend, it will show the raw key name instead of the translated value."
+        confirmText="Delete Key"
+        type="danger"
+      />
     </div>
   );
 }

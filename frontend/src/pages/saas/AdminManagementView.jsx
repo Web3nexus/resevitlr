@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Plus, Shield, ShieldCheck, Mail, Key, Trash2, X, Check, Search, Activity, AlertTriangle } from 'lucide-react';
 import api from '../../services/centralApi';
+import ConfirmationModal from '../../components/common/ConfirmationModal';
 
 const AVAILABLE_PERMISSIONS = [
   { id: 'manage_tenants', label: 'Tenant Management', desc: 'Manage restaurant instances and features' },
@@ -18,6 +19,8 @@ export default function AdminManagementView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [adminToDelete, setAdminToDelete] = useState(null);
 
   const [formData, setFormData] = useState({
     id: null,
@@ -93,13 +96,17 @@ export default function AdminManagementView() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure? This admin will lose all access immediately.")) return;
     try {
       await api.delete(`/saas/admins/${id}`);
       fetchAdmins();
     } catch (err) {
       alert("Failed to delete admin");
     }
+  };
+
+  const confirmDelete = (id) => {
+    setAdminToDelete(id);
+    setIsDeleteModalOpen(true);
   };
 
   const filteredAdmins = admins.filter(a => 
@@ -155,7 +162,7 @@ export default function AdminManagementView() {
                     <Activity className="w-4 h-4" />
                 </button>
                 <button 
-                  onClick={() => handleDelete(admin.id)}
+                  onClick={() => confirmDelete(admin.id)}
                   className="p-2 hover:bg-red-500/10 text-slate-400 hover:text-red-400 rounded-lg transition-colors"
                 >
                     <Trash2 className="w-4 h-4" />
@@ -314,6 +321,16 @@ export default function AdminManagementView() {
           </div>
         </div>
       )}
+
+      <ConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => handleDelete(adminToDelete)}
+        title="Revoke Admin Access?"
+        message="This admin will lose all access to the SaaS management panel immediately. This action can be reversed by creating a new account later if needed."
+        confirmText="Revoke Access"
+        type="danger"
+      />
     </div>
   );
 }

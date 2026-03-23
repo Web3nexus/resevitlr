@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Settings, Save, Globe, Shield, Mail, Database, Loader2, Bot, Layout, FileText, CreditCard, Package, Plus, Trash2, CheckCircle, CircleX as XCircle, MessageSquare, Copy, ExternalLink, Sparkles } from 'lucide-react';
 import api from '../../services/centralApi';
+import ConfirmationModal from '../../components/common/ConfirmationModal';
 
 const SYSTEM_FEATURES = [
   'basic_ordering', 
@@ -64,6 +65,8 @@ export default function SaaSSettingsView() {
   const [editingPlan, setEditingPlan] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [planToDelete, setPlanToDelete] = useState(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -109,13 +112,17 @@ export default function SaaSSettingsView() {
   };
 
   const handleDeletePlan = async (id) => {
-    if(!confirm("Are you sure? This might break existing tenants on this plan.")) return;
     try {
         await api.delete(`/saas/plans/${id}`);
         setPlans(plans.filter(p => p.id !== id));
     } catch (error) {
         alert("Error deleting plan.");
     }
+  };
+
+  const confirmDeletePlan = (id) => {
+    setPlanToDelete(id);
+    setIsDeleteModalOpen(true);
   };
 
   const handleSave = async () => {
@@ -805,8 +812,8 @@ export default function SaaSSettingsView() {
                                         <Settings className="w-4 h-4" />
                                     </button>
                                     <button 
-                                        onClick={() => handleDeletePlan(plan.id)}
-                                        className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                        onClick={() => confirmDeletePlan(plan.id)}
+                                        className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </button>
@@ -1283,6 +1290,16 @@ export default function SaaSSettingsView() {
           </div>
         </div>
       </div>
+
+      <ConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => handleDeletePlan(planToDelete)}
+        title="Delete Subscription Plan?"
+        message="Are you sure you want to delete this plan? This could potentially disrupt billing for existing tenants on this tier."
+        confirmText="Delete Plan"
+        type="danger"
+      />
     </div>
   );
 }

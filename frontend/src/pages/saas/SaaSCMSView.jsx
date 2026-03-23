@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit3, Trash2, Globe, FileText, Star, BookOpen, X, CheckCircle, AlertTriangle, Home, Save, RefreshCw } from 'lucide-react';
 import centralApi from '../../services/centralApi';
+import ConfirmationModal from '../../components/common/ConfirmationModal';
 
 // ─── Landing Page Settings Panel ─────────────────────────────────────
 function LandingPageEditor() {
@@ -173,6 +174,8 @@ export default function SaaSCMSView() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({});
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
 
     useEffect(() => {
         if (activeTab !== 'landing') fetchData();
@@ -235,13 +238,17 @@ export default function SaaSCMSView() {
     };
 
     const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this permanently?')) return;
         try {
             await centralApi.delete(`/saas/cms/${activeTab}/${id}`);
             fetchData();
         } catch (error) {
             console.error('Delete failed', error);
         }
+    };
+
+    const confirmDelete = (id) => {
+        setItemToDelete(id);
+        setIsDeleteModalOpen(true);
     };
 
     const tabs = [
@@ -338,7 +345,7 @@ export default function SaaSCMSView() {
                                             <button onClick={() => handleOpenModal(item)} className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
                                                 <Edit3 className="w-4 h-4" />
                                             </button>
-                                            <button onClick={() => handleDelete(item.id)} className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                                             <button onClick={() => confirmDelete(item.id)} className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -457,6 +464,16 @@ export default function SaaSCMSView() {
                     </div>
                 )}
             </AnimatePresence>
+
+            <ConfirmationModal 
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={() => handleDelete(itemToDelete)}
+                title={`Delete ${activeTab === 'blogs' ? 'Blog' : activeTab === 'stories' ? 'Story' : 'Doc'}?`}
+                message="This will permanently remove this content from your public website. This action cannot be undone."
+                confirmText="Delete Permanently"
+                type="danger"
+            />
         </div>
     );
 }

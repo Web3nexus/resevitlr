@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building2, Search, Plus, MoreVertical, ShieldAlert, CheckCircle, Activity, Play, Pause, Edit, Trash2, X, ExternalLink } from 'lucide-react';
 import api from '../../services/centralApi';
+import ConfirmationModal from '../../components/common/ConfirmationModal';
 
 export default function TenantManagementView() {
   const [tenants, setTenants] = useState([]);
@@ -21,6 +22,8 @@ export default function TenantManagementView() {
   const [tenantStaff, setTenantStaff] = useState([]);
   const [isStaffLoading, setIsStaffLoading] = useState(false);
   const [editingTenant, setEditingTenant] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [tenantToDelete, setTenantToDelete] = useState(null);
 
   const fetchTenants = async () => {
     setIsLoading(true);
@@ -108,13 +111,18 @@ export default function TenantManagementView() {
   };
 
   const deleteTenant = async (id) => {
-    if (!window.confirm("Are you sure? This will delete the entire restaurant database!")) return;
     try {
       await api.delete(`/saas/tenants/${id}`);
       fetchTenants();
+      if (selectedTenant?.id === id) setSelectedTenant(null);
     } catch (error) {
       console.error("Failed to delete tenant", error);
     }
+  };
+
+  const confirmDelete = (id) => {
+    setTenantToDelete(id);
+    setIsDeleteModalOpen(true);
   };
 
   const handleImpersonate = async (tenant) => {
@@ -311,7 +319,7 @@ export default function TenantManagementView() {
                             </button>
                         )}
                         <button 
-                          onClick={() => deleteTenant(tenant.id)}
+                          onClick={() => confirmDelete(tenant.id)}
                           className="p-2 hover:bg-slate-800 text-slate-400 hover:text-red-400 rounded-lg transition-colors" title="Delete Tenant Data"
                         >
                             <Trash2 className="w-4 h-4" />
@@ -576,13 +584,23 @@ export default function TenantManagementView() {
               </div>
 
               <div className="mt-8 pt-8 border-t border-slate-800">
-                 <button onClick={() => deleteTenant(selectedTenant.id)} className="w-full py-4 rounded-2xl border border-red-500/20 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
+                  <button onClick={() => confirmDelete(selectedTenant.id)} className="w-full py-4 rounded-2xl border border-red-500/20 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all">
                     Purge Instance Data
-                 </button>
+                  </button>
               </div>
            </div>
         </div>
       )}
+
+      <ConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => deleteTenant(tenantToDelete)}
+        title="Purge Restaurant Data?"
+        message="This will permanently delete the entire restaurant database, including all orders, staff and customers. This action is irreversible."
+        confirmText="Purge Database"
+        type="danger"
+      />
     </div>
   );
 }

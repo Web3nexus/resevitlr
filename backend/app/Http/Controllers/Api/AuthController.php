@@ -140,6 +140,11 @@ class AuthController extends Controller
             return response()->json(['message' => 'CAPTCHA validation failed. Please try again.'], 400);
         }
 
+        // Check if email is already registered as a tenant owner
+        if (Tenant::where('owner_email', $validated['email'])->exists()) {
+            return response()->json(['message' => 'This email is already registered with a business.'], 422);
+        }
+
         try {
             // Generate a unique tenant ID based on business name
             $tenantId = \Illuminate\Support\Str::slug($validated['business_name']);
