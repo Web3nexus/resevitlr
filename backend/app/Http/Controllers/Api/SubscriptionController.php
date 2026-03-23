@@ -41,6 +41,8 @@ class SubscriptionController extends Controller
             'provider' => $tenant->subscription_provider,
             'ends_at' => $tenant->subscription_ends_at,
             'country' => $tenant->country,
+            'ai_credits_limit' => $plan ? $plan->ai_credits_limit : 10, // Default 10 for Free if not set
+            'ai_credits_used' => $tenant->ai_credits_used ?? 0,
             'sales_email' => $salesEmail,
         ]);
     }

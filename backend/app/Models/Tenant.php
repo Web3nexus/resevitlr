@@ -22,6 +22,8 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'owner_name',
             'owner_email',
             'status',
+            'ai_credits_used',
+            'ai_credits_reset_at',
             'features',
             'created_at',
             'updated_at',
@@ -30,5 +32,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     protected $casts = [
         'features' => 'array',
+        'ai_credits_used' => 'integer',
+        'ai_credits_reset_at' => 'datetime',
     ];
 }

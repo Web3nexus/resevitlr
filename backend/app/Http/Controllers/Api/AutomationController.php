@@ -16,6 +16,35 @@ use App\Services\SocialMessengerService;
 class AutomationController extends Controller
 {
     /**
+     * Check if tenant has enough AI credits and consume one.
+     */
+    private function checkAndConsumeCredit()
+    {
+        $tenant = tenant();
+        if (!$tenant) return true; // Central context
+
+        $planSlug = $tenant->plan ?? 'free';
+        $plan = \App\Models\SubscriptionPlan::where('slug', $planSlug)->first();
+        
+        // Handle monthly reset if needed (simplified: reset if month changed)
+        if ($tenant->ai_credits_reset_at && $tenant->ai_credits_reset_at->isPast()) {
+            $tenant->ai_credits_used = 0;
+            $tenant->ai_credits_reset_at = now()->addMonth()->startOfMonth();
+        } elseif (!$tenant->ai_credits_reset_at) {
+            $tenant->ai_credits_reset_at = now()->addMonth()->startOfMonth();
+        }
+
+        $limit = $plan ? $plan->ai_credits_limit : 10; // Default 10 for Free
+        
+        if ($limit !== null && $tenant->ai_credits_used >= $limit) {
+            throw new \Exception("AI Credit Limit Reached ({$limit}/month). Please upgrade your plan.");
+        }
+
+        $tenant->increment('ai_credits_used');
+        return true;
+    }
+
+    /**
      * Get Tenant AI Settings
      */
     public function getSettings()
@@ -107,6 +136,12 @@ class AutomationController extends Controller
         }
 
         // Forward to AI for intent extraction
+        try {
+            $this->checkAndConsumeCredit();
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'limit_reached', 'reply' => $e->getMessage()]);
+        }
+        
         $intent = $this->analyzeMessageIntent($messageText);
 
         $interactionStatus = 'replied';
@@ -300,6 +335,12 @@ class AutomationController extends Controller
         $request->validate([
             'receipt' => 'required|image|max:5120',
         ]);
+
+        try {
+            $this->checkAndConsumeCredit();
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 403);
+        }
 
         $image = $request->file('receipt');
         $base64Image = base64_encode(file_get_contents($image->path()));

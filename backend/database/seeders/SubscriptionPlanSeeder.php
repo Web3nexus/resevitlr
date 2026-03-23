@@ -17,6 +17,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'yearly_price'      => 0,
                 'reservation_limit' => 50,
                 'max_staff'         => 2,
+                'ai_credits_limit'  => 10,
                 'features'          => [
                     'insights'          => true,
                     'reservations'      => true,
@@ -43,6 +44,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'yearly_price'      => 470,
                 'reservation_limit' => 500,
                 'max_staff'         => 10,
+                'ai_credits_limit'  => 1000,
                 'features'          => [
                     'insights'          => true,
                     'reservations'      => true,
@@ -69,6 +71,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'yearly_price'      => 1430,
                 'reservation_limit' => null,
                 'max_staff'         => null,
+                'ai_credits_limit'  => 5000,
                 'features'          => [
                     'insights'          => true,
                     'reservations'      => true,

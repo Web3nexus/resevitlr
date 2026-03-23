@@ -35,6 +35,7 @@ const defaultPlan = {
   yearly_price: '',
   reservation_limit: '',
   max_staff: '',
+  ai_credits_limit: '',
   features: { ...defaultFeatures },
   is_active: true,
 };
@@ -66,6 +67,7 @@ export default function PlanManagementView() {
     features: { ...defaultFeatures, ...(plan.features || {}) },
     reservation_limit: plan.reservation_limit ?? '',
     max_staff: plan.max_staff ?? '',
+    ai_credits_limit: plan.ai_credits_limit ?? '',
   });
 
   const handleSave = async (e) => {
@@ -76,6 +78,7 @@ export default function PlanManagementView() {
         ...editingPlan,
         reservation_limit: editingPlan.reservation_limit === '' ? null : parseInt(editingPlan.reservation_limit, 10),
         max_staff: editingPlan.max_staff === '' ? null : parseInt(editingPlan.max_staff, 10),
+        ai_credits_limit: editingPlan.ai_credits_limit === '' ? null : parseInt(editingPlan.ai_credits_limit, 10),
       };
       await api.post('/saas/plans', payload);
       setMessage({ type: 'success', text: 'Plan saved successfully!' });
@@ -177,6 +180,12 @@ export default function PlanManagementView() {
                   </div>
                   <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Staff Accounts</div>
                 </div>
+                <div className="bg-slate-900/50 rounded-xl p-3 text-center col-span-2">
+                  <div className="text-lg font-black text-blue-400">
+                    {plan.ai_credits_limit ?? <Infinity className="w-5 h-5 mx-auto text-emerald-400" />}
+                  </div>
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">Monthly AI Credits</div>
+                </div>
               </div>
 
               {/* Features */}
@@ -255,6 +264,12 @@ export default function PlanManagementView() {
                       <input type="number" min="0" value={editingPlan.max_staff} onChange={e => setEditingPlan(p => ({ ...p, max_staff: e.target.value }))}
                         placeholder="Leave blank for unlimited" className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-600 text-sm" />
                       <p className="text-[10px] text-slate-600 mt-1">Leave blank = ∞ unlimited</p>
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-sm font-medium text-slate-400 mb-1.5">Monthly AI Credits</label>
+                      <input type="number" min="0" value={editingPlan.ai_credits_limit} onChange={e => setEditingPlan(p => ({ ...p, ai_credits_limit: e.target.value }))}
+                        placeholder="e.g. 1000 (Leave blank for unlimited)" className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2.5 px-4 text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-600 text-sm" />
+                      <p className="text-[10px] text-slate-600 mt-1">Set to 0 to disable AI. Leave blank for unlimited.</p>
                     </div>
                   </div>
                 </div>

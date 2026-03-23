@@ -126,15 +126,44 @@ export default function BillingView() {
             </div>
             <div className="text-[10px] text-blue-200 mb-1">Billing Provider</div>
             <div className="font-bold text-sm capitalize">{status?.provider || 'System Internal'}</div>
+
+            {/* AI Credits Usage Indicator */}
+            <div className="mt-6 pt-6 border-t border-white/10">
+              <div className="flex justify-between items-end mb-2">
+                <div className="text-[10px] font-black text-blue-200 uppercase tracking-widest">AI Credit Usage</div>
+                <div className="text-xs font-bold text-white">{status?.ai_credits_used || 0} / {status?.ai_credits_limit || '∞'}</div>
+              </div>
+              <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-300 transition-all duration-500" 
+                  style={{ width: `${Math.min(((status?.ai_credits_used || 0) / (status?.ai_credits_limit || 1)) * 100, 100)}%` }}
+                />
+              </div>
+            </div>
           </div>
         </div>
+
+        {/* Upgrade Call to Action for Free Users */}
+        {(status?.plan_slug === 'free' || !status?.plan_slug) && (
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20">
+            <div className="mb-4 sm:mb-0">
+              <p className="text-sm font-bold text-blue-100 italic">"Your account is limited by the Free tier. Unlock high-performance AI and premium management tools."</p>
+            </div>
+            <button 
+              onClick={() => document.getElementById('plans-selection').scrollIntoView({ behavior: 'smooth' })}
+              className="px-6 py-3 bg-white text-blue-600 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-50 transition-colors shadow-lg"
+            >
+              Choose a Premium Plan
+            </button>
+          </div>
+        )}
         
         {/* Background Decorative Element */}
         <CreditCard className="absolute -bottom-10 -right-10 w-64 h-64 text-white/5 rotate-12" />
       </div>
 
       {/* Plan Selection */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div id="plans-selection" className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {(Array.isArray(plans) ? plans : []).map((plan) => (
           <div key={plan.id} className={`bg-white border-2 rounded-3xl p-8 flex flex-col transition-all group relative shadow-sm ${
             status?.plan_slug === plan.slug ? 'border-blue-500 bg-blue-50/50 shadow-md' : 'border-slate-200 hover:border-slate-300'
@@ -162,6 +191,11 @@ export default function BillingView() {
                     <span className="capitalize">{feature.replace(/_/g, ' ')}</span>
                   </li>
                 ))}
+                {/* AI Credits Feature Item */}
+                <li className="flex items-center gap-3 text-sm font-bold text-blue-600 pt-2 border-t border-slate-100 mt-2">
+                  <Zap className="w-4 h-4 text-blue-500 shrink-0" />
+                  <span>{plan.ai_credits_limit ? `${plan.ai_credits_limit.toLocaleString()} AI Credits/mo` : 'Unlimited AI Credits'}</span>
+                </li>
               </ul>
             </div>
 
