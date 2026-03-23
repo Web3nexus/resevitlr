@@ -89,6 +89,15 @@ class SaaSCMSSeeder extends Seeder
             'is_published' => true,
         ]);
 
+        SaaSDocumentation::create([
+            'title' => 'Account Management & Deletion',
+            'slug' => 'account-management-deletion',
+            'category' => 'Account Settings',
+            'order_index' => 3,
+            'content' => "# Managing Your Account\n\nYou can manage your name, email, and security settings in the **Account Settings** view.\n\n### Updating Your Email\n- **Super Admins**: Updating your email requires a verification code sent to the new address to ensure security.\n- **Tenant Users**: Once your email is verified, it becomes locked for security. Contact your administrator if you need a change.\n\n### Deleting Your Account\nIf you wish to permanently remove your access and data from the Resevit node:\n1. Navigate to **Account Settings**.\n2. Scroll to the bottom of the **Profile Information** tab.\n3. Click **Delete Account**.\n4. Confirm the permanent deletion in the secure modal.\n\n**Warning**: This action is irreversible and will immediately revoke all infrastructure tokens.",
+            'is_published' => true,
+        ]);
+
         // Seed Help Articles
         SaaSHelpArticle::create([
             'title' => 'How do I change my opening hours?',

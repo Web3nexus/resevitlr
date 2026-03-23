@@ -13,9 +13,20 @@ class AdminUserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Admin::role('super_admin')->get());
+        $user = $request->user();
+        
+        $query = Admin::role('super_admin');
+
+        // Developer Visibility Logic:
+        // 1. If current user is developer, they see themselves + all other admins.
+        // 2. If current user is NOT developer, they see all other admins EXCEPT developers.
+        if (!$user->is_developer) {
+            $query->where('is_developer', false);
+        }
+
+        return response()->json($query->get());
     }
 
     /**
@@ -38,8 +49,11 @@ class AdminUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'permissions' => $request->permissions ?? []
+            'permissions' => $request->permissions ?? [],
+            'is_developer' => false // Never allow creating developers via API
         ]);
+
+        $admin->assignRole('super_admin');
 
         return response()->json($admin, 201);
     }
@@ -86,12 +100,20 @@ class AdminUserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $admin = Admin::findOrFail($id);
         
-        // Prevent deleting the last admin or yourself if needed
-        // For now, just delete
+        // Prevent deleting developers
+        if ($admin->is_developer) {
+            return response()->json(['message' => 'Developer accounts cannot be deleted.'], 403);
+        }
+
+        // Prevent deleting yourself
+        if ($admin->id === $request->user()->id) {
+            return response()->json(['message' => 'You cannot delete your own account.'], 403);
+        }
+
         $admin->delete();
 
         return response()->json(null, 204);

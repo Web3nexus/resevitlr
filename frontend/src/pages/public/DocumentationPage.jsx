@@ -188,9 +188,12 @@ export default function DocumentationPage() {
                                 </div>
                             </motion.div>
                         ) : (
-                            <div className="py-20 text-center">
-                                <Loader2 className="w-10 h-10 text-slate-800 animate-spin mx-auto mb-4" />
-                                <p className="text-slate-500">Select a guide to begin reading.</p>
+                            <div className="py-20 text-center space-y-4">
+                                <Book className="w-16 h-16 text-slate-800 mx-auto opacity-20" />
+                                <div className="space-y-1">
+                                    <p className="text-white font-bold tracking-tight">No guides available yet</p>
+                                    <p className="text-slate-500 text-sm">Select a category from the sidebar or try a different search.</p>
+                                </div>
                             </div>
                         )}
                     </AnimatePresence>

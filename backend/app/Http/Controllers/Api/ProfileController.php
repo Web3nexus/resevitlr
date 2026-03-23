@@ -11,6 +11,9 @@ class ProfileController extends \App\Http\Controllers\Controller
     {
         $user = $request->user();
         $data = $user->toArray();
+        $data['email_verified_at'] = $user->email_verified_at;
+        $data['is_developer'] = $user->is_developer ?? false;
+        
         if ($user instanceof \App\Models\Admin) {
             $data['role'] = 'admin';
         } else {
@@ -197,5 +200,89 @@ class ProfileController extends \App\Http\Controllers\Controller
         ]);
 
         return response()->json(['message' => 'PIN set successfully.']);
+    }
+
+    /**
+     * Send OTP to the NEW email address for verification.
+     */
+    public function sendEmailOTP(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|unique:users,email|unique:admins,email',
+        ]);
+
+        $user = $request->user();
+        $otp = rand(100000, 999999);
+        
+        // Temporarily store OTP and new email in user record or cache
+        // Using columns on the model if they exist, else we might need a separate table
+        // For simplicity, let's assume we can use two_factor_code and store new email in a 'temp' session or similar
+        // Better to use Cache for OTP
+        \Illuminate\Support\Facades\Cache::put('email_otp_' . $user->id, [
+            'otp' => $otp,
+            'new_email' => $request->email
+        ], now()->addMinutes(10));
+
+        // Send Email (Mocking for now or using a generic mailer if available)
+        try {
+            \Illuminate\Support\Facades\Mail::raw("Your Resevit verification code is: {$otp}. This code is for updating your account email.", function ($message) use ($request) {
+                $message->to($request->email)
+                    ->subject('Verify Your New Email');
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to send verification email.'], 500);
+        }
+
+        return response()->json(['message' => 'Verification code sent to ' . $request->email]);
+    }
+
+    /**
+     * Verify OTP and update user email.
+     */
+    public function verifyEmailOTP(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string|size:6',
+        ]);
+
+        $user = $request->user();
+        $cached = \Illuminate\Support\Facades\Cache::get('email_otp_' . $user->id);
+
+        if (!$cached || $cached['otp'] != $request->code) {
+            return response()->json(['message' => 'Invalid or expired verification code.'], 400);
+        }
+
+        $user->update([
+            'email' => $cached['new_email'],
+            'email_verified_at' => now(),
+        ]);
+
+        \Illuminate\Support\Facades\Cache::forget('email_otp_' . $user->id);
+
+        return response()->json(['message' => 'Email updated and verified successfully.']);
+    }
+
+    /**
+     * Delete the user account.
+     */
+    public function destroy(\Illuminate\Http\Request $request)
+    {
+        $user = $request->user();
+        
+        // If it's the last super admin, prevent deletion
+        if ($user instanceof \App\Models\Admin) {
+            $adminCount = \App\Models\Admin::count();
+            if ($adminCount <= 1) {
+                return response()->json(['message' => 'Cannot delete the last administrator account.'], 403);
+            }
+        }
+
+        // Revoke all tokens
+        $user->tokens()->delete();
+        
+        // Delete the user record
+        $user->delete();
+
+        return response()->json(['message' => 'Account deleted successfully.']);
     }
 }

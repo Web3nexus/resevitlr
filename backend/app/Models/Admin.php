@@ -23,11 +23,13 @@ class Admin extends Authenticatable
         'login_pin',
         'two_factor_code',
         'two_factor_expires_at',
+        'is_developer',
     ];
 
     protected $casts = [
         'permissions' => 'json',
         'two_factor_expires_at' => 'datetime',
+        'is_developer' => 'boolean',
     ];
 
     protected $hidden = [

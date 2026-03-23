@@ -15,6 +15,7 @@ const AVAILABLE_PERMISSIONS = [
 export default function AdminManagementView() {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [saving, setSaving] = useState(false);
@@ -33,8 +34,12 @@ export default function AdminManagementView() {
   const fetchAdmins = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/saas/admins');
-      setAdmins(res.data);
+      const [adminsRes, profileRes] = await Promise.all([
+        api.get('/saas/admins'),
+        api.get('/profile')
+      ]);
+      setAdmins(adminsRes.data);
+      setCurrentUser(profileRes.data);
     } catch (err) {
       console.error("Failed to fetch admins", err);
     } finally {
@@ -155,18 +160,22 @@ export default function AdminManagementView() {
         ) : filteredAdmins.map(admin => (
           <div key={admin.id} className="bg-slate-800/30 border border-slate-700/50 rounded-3xl p-6 hover:bg-slate-800/50 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button 
-                  onClick={() => handleOpenModal(admin)}
-                  className="p-2 hover:bg-blue-500/10 text-slate-400 hover:text-blue-400 rounded-lg transition-colors"
-                >
-                    <Activity className="w-4 h-4" />
-                </button>
-                <button 
-                  onClick={() => confirmDelete(admin.id)}
-                  className="p-2 hover:bg-red-500/10 text-slate-400 hover:text-red-400 rounded-lg transition-colors"
-                >
-                    <Trash2 className="w-4 h-4" />
-                </button>
+                {(!admin.is_developer || currentUser?.is_developer) && (
+                  <button 
+                    onClick={() => handleOpenModal(admin)}
+                    className="p-2 hover:bg-blue-500/10 text-slate-400 hover:text-blue-400 rounded-lg transition-colors"
+                  >
+                      <Activity className="w-4 h-4" />
+                  </button>
+                )}
+                {!admin.is_developer && admin.id !== currentUser?.id && (
+                  <button 
+                    onClick={() => confirmDelete(admin.id)}
+                    className="p-2 hover:bg-red-500/10 text-slate-400 hover:text-red-400 rounded-lg transition-colors"
+                  >
+                      <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
             </div>
 
             <div className="flex items-center gap-4 mb-6">
@@ -174,7 +183,14 @@ export default function AdminManagementView() {
                     <Shield className={`w-6 h-6 ${admin.permissions?.length === AVAILABLE_PERMISSIONS.length ? 'text-emerald-400' : 'text-blue-400'}`} />
                 </div>
                 <div>
-                    <h3 className="font-bold text-white">{admin.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-white">{admin.name}</h3>
+                      {admin.is_developer && (
+                        <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 text-[8px] font-black uppercase tracking-tighter border border-amber-500/20">
+                          Developer Control
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-500">{admin.email}</p>
                 </div>
             </div>

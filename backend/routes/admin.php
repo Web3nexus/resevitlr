@@ -85,6 +85,14 @@ Route::middleware(['auth:sanctum'])->prefix('saas')->group(function () {
     Route::post('/translations', [TranslationController::class, 'store']);
     Route::put('/translations/{id}', [TranslationController::class, 'update']);
     Route::delete('/translations/{id}', [TranslationController::class, 'destroy']);
+
+    // Profile Management (Central)
+    Route::get('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'index']);
+    Route::post('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'update']);
+    Route::post('/profile/password', [\App\Http\Controllers\Api\ProfileController::class, 'updatePassword']);
+    Route::post('/profile/email-otp', [\App\Http\Controllers\Api\ProfileController::class, 'sendEmailOTP']);
+    Route::post('/profile/verify-email', [\App\Http\Controllers\Api\ProfileController::class, 'verifyEmailOTP']);
+    Route::delete('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'destroy']);
 });
 
 // Tenants list for registration etc.

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { User, Shield, Bell, Globe, Eye, EyeOff, Save, Check, Loader2, AlertTriangle } from 'lucide-react'
 import api from '../services/api'
 import centralApi from '../services/centralApi'
+import ConfirmationModal from '../components/common/ConfirmationModal'
 import { useTranslation } from 'react-i18next'
 
 const TABS = [
@@ -32,11 +33,24 @@ export default function AccountSettingsView() {
   const [setupMode, setSetupMode] = useState(null); // 'totp' or 'pin'
   const [setupData, setSetupData] = useState({ secret: '', qr_code: '', code: '', pin: '', pin_confirmation: '' });
 
+  const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [verifying, setVerifying] = useState(false);
+  const [originalEmail, setOriginalEmail] = useState('');
+
   useEffect(() => {
     const fetchProfile = async () => {
         try {
             const res = await activeApi.get('/profile');
-            setProfile({ name: res.data.name, email: res.data.email });
+            setProfile({ 
+              name: res.data.name, 
+              email: res.data.email,
+              email_verified_at: res.data.email_verified_at,
+              is_developer: res.data.is_developer
+            });
+            setOriginalEmail(res.data.email);
             setTwoFactorMethod(res.data.two_factor_method || 'none');
         } catch (err) {
             console.error("Profile fetch failed", err);
@@ -124,15 +138,62 @@ export default function AccountSettingsView() {
 
   const handleUpdateProfile = async (e) => {
     if (e) e.preventDefault();
+    
+    // If Admin is changing email, trigger OTP flow
+    if (isSaaS && profile.email !== originalEmail) {
+        try {
+            setSaving(true);
+            await centralApi.post('/profile/email-otp', { email: profile.email });
+            setIsVerifyModalOpen(true);
+            setNewEmail(profile.email);
+            return;
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to initiate email update.");
+            return;
+        } finally {
+            setSaving(false);
+        }
+    }
+
     setSaving(true);
     setError(null);
     try {
         await activeApi.post('/profile', profile);
         setSaved(true);
+        setOriginalEmail(profile.email);
         setTimeout(() => setSaved(false), 3000);
     } catch (err) {
         setError(err.response?.data?.message || "Failed to update profile.");
     } finally {
+        setSaving(false);
+    }
+  };
+
+  const handleVerifyEmail = async () => {
+    setVerifying(true);
+    setError(null);
+    try {
+        await centralApi.post('/profile/verify-email', { code: verificationCode });
+        setIsVerifyModalOpen(false);
+        setOriginalEmail(newEmail);
+        setProfile(prev => ({ ...prev, email: newEmail, email_verified_at: new Date().toISOString() }));
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+        setError(err.response?.data?.message || "Invalid verification code.");
+    } finally {
+        setVerifying(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setSaving(true);
+    try {
+        await activeApi.delete('/profile');
+        localStorage.clear();
+        window.location.href = isSaaS ? '/securegate' : '/';
+    } catch (err) {
+        setError(err.response?.data?.message || "Failed to delete account.");
         setSaving(false);
     }
   };
@@ -226,14 +287,21 @@ export default function AccountSettingsView() {
           {/* ── PROFILE TAB ── */}
           {activeTab === 'profile' && (
             <div className="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm space-y-8 animate-in fade-in duration-300">
-              <div className="flex items-center gap-6">
-                <div className="h-20 w-20 rounded-[28px] bg-blue-600 flex items-center justify-center text-white font-black text-3xl shadow-2xl shadow-blue-500/20">
-                    {profile.name?.charAt(0) || 'U'}
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-[32px] bg-white text-slate-800 flex items-center justify-center shadow-2xl relative">
+                  <User size={36} />
                 </div>
                 <div>
-                  <div className="font-black text-slate-900 uppercase">{profile.name || 'User Profile'}</div>
-                  <div className="text-[10px] text-slate-400 font-bold tracking-tight">Authenticated · {isSaaS ? 'Super Admin' : 'Business Owner'}</div>
-                  <button className="mt-2 bg-white border-2 border-slate-100 px-4 py-1.5 rounded-xl font-black text-[9px] uppercase tracking-widest hover:border-blue-600 transition-all">Change Avatar</button>
+                    <div className="flex items-center gap-2">
+                        <h2 className="text-2xl font-black text-slate-900 tracking-tight leading-none">{profile.name}</h2>
+                        {profile.is_developer && (
+                            <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 text-[9px] font-black uppercase tracking-widest border border-amber-500/30">
+                                Developer Control
+                            </span>
+                        )}
+                    </div>
+                    <p className="text-slate-400 font-bold text-sm tracking-tight mt-1 opacity-80">{profile.email}</p>
+                    <button className="mt-2 bg-white border-2 border-slate-100 px-4 py-1.5 rounded-xl font-black text-[9px] uppercase tracking-widest hover:border-blue-600 transition-all">Change Avatar</button>
                 </div>
               </div>
 
@@ -253,12 +321,28 @@ export default function AccountSettingsView() {
                         type="email" 
                         value={profile.email} 
                         onChange={e => setProfile({...profile, email: e.target.value})}
-                        className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 font-bold text-slate-800 text-sm outline-none focus:border-blue-600 transition-all" 
+                        disabled={!isSaaS && profile.email_verified_at}
+                        className={`w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-3 font-bold text-slate-800 text-sm outline-none focus:border-blue-600 transition-all ${
+                            !isSaaS && profile.email_verified_at ? 'opacity-60 cursor-not-allowed' : ''
+                        }`} 
                     />
+                    {!isSaaS && profile.email_verified_at && (
+                        <p className="text-[9px] text-emerald-500 font-bold uppercase tracking-widest ml-1 flex items-center gap-1">
+                            <Check size={10} /> Verified & Secured
+                        </p>
+                    )}
                 </div>
               </div>
 
-              <SaveButton saving={saving} saved={saved} onClick={handleUpdateProfile} />
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                <SaveButton saving={saving} saved={saved} onClick={handleUpdateProfile} />
+                <button 
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  className="text-[10px] font-black text-red-400 uppercase tracking-widest hover:text-red-600 transition-colors"
+                >
+                    Delete Account
+                </button>
+              </div>
             </div>
           )}
 
@@ -537,6 +621,59 @@ export default function AccountSettingsView() {
           )}
         </div>
       </div>
+
+      {/* Verify Email Modal */}
+      {isVerifyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" />
+          <div className="relative bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl space-y-6">
+            <div className="text-center space-y-2">
+              <div className="h-16 w-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Globe size={32} />
+              </div>
+              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Verify New Email</h3>
+              <p className="text-xs text-slate-500 font-bold">We sent a 6-digit verification code to <span className="text-slate-900">{newEmail}</span></p>
+            </div>
+
+            <div className="space-y-4">
+              <input 
+                type="text" 
+                maxLength={6}
+                value={verificationCode}
+                onChange={e => setVerificationCode(e.target.value)}
+                placeholder="000000"
+                className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-4 text-center text-2xl font-black tracking-[0.5em] text-slate-800 outline-none focus:border-blue-600 transition-all"
+              />
+              <button 
+                onClick={handleVerifyEmail}
+                disabled={verifying || verificationCode.length !== 6}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-blue-500/20 disabled:opacity-50 transition-all"
+              >
+                {verifying ? 'Verifying Code...' : 'Update Email Address'}
+              </button>
+              <button 
+                onClick={() => {
+                  setIsVerifyModalOpen(false);
+                  setProfile(prev => ({ ...prev, email: originalEmail }));
+                }}
+                className="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
+              >
+                Cancel and keep original
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ConfirmationModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteAccount}
+        title="Permanently Delete Account?"
+        message="This action is irreversible. All your personal data, settings, and infrastructure access will be permanently purged from the node. Are you absolutely sure?"
+        confirmText="Confirm Deception"
+        type="danger"
+      />
     </div>
   )
 }
