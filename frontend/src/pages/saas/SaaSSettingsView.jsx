@@ -871,25 +871,33 @@ export default function SaaSSettingsView() {
                         <div className="mb-6">
                             <label className="block text-xs font-medium text-slate-500 mb-3 uppercase">Plan Features</label>
                             <div className="grid grid-cols-2 gap-2">
-                                {SYSTEM_FEATURES.map(feat => (
-                                    <label key={feat} className="flex items-center gap-2 cursor-pointer group">
-                                        <input 
-                                            type="checkbox"
-                                            checked={editingPlan.features?.includes(feat)}
-                                            onChange={e => {
-                                                const news = e.target.checked 
-                                                    ? [...(editingPlan.features || []), feat]
-                                                    : (editingPlan.features || []).filter(f => f !== feat);
-                                                setEditingPlan({...editingPlan, features: news});
-                                            }}
-                                            className="hidden"
-                                        />
-                                        <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${editingPlan.features?.includes(feat) ? 'bg-blue-600 border-blue-600' : 'bg-slate-950 border-slate-800'}`}>
-                                            {editingPlan.features?.includes(feat) && <CheckCircle className="w-3 h-3 text-white" />}
-                                        </div>
-                                        <span className="text-xs text-slate-400 group-hover:text-white transition-colors">{feat.replace(/_/g, ' ')}</span>
-                                    </label>
-                                ))}
+                                {SYSTEM_FEATURES.map(feat => {
+                                    // Support both old array format and new object format
+                                    const features = editingPlan.features;
+                                    const isEnabled = Array.isArray(features)
+                                        ? features.includes(feat)
+                                        : !!(features?.[feat]);
+                                    return (
+                                        <label key={feat} className="flex items-center gap-2 cursor-pointer group">
+                                            <input
+                                                type="checkbox"
+                                                checked={isEnabled}
+                                                onChange={e => {
+                                                    // Always save in new object format
+                                                    const currentFeatures = Array.isArray(features)
+                                                        ? Object.fromEntries(features.map(f => [f, true]))
+                                                        : (features || {});
+                                                    setEditingPlan({...editingPlan, features: { ...currentFeatures, [feat]: e.target.checked }});
+                                                }}
+                                                className="hidden"
+                                            />
+                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isEnabled ? 'bg-blue-600 border-blue-600' : 'bg-slate-950 border-slate-800'}`}>
+                                                {isEnabled && <CheckCircle className="w-3 h-3 text-white" />}
+                                            </div>
+                                            <span className="text-xs text-slate-400 group-hover:text-white transition-colors">{feat.replace(/_/g, ' ')}</span>
+                                        </label>
+                                    );
+                                })}
                             </div>
                         </div>
 
