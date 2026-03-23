@@ -111,7 +111,7 @@ export function POSView() {
          </div>
 
          <div className="flex-1 overflow-y-auto pr-2 grid grid-cols-2 lg:grid-cols-4 gap-4 pb-4">
-            {filteredItems.map(item => (
+            {(Array.isArray(filteredItems) ? filteredItems : []).map(item => (
               <button 
                 key={item.id}
                 onClick={() => addToCart(item)}
@@ -154,7 +154,7 @@ export function POSView() {
               onChange={(e) => setSelectedTable(e.target.value)}
               className="bg-slate-100 text-slate-800 font-bold px-3 py-1.5 rounded-lg text-xs border-transparent focus:ring-0 cursor-pointer"
             >
-              {tables.map(t => (
+              {(Array.isArray(tables) ? tables : []).map(t => (
                 <option key={t.id} value={t.id}>Table {t.table_number}</option>
               ))}
             </select>

@@ -127,7 +127,7 @@ export function MenuView() {
              </div>
            ) : activeTab === 'categories' ? (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categories.length > 0 ? categories.map(cat => (
+                {Array.isArray(categories) && categories.length > 0 ? categories.map(cat => (
                   <div key={cat.id} className="p-5 border border-slate-100 rounded-xl bg-slate-50/50 hover:border-blue-200 hover:shadow-md transition-all group">
                     <div className="flex justify-between items-start mb-4">
                       <div className="bg-white p-3 rounded-lg border border-slate-100 shadow-sm text-blue-600">
@@ -165,7 +165,7 @@ export function MenuView() {
                       </tr>
                    </thead>
                    <tbody className="divide-y divide-slate-100">
-                      {allItems.length > 0 ? allItems.map(item => (
+                      {Array.isArray(allItems) && allItems.length > 0 ? allItems.map(item => (
                         <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
                            <td className="px-6 py-4">
                               <div className="font-bold text-slate-800">{item.name}</div>
@@ -238,7 +238,7 @@ export function MenuView() {
                         <label className="block text-xs font-bold text-slate-500 mb-1">Category</label>
                         <select required value={newItem.menu_category_id} onChange={e => setNewItem({...newItem, menu_category_id: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 outline-none">
                            <option value="">Select Category</option>
-                           {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                           {(Array.isArray(categories) ? categories : []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
                      </div>
                  </div>

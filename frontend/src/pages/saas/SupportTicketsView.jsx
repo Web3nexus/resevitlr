@@ -99,7 +99,7 @@ export default function SupportTicketsView() {
              <p className="text-slate-500 font-medium">No tickets found.</p>
           </div>
         ) : (
-          filteredTickets.map(ticket => (
+          (Array.isArray(filteredTickets) ? filteredTickets : []).map(ticket => (
             <div 
               key={ticket.id} 
               className="group bg-slate-800/30 border border-slate-700/50 rounded-2xl p-6 hover:border-blue-500/30 transition-all cursor-pointer"

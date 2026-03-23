@@ -112,7 +112,7 @@ export default function EmailManagementView() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {template.variables?.map(v => (
+              {(Array.isArray(template.variables) ? template.variables : []).map(v => (
                 <span key={v} className="px-2 py-0.5 bg-slate-800 text-slate-400 rounded text-[10px] font-mono">
                   {'{'}{v}{'}'}
                 </span>
@@ -190,13 +190,13 @@ export default function EmailManagementView() {
                     <button 
                       key={v}
                       onClick={() => {
-                        const news = editingTemplate.variables?.includes(v)
+                        const news = (Array.isArray(editingTemplate.variables) && editingTemplate.variables.includes(v))
                           ? editingTemplate.variables.filter(x => x !== v)
-                          : [...(editingTemplate.variables || []), v];
+                          : [...(Array.isArray(editingTemplate.variables) ? editingTemplate.variables : []), v];
                         setEditingTemplate({...editingTemplate, variables: news});
                       }}
                       className={`px-3 py-1 rounded-lg text-xs font-mono transition-colors border ${
-                        editingTemplate.variables?.includes(v)
+                        (Array.isArray(editingTemplate.variables) && editingTemplate.variables.includes(v))
                           ? 'bg-blue-600 border-blue-600 text-white'
                           : 'bg-slate-950 border-slate-800 text-slate-500 hover:border-slate-700'
                       }`}

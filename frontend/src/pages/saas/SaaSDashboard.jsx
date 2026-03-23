@@ -172,7 +172,7 @@ export default function SaaSDashboard() {
             </div>
 
             <div className="space-y-4">
-               {health?.services?.map(service => (
+               {(Array.isArray(health?.services) ? health.services : []).map(service => (
                   <div key={service.name} className="flex items-center justify-between p-4 rounded-xl bg-slate-900/50 border border-slate-800/50">
                      <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${
@@ -214,7 +214,7 @@ export default function SaaSDashboard() {
                      <p className="text-slate-600 text-xs">All support requests have been resolved.</p>
                   </div>
                ) : (
-                  tickets.map(ticket => (
+                  (Array.isArray(tickets) ? tickets : []).map(ticket => (
                      <div key={ticket.id} className="p-4 rounded-xl bg-slate-900/50 border border-slate-800/50 hover:border-blue-500/30 transition-colors group cursor-pointer">
                         <div className="flex items-center justify-between mb-2">
                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded ${

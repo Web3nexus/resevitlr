@@ -92,7 +92,7 @@ export default function SaaSSubscriptionsView() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700/50 text-slate-300">
-             {recent_tenants.length > 0 ? recent_tenants.map((tenant) => (
+             {(Array.isArray(recent_tenants) && recent_tenants.length > 0) ? recent_tenants.map((tenant) => (
               <tr key={tenant.id} className="hover:bg-slate-800/30">
                   <td className="p-4 font-medium text-blue-400">{tenant.business_name}</td>
                   <td className="p-4">{tenant.owner_email}</td>

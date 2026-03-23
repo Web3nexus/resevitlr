@@ -501,7 +501,7 @@ export default function AccountSettingsView() {
                        <Loader2 className="animate-spin w-3 h-3" /> Fetching active infrastructure tokens...
                     </div>
                   ) : sessions.length > 0 ? (
-                    sessions.map(s => (
+                    (Array.isArray(sessions) ? sessions : []).map(s => (
                       <div key={s.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
                         <div className="flex items-center gap-4">
                           <div className="h-10 w-10 bg-white rounded-xl flex items-center justify-center text-blue-600 border border-slate-100">

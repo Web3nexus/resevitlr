@@ -206,7 +206,7 @@ export default function TenantManagementView() {
         <div className="flex items-center gap-2">
             <select className="bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-xl py-2 px-4 outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="all">All Plans</option>
-                {plans?.map(p => (
+                {(Array.isArray(plans) ? plans : []).map(p => (
                   <option key={p.id} value={p.slug}>{p.name} (${p.monthly_price})</option>
                 ))}
             </select>
