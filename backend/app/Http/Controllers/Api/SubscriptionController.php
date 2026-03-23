@@ -32,6 +32,8 @@ class SubscriptionController extends Controller
         $tenant = Tenant::find($user->tenant_id);
         $plan = SubscriptionPlan::where('slug', $tenant->plan)->first();
 
+        $salesEmail = \App\Models\SaaSSetting::where('key', 'sales_email')->first()?->value ?? 'sales@resevit.com';
+
         return response()->json([
             'plan_name' => $plan ? $plan->name : 'Free',
             'plan_slug' => $tenant->plan,
@@ -39,6 +41,7 @@ class SubscriptionController extends Controller
             'provider' => $tenant->subscription_provider,
             'ends_at' => $tenant->subscription_ends_at,
             'country' => $tenant->country,
+            'sales_email' => $salesEmail,
         ]);
     }
 

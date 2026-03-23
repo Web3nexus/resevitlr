@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, Building2, CreditCard, MessageSquare, Mail, Shield, BookOpen, Globe, Settings, Users, LogOut, Bell, AlertTriangle, CheckCircle } from 'lucide-react';
+import { LayoutDashboard, Building2, CreditCard, MessageSquare, Mail, Shield, BookOpen, Globe, Settings, Users, LogOut, Bell, AlertTriangle, CheckCircle, Menu, X } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 import { useInactivityLogout } from '../hooks/useInactivityLogout';
 import { useBranding } from '../hooks/useBranding';
@@ -11,6 +11,8 @@ export function SaaSAdminLayout() {
   const location = useLocation();
   const { t } = useTranslation();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications(20000);
   const settings = useBranding();
 
@@ -32,23 +34,40 @@ export function SaaSAdminLayout() {
 
   return (
     <div className="min-h-screen bg-[#0f172a] flex text-[#94a3b8]">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-foreground bg-[#020617] flex flex-col h-screen sticky top-0">
-        <Link to="/securegate/dashboard" className="p-6 border-b border-foreground flex items-center gap-3 hover:bg-[#0f172a] transition-colors">
-          {settings.platform_logo_url ? (
-             <img src={settings.platform_logo_url} alt={settings.platform_name} className="h-8 w-auto object-contain" />
-          ) : (
-            <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center ring-2 ring-primary-600/20">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
-          )}
-          <div>
-            <h1 className="text-white font-bold tracking-tight">{settings.platform_name}</h1>
-            <p className="text-[10px] text-[#64748b] uppercase tracking-widest font-semibold">Super Admin Control</p>
-          </div>
-        </Link>
+      {/* Mobile Sidebar Overlay */}
+      {isMobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden" 
+          onClick={() => setIsMobileSidebarOpen(false)} 
+        />
+      )}
 
-        <nav className="flex-1 p-4 space-y-1">
+      {/* Sidebar */}
+      <aside className={`border-r border-foreground bg-[#020617] flex flex-col h-screen fixed lg:sticky top-0 z-50 transition-all duration-300 ${
+        isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      } ${isSidebarCollapsed ? 'w-20' : 'w-64'}`}>
+        <div className={`p-4 md:p-6 border-b border-foreground flex items-center justify-between lg:justify-center hover:bg-[#0f172a] transition-colors`}>
+           <Link to="/securegate/dashboard" className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`} onClick={() => setIsMobileSidebarOpen(false)}>
+              {settings.platform_logo_url ? (
+                 <img src={settings.platform_logo_url} alt={settings.platform_name} className={`h-8 w-auto object-contain ${isSidebarCollapsed ? 'mx-auto' : ''}`} />
+              ) : (
+                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center ring-2 ring-blue-600/20 shrink-0">
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
+              )}
+              {!isSidebarCollapsed && (
+                <div className="overflow-hidden">
+                  <h1 className="text-white font-bold tracking-tight truncate">{settings.platform_name}</h1>
+                  <p className="text-[10px] text-[#64748b] uppercase tracking-widest font-semibold shrink-0">Super Admin Control</p>
+                </div>
+              )}
+           </Link>
+           <button className="lg:hidden text-slate-400 hover:text-white shrink-0" onClick={() => setIsMobileSidebarOpen(false)}>
+              <X size={20} />
+           </button>
+        </div>
+
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto no-scrollbar">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -56,36 +75,46 @@ export function SaaSAdminLayout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${
+                onClick={() => setIsMobileSidebarOpen(false)}
+                title={item.name}
+                className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} rounded-xl transition-all overflow-hidden ${
                   isActive 
                     ? 'bg-blue-600/10 text-blue-400 font-medium' 
                     : 'hover:bg-slate-800/50 hover:text-white'
                 }`}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
-                {item.name}
+                <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-blue-400' : 'text-slate-500'}`} />
+                {!isSidebarCollapsed && <span className="truncate">{item.name}</span>}
               </Link>
             );
           })}
         </nav>
 
-        <div className="p-4 border-t border-slate-800">
-          <Link to="/securegate" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/10 hover:text-red-400 transition-colors text-slate-400">
-            <LogOut className="w-5 h-5" />
-            {t('auth.logout')}
+        <div className={`p-4 border-t border-slate-800 flex ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>
+          <Link to="/securegate" className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3 py-2.5'} rounded-xl hover:bg-red-500/10 hover:text-red-400 transition-colors text-slate-400 w-full`} title={t('auth.logout')}>
+            <LogOut className="w-5 h-5 shrink-0" />
+            {!isSidebarCollapsed && <span className="truncate">{t('auth.logout')}</span>}
           </Link>
         </div>
       </aside>
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
-        <header className="h-16 border-b-2 border-slate-800 bg-slate-900/50 backdrop-blur-xl flex items-center justify-between px-8 sticky top-0 z-10 border-b-blue-500/50">
-            <div className="flex flex-col">
-                <h2 className="text-lg font-semibold text-white leading-none">
-                   {navItems.find(i => i.path === location.pathname)?.name || 'Control Panel'}
-                </h2>
-                <div className="flex items-center gap-2 mt-1">
-                    <span className="text-[8px] font-black bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded uppercase tracking-widest border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]">System Infrastructure</span>
+        <header className="h-16 border-b-2 border-slate-800 bg-slate-900/50 backdrop-blur-xl flex items-center justify-between px-4 md:px-8 sticky top-0 z-10 border-b-blue-500/50">
+            <div className="flex items-center gap-4">
+                <button className="lg:hidden p-2 text-slate-500 hover:bg-slate-800 rounded-lg transition-colors" onClick={() => setIsMobileSidebarOpen(true)}>
+                  <Menu size={24} />
+                </button>
+                <button className="hidden lg:block p-2 text-slate-500 hover:bg-slate-800 rounded-lg transition-colors" onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}>
+                  <Menu size={24} />
+                </button>
+                <div className="flex flex-col">
+                    <h2 className="text-lg font-semibold text-white leading-none">
+                       {navItems.find(i => i.path === location.pathname)?.name || 'Control Panel'}
+                    </h2>
+                    <div className="flex items-center gap-2 mt-1">
+                        <span className="text-[8px] font-black bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded uppercase tracking-widest border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]">System Infrastructure</span>
+                    </div>
                 </div>
             </div>
             <div className="flex items-center gap-4">

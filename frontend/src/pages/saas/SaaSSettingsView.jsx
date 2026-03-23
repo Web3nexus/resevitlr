@@ -60,6 +60,7 @@ export default function SaaSSettingsView() {
     platform_favicon_url: '',
     turnstile_site_key: '',
     turnstile_secret_key: '',
+    sales_email: '',
   });
   const [plans, setPlans] = useState([]);
   const [editingPlan, setEditingPlan] = useState(null);
@@ -1269,6 +1270,16 @@ export default function SaaSSettingsView() {
                           value={settings.facebook_url || ''} 
                           onChange={e => setSettings({...settings, facebook_url: e.target.value})}
                           placeholder="https://facebook.com/resevit"
+                          className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl py-2 px-4 focus:ring-2 focus:ring-blue-500 outline-none" 
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-2">Contact Sales Email</label>
+                        <input 
+                          type="email" 
+                          value={settings.sales_email || ''} 
+                          onChange={e => setSettings({...settings, sales_email: e.target.value})}
+                          placeholder="sales@resevit.com"
                           className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl py-2 px-4 focus:ring-2 focus:ring-blue-500 outline-none" 
                         />
                     </div>

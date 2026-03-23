@@ -194,9 +194,12 @@ export default function BillingView() {
             <h3 className="text-lg font-bold text-slate-900">Enterprise Flex</h3>
             <p className="text-slate-500 text-sm mt-1">Need a specialized setup for 50+ locations?</p>
           </div>
-          <button className="text-blue-400 font-bold text-xs uppercase tracking-widest hover:text-blue-300 transition-colors">
+          <a 
+            href={`mailto:${status?.sales_email || 'sales@resevit.com'}?subject=Enterprise%20Flex%20Inquiry`}
+            className="text-blue-400 font-bold text-xs uppercase tracking-widest hover:text-blue-300 transition-colors"
+          >
             Contact Sales Team
-          </button>
+          </a>
         </div>
       </div>
     </div>
