@@ -166,7 +166,12 @@ class AuthController extends Controller
                     \Illuminate\Support\Facades\Log::error("Failed to delete partially created tenant: " . $deleteEx->getMessage());
                 }
             }
-            return response()->json(['message' => 'Registration failed: ' . $e->getMessage()], 500);
+            return response()->json([
+                'message' => 'Registration failed: ' . $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => collect($e->getTrace())->take(5)->toArray()
+            ], 500);
         }
     }
 
