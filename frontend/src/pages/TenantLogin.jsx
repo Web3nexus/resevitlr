@@ -38,7 +38,7 @@ export default function TenantLogin() {
 
     if (domain) {
       localStorage.setItem('tenant_domain', domain);
-      api.defaults.baseURL = `http://${domain}/api`;
+      api.defaults.baseURL = protocol + '//' + domain + '/tenant-api';
     }
   }, [location]);
 
@@ -66,7 +66,7 @@ export default function TenantLogin() {
       // Use the domain param if provided, otherwise fall back to the current subdomain
       const targetDomain = domain || window.location.hostname;
       const protocol = window.location.protocol; // Respect http: or https:
-      api.defaults.baseURL = `${protocol}//${targetDomain}/api`;
+      api.defaults.baseURL = `${protocol}//${targetDomain}/tenant-api`;
       
       // POST to the dedicated token-based login endpoint
       const { data } = await api.post('/login/token', { token });
