@@ -33,7 +33,7 @@ export default function TenantLogin() {
 
     if (token) {
         setIsAutoLogging(true);
-        handleAutoLogin(token, domain);
+        handleAutoLogin(token, domain, impersonate);
     } else {
         fetchBusinessInfo();
     }
@@ -63,7 +63,7 @@ export default function TenantLogin() {
     }
   };
 
-  const handleAutoLogin = async (token, domain) => {
+  const handleAutoLogin = async (token, domain, impersonate) => {
     setIsLoading(true);
     try {
       // Use the domain param if provided, otherwise fall back to the current subdomain
@@ -79,12 +79,18 @@ export default function TenantLogin() {
         localStorage.setItem('token', token);
         localStorage.setItem('auth_user', JSON.stringify(data.user));
         localStorage.setItem('tenant_domain', targetDomain);
-        localStorage.setItem('is_impersonating', 'true');
+        
+        if (impersonate === 'true' || impersonate === '1') {
+            localStorage.setItem('is_impersonating', 'true');
+            if (setIsImpersonating) setIsImpersonating(true);
+        } else {
+            localStorage.removeItem('is_impersonating');
+            if (setIsImpersonating) setIsImpersonating(false);
+        }
         
         // Update global auth context immediately
         api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         if (setUser) setUser(data.user);
-        if (setIsImpersonating) setIsImpersonating(true);
         
         navigate('/dashboard');
       } else {
