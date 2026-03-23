@@ -71,79 +71,20 @@ export function DashboardLayout() {
             </button>
           </div>
           <nav className="space-y-1">
-            <Link to="/dashboard" className={navItemClass('/dashboard')} title={t('dashboard.insights')} onClick={() => setIsMobileSidebarOpen(false)}>
-              <LayoutDashboard size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.insights')}</span>}
-            </Link>
-            <Link to="/dashboard/reservations" className={navItemClass('/dashboard/reservations')} title={t('dashboard.reservations')} onClick={() => setIsMobileSidebarOpen(false)}>
-              <Calendar size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.reservations')}</span>}
-            </Link>
-            
-            {(user?.role === 'owner' || user?.role === 'restaurant_owner') && hasFeature('social_integration') && (
-              <Link to="/dashboard/messages" className={navItemClass('/dashboard/messages')} title={t('dashboard.unifiedChat')} onClick={() => setIsMobileSidebarOpen(false)}>
-                <MessageSquare size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.unifiedChat')}</span>}
-              </Link>
-            )}
-
-            <Link to="/dashboard/pos" className={navItemClass('/dashboard/pos')} title={t('dashboard.posTerminal')} onClick={() => setIsMobileSidebarOpen(false)}>
-              <Component size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.posTerminal')}</span>}
-            </Link>
-            <Link to="/dashboard/menu" className={navItemClass('/dashboard/menu')} title={t('dashboard.menuBuilder')} onClick={() => setIsMobileSidebarOpen(false)}>
-              <Utensils size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.menuBuilder')}</span>}
-            </Link>
-            <Link to="/dashboard/tables" className={navItemClass('/dashboard/tables')} title={t('dashboard.floorPlan')} onClick={() => setIsMobileSidebarOpen(false)}>
-              <Table size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.floorPlan')}</span>}
-            </Link>
-            
-            {(user?.role === 'owner' || user?.role === 'restaurant_owner') && (
-              <>
-                <Link to="/dashboard/staff" className={navItemClass('/dashboard/staff')} title={t('dashboard.staffProfiles')} onClick={() => setIsMobileSidebarOpen(false)}>
-                  <Users size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.staffProfiles')}</span>}
-                </Link>
-                
-                {hasFeature('financial_reports') ? (
-                  <Link to="/dashboard/financials" className={navItemClass('/dashboard/financials')} title={t('dashboard.financials')} onClick={() => setIsMobileSidebarOpen(false)}>
-                    <DollarSign size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.financials')}</span>}
-                  </Link>
-                ) : (
-                  <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'gap-3 p-3'} rounded-lg text-slate-600 cursor-not-allowed opacity-50 grayscale`} title={t('dashboard.financials')}>
-                    <DollarSign size={18} className="flex-shrink-0" /> 
-                    {!isSidebarCollapsed && (
-                      <div className="flex w-full items-center">
-                        <span className="truncate">{t('dashboard.financials')}</span>
-                        <span className="ml-auto text-[9px] bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded font-bold">PRO</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                <Link to="/dashboard/billing" className={navItemClass('/dashboard/billing')} title={t('dashboard.billingPlan') || 'Billing & Plan'} onClick={() => setIsMobileSidebarOpen(false)}>
-                  <CreditCard size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.billingPlan') || 'Billing & Plan'}</span>}
-                </Link>
-                
-                {hasFeature('ai_automation') ? (
-                  <Link to="/dashboard/automation" className={navItemClass('/dashboard/automation')} title={t('dashboard.aiCommand')} onClick={() => setIsMobileSidebarOpen(false)}>
-                    <Bot size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.aiCommand')}</span>}
-                  </Link>
-                ) : (
-                  <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center p-3' : 'gap-3 p-3'} rounded-lg text-slate-600 cursor-not-allowed opacity-50 grayscale`} title={t('dashboard.aiCommand')}>
-                    <Bot size={18} className="flex-shrink-0" /> 
-                    {!isSidebarCollapsed && (
-                      <div className="flex w-full items-center">
-                        <span className="truncate">{t('dashboard.aiCommand')}</span>
-                        <span className="ml-auto text-[9px] bg-amber-500/20 text-amber-500 px-1.5 py-0.5 rounded font-bold">PRO+</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                <Link to="/dashboard/settings" className={navItemClass('/dashboard/settings')} title={t('dashboard.configuration')} onClick={() => setIsMobileSidebarOpen(false)}>
-                  <Settings size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.configuration')}</span>}
-                </Link>
-                <Link to="/dashboard/onboarding" className={navItemClass('/dashboard/onboarding')} title={t('dashboard.provisioning')} onClick={() => setIsMobileSidebarOpen(false)}>
-                  <Plus size={18} className="flex-shrink-0" /> {!isSidebarCollapsed && <span className="truncate">{t('dashboard.provisioning')}</span>}
-                </Link>
-              </>
-            )}
+            <SidebarItem to="/dashboard" icon={LayoutDashboard} label={t('dashboard.insights')} alwaysOn roleCheck={false} />
+            <SidebarItem to="/dashboard/reservations" icon={Calendar} label={t('dashboard.reservations')} alwaysOn roleCheck={false} />
+            <SidebarItem to="/dashboard/messages" icon={MessageSquare} label={t('dashboard.unifiedChat')} feature="social_integration" />
+            <SidebarItem to="/dashboard/pos" icon={Component} label={t('dashboard.posTerminal')} feature="pos_terminal" roleCheck={false} />
+            <SidebarItem to="/dashboard/menu" icon={Utensils} label={t('dashboard.menuBuilder')} feature="menu_builder" roleCheck={false} />
+            <SidebarItem to="/dashboard/tables" icon={Table} label={t('dashboard.floorPlan')} feature="floor_plan" roleCheck={false} />
+            <SidebarItem to="/dashboard/staff" icon={Users} label={t('dashboard.staffProfiles')} feature="staff_management" />
+            <SidebarItem to="/dashboard/financials" icon={DollarSign} label={t('dashboard.financials')} feature="financial_reports" />
+            <SidebarItem to="/dashboard/billing" icon={CreditCard} label={t('dashboard.billingPlan') || 'Billing & Plan'} alwaysOn />
+            <SidebarItem to="/dashboard/automation" icon={Bot} label={t('dashboard.aiCommand')} feature="ai_automation" />
+            <SidebarItem to="/dashboard/online-ordering" icon={ShoppingBag} label="Online Ordering" feature="online_ordering" />
+            <SidebarItem to="/dashboard/inventory" icon={Package} label="Inventory Tracking" feature="inventory_tracking" />
+            <SidebarItem to="/dashboard/settings" icon={Settings} label={t('dashboard.configuration')} alwaysOn />
+            <SidebarItem to="/dashboard/onboarding" icon={Plus} label={t('dashboard.provisioning')} alwaysOn />
           </nav>
         </div>
         <div className={`p-4 border-t border-slate-800 flex ${isSidebarCollapsed ? 'justify-center' : 'justify-start'}`}>

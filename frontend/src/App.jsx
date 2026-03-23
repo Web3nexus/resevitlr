@@ -29,6 +29,7 @@ import EmailManagementView from './pages/saas/EmailManagementView'
 import SaaSCMSView from './pages/saas/SaaSCMSView'
 import TranslationManagementView from './pages/saas/TranslationManagementView'
 import PlanManagementView from './pages/saas/PlanManagementView'
+import ComingSoonView from './pages/ComingSoonView'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import { PublicLayout } from './layouts/PublicLayout'
@@ -114,10 +115,12 @@ function App() {
                   <Route path="financials" element={<FinancialsView />} />
                   <Route path="automation" element={<AutomationView />} />
                   <Route path="messages" element={<MessagesView />} />
-                  <Route path="settings" element={<SettingsView />} />
-                  <Route path="onboarding" element={<OnboardingView />} />
-                  <Route path="account" element={<AccountSettingsView />} />
-                </Route>
+                   <Route path="settings" element={<SettingsView />} />
+                   <Route path="onboarding" element={<OnboardingView />} />
+                   <Route path="account" element={<AccountSettingsView />} />
+                   <Route path="inventory" element={<ComingSoonView title="Inventory Management" description="Track stock levels, ingredient usage, and supplier orders in real-time." />} />
+                   <Route path="online-ordering" element={<ComingSoonView title="Online Ordering" description="Launch your own branded web shop for pickups and deliveries." />} />
+                 </Route>
               </Route>
               <Route path="/access-denied" element={<AccessDenied />} />
             </Route>

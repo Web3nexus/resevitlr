@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, CheckCircle, X, Loader2, MessageSquare, DollarSign, Bot, Calendar, Component, Utensils, Table, Save, Infinity, LayoutDashboard, Users, CreditCard, Settings } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle, X, Loader2, MessageSquare, DollarSign, Bot, Calendar, Component, Utensils, Table, Save, Infinity, LayoutDashboard, Users, CreditCard, Settings, ShoppingBag, Package } from 'lucide-react';
 import api from '../../services/centralApi';
 
 // IMPORTANT: The 'key' values below MUST match exactly what DashboardLayout.jsx
@@ -9,18 +9,21 @@ const ALL_FEATURES = [
   // Always-visible sidebar items (always included — no hasFeature check in sidebar)
   { key: 'insights',         label: 'Insights',            description: 'Dashboard overview & analytics', icon: LayoutDashboard, alwaysOn: true },
   { key: 'reservations',     label: 'Reservations',        description: 'Accept and manage table bookings', icon: Calendar, alwaysOn: true },
-  { key: 'pos_terminal',     label: 'POS Terminal',         description: 'Point of sale for in-house orders', icon: Component, alwaysOn: true },
-  { key: 'menu_builder',     label: 'Menu Builder',         description: 'Create & manage menu items', icon: Utensils, alwaysOn: true },
-  { key: 'floor_plan',       label: 'Floor Plan',           description: 'Visual table & seating manager', icon: Table, alwaysOn: true },
-  { key: 'staff_profiles',   label: 'Staff Profiles',       description: 'Manage staff accounts & roles', icon: Users, alwaysOn: true },
-  { key: 'billing_plan',     label: 'Billing & Plan',       description: 'View & upgrade subscription', icon: CreditCard, alwaysOn: true },
   { key: 'configuration',    label: 'Configuration',        description: 'Store & platform settings', icon: Settings, alwaysOn: true },
   { key: 'provisioning',     label: 'Provisioning',         description: 'New setup & onboarding tools', icon: Plus, alwaysOn: true },
+  { key: 'billing_plan',     label: 'Billing & Plan',       description: 'View & upgrade subscription', icon: CreditCard, alwaysOn: true },
   
   // Gated features — controlled by hasFeature() in DashboardLayout.jsx
-  { key: 'social_integration', label: 'Unified Chat',        description: 'Central inbox: WhatsApp, Facebook, Instagram', icon: MessageSquare, alwaysOn: false },
-  { key: 'financial_reports',  label: 'Financials',          description: 'Revenue, expenses & net profit analytics', icon: DollarSign, alwaysOn: false },
-  { key: 'ai_automation',      label: 'AI Command',          description: 'AI automation & intelligent order routing', icon: Bot, alwaysOn: false },
+  // Exactly 9 gated features as requested
+  { key: 'social_integration', label: 'Unified Chat',        description: 'WhatsApp, Facebook, Instagram', icon: MessageSquare, alwaysOn: false },
+  { key: 'pos_terminal',       label: 'POS Terminal',         description: 'In-house ordering & payments', icon: Component, alwaysOn: false },
+  { key: 'menu_builder',       label: 'Menu Builder',         description: 'Digital catalog & QR ordering', icon: Utensils, alwaysOn: false },
+  { key: 'floor_plan',         label: 'Floor Plan',           description: 'Visual table management', icon: Table, alwaysOn: false },
+  { key: 'staff_management',   label: 'Staff Profiles',       description: 'Account access & role control', icon: Users, alwaysOn: false },
+  { key: 'financial_reports',  label: 'Financials',          description: 'Revenue, expenses & profit metrics', icon: DollarSign, alwaysOn: false },
+  { key: 'ai_automation',      label: 'AI Command',          description: 'AI workflow & intelligent responses', icon: Bot, alwaysOn: false },
+  { key: 'online_ordering',    label: 'Online Ordering',      description: 'Customer ordering web portal', icon: ShoppingBag, alwaysOn: false },
+  { key: 'inventory_tracking', label: 'Inventory Management', description: 'Stock levels & ingredient tracking', icon: Package, alwaysOn: false },
 ];
 
 const defaultFeatures = Object.fromEntries(ALL_FEATURES.map(f => [f.key, false]));
