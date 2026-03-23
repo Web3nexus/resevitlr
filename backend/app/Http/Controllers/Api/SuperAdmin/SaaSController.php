@@ -230,6 +230,7 @@ class SaaSController extends Controller
                 'role' => $isOwner ? 'owner' : ($user->roles->first()?->name ?? 'staff'),
                 'is_active' => true,
                 'is_owner' => $isOwner,
+                'two_factor_enabled' => $user->two_factor_method !== 'none',
                 'created_at' => $user->created_at,
             ];
         });
@@ -253,6 +254,26 @@ class SaaSController extends Controller
             'message' => 'Tenant features updated successfully', 
             'features' => $features
         ]);
+    }
+
+    /**
+     * Toggle 2FA for a tenant staff member.
+     */
+    public function toggleTenantUser2FA(Request $request, $id, $userId)
+    {
+        $tenant = Tenant::findOrFail($id);
+        $request->validate(['enabled' => 'required|boolean']);
+        
+        tenancy()->initialize($tenant);
+        
+        $user = \App\Models\User::findOrFail($userId);
+        $user->update([
+            'two_factor_method' => $request->enabled ? 'email' : 'none'
+        ]);
+        
+        tenancy()->end();
+        
+        return response()->json(['message' => 'User 2FA updated successfully']);
     }
 
     /**

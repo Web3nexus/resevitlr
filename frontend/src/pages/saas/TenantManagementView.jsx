@@ -69,6 +69,16 @@ export default function TenantManagementView() {
     }
   };
 
+  const toggleStaff2FA = async (tenantId, userId, currentStatus) => {
+    try {
+      await api.patch(`/saas/tenants/${tenantId}/staff/${userId}/2fa`, { enabled: !currentStatus });
+      fetchTenantStaff(tenantId);
+    } catch (error) {
+      console.error("Failed to toggle staff 2FA", error);
+      alert("Failed to update 2FA status.");
+    }
+  };
+
   const handleUpdateFeatures = async (features) => {
     setIsUpdatingFeatures(true);
     try {
@@ -577,7 +587,18 @@ export default function TenantManagementView() {
                                  <p className="text-[10px] text-slate-500 font-medium">{staff?.email || 'N/A'}</p>
                               </div>
                               <div className={`w-2 h-2 rounded-full ${staff?.is_active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-slate-600'}`} />
-                           </div>
+                              <button 
+                                onClick={() => toggleStaff2FA(selectedTenant.id, staff.id, staff.two_factor_enabled)}
+                                className={`ml-2 p-1.5 rounded-lg border transition-all ${
+                                  staff.two_factor_enabled 
+                                  ? 'bg-blue-600/10 border-blue-600/20 text-blue-400' 
+                                  : 'bg-slate-800 border-slate-700 text-slate-500'
+                                }`}
+                                title={staff.two_factor_enabled ? "2FA Active - Click to Disable" : "2FA Disabled - Click to Enable"}
+                              >
+                                <Shield size={14} fill={staff.two_factor_enabled ? "currentColor" : "none"} />
+                              </button>
+                            </div>
                         ))
                     )}
                  </div>

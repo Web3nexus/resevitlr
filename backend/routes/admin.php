@@ -51,6 +51,7 @@ Route::middleware(['auth:sanctum'])->prefix('saas')->group(function () {
     Route::patch('/tenants/{id}/status', [SaaSController::class, 'updateTenantStatus']);
     Route::patch('/tenants/{id}', [SaaSController::class, 'updateTenant']);
     Route::get('/tenants/{id}/staff', [SaaSController::class, 'getTenantStaff']);
+    Route::patch('/tenants/{id}/staff/{userId}/2fa', [SaaSController::class, 'toggleTenantUser2FA']);
     Route::get('/tenants/{id}/impersonate', [SaaSController::class, 'impersonate']);
     Route::delete('/tenants/{id}', [SaaSController::class, 'destroyTenant']);
     
