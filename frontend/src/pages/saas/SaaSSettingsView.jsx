@@ -4,18 +4,12 @@ import { Settings, Save, Globe, Shield, Mail, Database, Loader2, Bot, Layout, Fi
 import api from '../../services/centralApi';
 import ConfirmationModal from '../../components/common/ConfirmationModal';
 
+// These keys MUST match the exact strings used by hasFeature() in DashboardLayout.jsx
+// Only list features that are actually gated — alway-visible sidebar items are not here
 const SYSTEM_FEATURES = [
-  'basic_ordering', 
-  'menu_management', 
-  'ai_automation', 
-  'social_integration',
-  'financial_reports', 
-  'multi_location', 
-  'premium_support',
-  'inventory_tracking', 
-  'marketing_tools',
-  'staff_management',
-  'customer_logs'
+  'social_integration',  // → Unified Chat / Messages (WhatsApp, Facebook, Instagram)
+  'financial_reports',   // → Financials (Revenue, Expenses, Net Profit)
+  'ai_automation',       // → AI Command Center
 ];
 
 export default function SaaSSettingsView() {

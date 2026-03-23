@@ -1,18 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, CheckCircle, X, Loader2, MessageSquare, BarChart2, Bot, ShoppingBag, Users, CreditCard, Calendar, Component, Utensils, Table, Save, Infinity } from 'lucide-react';
+import { Plus, Edit2, Trash2, CheckCircle, X, Loader2, MessageSquare, DollarSign, Bot, Calendar, Component, Utensils, Table, Save, Infinity, LayoutDashboard, Users, CreditCard, Settings } from 'lucide-react';
 import api from '../../services/centralApi';
 
-// All features that exist in the business owner dashboard sidebar
+// IMPORTANT: The 'key' values below MUST match exactly what DashboardLayout.jsx
+// passes to hasFeature(). Sidebar items without a feature check are always visible
+// and are listed below for clarity but can't be toggled per-plan.
 const ALL_FEATURES = [
-  { key: 'reservations',      label: 'Reservations',          description: 'Accept and manage table bookings', icon: Calendar },
-  { key: 'pos_terminal',      label: 'POS Terminal',           description: 'Point of sale for orders',         icon: Component },
-  { key: 'menu_builder',      label: 'Menu Builder',           description: 'Create & manage menu items',       icon: Utensils },
-  { key: 'floor_plan',        label: 'Floor Plan',             description: 'Visual table & seating manager',   icon: Table },
-  { key: 'unified_messaging', label: 'Unified Messaging',      description: 'Central inbox (WhatsApp, FB, IG)', icon: MessageSquare },
-  { key: 'staff_management',  label: 'Staff Management',       description: 'Manage staff profiles & roles',    icon: Users },
-  { key: 'financial_reports', label: 'Financial Reports',      description: 'Revenue, expenses & net profit',   icon: BarChart2 },
-  { key: 'ai_automation',     label: 'AI Automation',          description: 'AI command center & automation',   icon: Bot },
-  { key: 'online_ordering',   label: 'Online Ordering',        description: 'Customer-facing ordering portal',  icon: ShoppingBag },
+  // Always-visible sidebar items (always included — no hasFeature check in sidebar)
+  { key: 'insights',         label: 'Insights',            description: 'Dashboard overview & analytics', icon: LayoutDashboard, alwaysOn: true },
+  { key: 'reservations',     label: 'Reservations',        description: 'Accept and manage table bookings', icon: Calendar, alwaysOn: true },
+  { key: 'pos_terminal',     label: 'POS Terminal',         description: 'Point of sale for in-house orders', icon: Component, alwaysOn: true },
+  { key: 'menu_builder',     label: 'Menu Builder',         description: 'Create & manage menu items', icon: Utensils, alwaysOn: true },
+  { key: 'floor_plan',       label: 'Floor Plan',           description: 'Visual table & seating manager', icon: Table, alwaysOn: true },
+  { key: 'staff_profiles',   label: 'Staff Profiles',       description: 'Manage staff accounts & roles', icon: Users, alwaysOn: true },
+  { key: 'billing_plan',     label: 'Billing & Plan',       description: 'View & upgrade subscription', icon: CreditCard, alwaysOn: true },
+  { key: 'configuration',    label: 'Configuration',        description: 'Store & platform settings', icon: Settings, alwaysOn: true },
+  { key: 'provisioning',     label: 'Provisioning',         description: 'New setup & onboarding tools', icon: Plus, alwaysOn: true },
+  
+  // Gated features — controlled by hasFeature() in DashboardLayout.jsx
+  { key: 'social_integration', label: 'Unified Chat',        description: 'Central inbox: WhatsApp, Facebook, Instagram', icon: MessageSquare, alwaysOn: false },
+  { key: 'financial_reports',  label: 'Financials',          description: 'Revenue, expenses & net profit analytics', icon: DollarSign, alwaysOn: false },
+  { key: 'ai_automation',      label: 'AI Command',          description: 'AI automation & intelligent order routing', icon: Bot, alwaysOn: false },
 ];
 
 const defaultFeatures = Object.fromEntries(ALL_FEATURES.map(f => [f.key, false]));
@@ -171,7 +179,7 @@ export default function PlanManagementView() {
               {/* Features */}
               <div className="space-y-1.5">
                 {ALL_FEATURES.map(f => {
-                  const enabled = plan.features?.[f.key];
+                  const enabled = f.alwaysOn || !!plan.features?.[f.key];
                   return (
                     <div key={f.key} className={`flex items-center gap-2 text-xs font-medium ${enabled ? 'text-slate-300' : 'text-slate-600'}`}>
                       <CheckCircle className={`w-3.5 h-3.5 shrink-0 ${enabled ? 'text-emerald-400' : 'text-slate-700'}`} />
@@ -250,9 +258,25 @@ export default function PlanManagementView() {
 
                 {/* Feature Toggles */}
                 <div>
-                  <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Feature Access</h4>
+                  <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Always Included</h4>
+                  <p className="text-[10px] text-slate-600 mb-3">These features are available on every plan and cannot be removed.</p>
+                  <div className="grid grid-cols-2 gap-2 mb-5">
+                    {ALL_FEATURES.filter(f => f.alwaysOn).map(f => {
+                      const Icon = f.icon;
+                      return (
+                        <div key={f.key} className="flex items-center gap-2 p-2.5 bg-slate-950/30 border border-slate-800/50 rounded-xl opacity-60">
+                          <div className="p-1.5 bg-slate-800 rounded-lg text-slate-500"><Icon className="w-3.5 h-3.5" /></div>
+                          <span className="text-xs font-medium text-slate-500">{f.label}</span>
+                          <CheckCircle className="w-3 h-3 text-emerald-600 ml-auto shrink-0" />
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <h4 className="text-xs font-black text-slate-500 uppercase tracking-widest mb-1">Gated Features</h4>
+                  <p className="text-[10px] text-slate-600 mb-3">Toggle which premium features this plan grants access to.</p>
                   <div className="space-y-2">
-                    {ALL_FEATURES.map(f => {
+                    {ALL_FEATURES.filter(f => !f.alwaysOn).map(f => {
                       const Icon = f.icon;
                       const enabled = !!editingPlan.features[f.key];
                       return (

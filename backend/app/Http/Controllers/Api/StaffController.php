@@ -37,6 +37,26 @@ class StaffController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Check Max Staff Limit
+        $tenant = tenant();
+        $planSlug = $tenant->plan ?? 'free';
+
+        $plan = \Stancl\Tenancy\Facades\Tenancy::central(function () use ($planSlug) {
+            return \App\Models\SubscriptionPlan::where('slug', $planSlug)->first();
+        });
+
+        if ($plan && $plan->max_staff !== null) {
+            $count = StaffProfile::count();
+            
+            if ($count >= $plan->max_staff) {
+                return response()->json([
+                    'error' => 'limit_reached',
+                    'message' => "Maximum staff accounts limit of {$plan->max_staff} has been reached for your {$plan->name} plan.",
+                    'limit' => $plan->max_staff
+                ], 403);
+            }
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:staff_profiles',

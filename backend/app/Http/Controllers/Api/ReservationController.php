@@ -22,6 +22,29 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
+        // 1. Check Monthly Reservation Limit
+        $tenant = tenant();
+        $planSlug = $tenant->plan ?? 'free';
+        
+        $plan = \Stancl\Tenancy\Facades\Tenancy::central(function () use ($planSlug) {
+            return \App\Models\SubscriptionPlan::where('slug', $planSlug)->first();
+        });
+
+        if ($plan && $plan->reservation_limit !== null) {
+            $monthStart = \Carbon\Carbon::now()->startOfMonth();
+            $monthEnd = \Carbon\Carbon::now()->endOfMonth();
+            
+            $count = Reservation::whereBetween('created_at', [$monthStart, $monthEnd])->count();
+            
+            if ($count >= $plan->reservation_limit) {
+                return response()->json([
+                    'error' => 'limit_reached',
+                    'message' => "Monthly reservation limit of {$plan->reservation_limit} has been reached for your {$plan->name} plan.",
+                    'limit' => $plan->reservation_limit
+                ], 403);
+            }
+        }
+
         $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email',
