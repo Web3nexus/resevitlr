@@ -189,7 +189,14 @@ class AuthController extends Controller
                 'message' => 'Registration failed: ' . $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'trace' => collect($e->getTrace())->take(5)->toArray()
+                'trace' => collect($e->getTrace())->take(15)->map(function($t) { 
+                    return [
+                        'file' => $t['file'] ?? '',
+                        'line' => $t['line'] ?? '',
+                        'function' => $t['function'] ?? '',
+                        'class' => $t['class'] ?? ''
+                    ]; 
+                })->toArray()
             ], 500);
         }
     }
