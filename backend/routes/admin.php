@@ -86,7 +86,11 @@ Route::middleware(['auth:sanctum'])->prefix('saas')->group(function () {
     Route::put('/translations/{id}', [TranslationController::class, 'update']);
     Route::delete('/translations/{id}', [TranslationController::class, 'destroy']);
 
-    // Profile Management (Central)
+# Move out of prefix group
+});
+
+// Profile Management (Central) - Keep it consistent with /api/profile
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'index']);
     Route::post('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'update']);
     Route::post('/profile/password', [\App\Http\Controllers\Api\ProfileController::class, 'updatePassword']);
