@@ -15,7 +15,7 @@ const getBaseURL = () => {
     return import.meta.env.VITE_CENTRAL_API_BASE_URL || '/central-api';
   }
 
-  return import.meta.env.VITE_API_BASE_URL || '/api';
+  return import.meta.env.VITE_API_BASE_URL || '/tenant-api';
 };
 
 const api = axios.create({
