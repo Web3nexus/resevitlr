@@ -198,10 +198,14 @@ export default function AdminManagementView() {
             <div className="space-y-3">
                 <div className="flex items-center justify-between text-[10px] uppercase font-black tracking-widest text-slate-500 border-b border-slate-700 pb-2 mb-3">
                     <span>Feature Access</span>
-                    <span>{admin.permissions?.length || 0} / {AVAILABLE_PERMISSIONS.length}</span>
+                    <span>{admin.is_developer ? AVAILABLE_PERMISSIONS.length : (admin.permissions?.length || 0)} / {AVAILABLE_PERMISSIONS.length}</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
-                    {admin.permissions?.length > 0 ? (
+                    {admin.is_developer ? (
+                        <span className="px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 text-[9px] font-bold uppercase tracking-tight border border-amber-500/20">
+                            All System Functions Enabled
+                        </span>
+                    ) : admin.permissions?.length > 0 ? (
                         admin.permissions.map(p => (
                             <span key={p} className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 text-[9px] font-bold uppercase tracking-tight border border-blue-500/20">
                                 {p.replace('manage_', '').replace('_', ' ')}
@@ -213,7 +217,7 @@ export default function AdminManagementView() {
                 </div>
             </div>
 
-            {admin.permissions?.length === AVAILABLE_PERMISSIONS.length && (
+            {(admin.is_developer || admin.permissions?.length === AVAILABLE_PERMISSIONS.length) && (
                 <div className="mt-6 pt-4 border-t border-slate-700 flex items-center gap-2 text-[10px] font-bold text-emerald-500 uppercase tracking-widest">
                     <ShieldCheck className="w-4 h-4" /> Full Root Access
                 </div>

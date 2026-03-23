@@ -405,23 +405,39 @@ export default function AccountSettingsView() {
                 <h3 className="font-black text-slate-800 uppercase tracking-tight">Two-Factor Authentication</h3>
                 
                 {!setupMode ? (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[
-                      { id: 'none', label: 'Disabled', desc: 'Not recommended' },
-                      { id: 'email', label: 'Email Code', desc: 'Receive via email' },
-                      { id: 'totp', label: 'Authenticator', desc: 'Google/Authy App' },
-                      { id: 'pin', label: 'Login PIN', desc: '6-digit secure PIN' }
-                    ].map(m => (
+                  <>
+                    <div className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+                      <div>
+                        <div className="font-black text-sm text-slate-800 uppercase tracking-tight">Email Verification Code</div>
+                        <div className="text-[10px] text-slate-400 font-bold mt-0.5">Protect your account with codes sent to your email.</div>
+                      </div>
                       <button
-                        key={m.id}
-                        onClick={() => handleUpdate2faMethod(m.id)}
-                        className={`p-4 rounded-2xl border-2 text-left transition-all ${twoFactorMethod === m.id ? 'border-blue-600 bg-blue-50/50' : 'border-slate-100 hover:border-slate-200'}`}
+                        onClick={() => handleUpdate2faMethod(twoFactorMethod === 'none' ? 'email' : 'none')}
+                        className={`relative w-11 h-6 rounded-full transition-all ${twoFactorMethod !== 'none' ? 'bg-blue-600' : 'bg-slate-200'}`}
                       >
-                        <div className={`font-black uppercase tracking-widest text-[10px] ${twoFactorMethod === m.id ? 'text-blue-700' : 'text-slate-700'}`}>{m.label}</div>
-                        <div className="text-[9px] font-bold text-slate-400 mt-1">{m.desc}</div>
+                        <span className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow-md transition-all ${twoFactorMethod !== 'none' ? 'left-6' : 'left-1'}`}></span>
                       </button>
-                    ))}
-                  </div>
+                    </div>
+
+                    {twoFactorMethod !== 'none' && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 animate-in fade-in zoom-in duration-300">
+                        {[
+                          { id: 'email', label: 'Email Only', desc: 'Default protection' },
+                          { id: 'totp', label: 'Authenticator', desc: 'Google/Authy App' },
+                          { id: 'pin', label: 'Login PIN', desc: '6-digit secure PIN' }
+                        ].map(m => (
+                          <button
+                            key={m.id}
+                            onClick={() => handleUpdate2faMethod(m.id)}
+                            className={`p-4 rounded-2xl border-2 text-left transition-all ${twoFactorMethod === m.id ? 'border-blue-600 bg-blue-50/50' : 'border-slate-100 hover:border-slate-200'}`}
+                          >
+                            <div className={`font-black uppercase tracking-widest text-[10px] ${twoFactorMethod === m.id ? 'text-blue-700' : 'text-slate-700'}`}>{m.label}</div>
+                            <div className="text-[9px] font-bold text-slate-400 mt-1">{m.desc}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 ) : setupMode === 'totp' ? (
                   <div className="space-y-4 bg-slate-50 p-6 rounded-2xl border border-slate-100">
                     <h4 className="font-black text-sm text-slate-800 uppercase">Set Up Authenticator</h4>

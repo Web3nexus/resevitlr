@@ -135,6 +135,10 @@ Route::middleware([
             Route::get('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'index']);
             Route::post('/profile', [\App\Http\Controllers\Api\ProfileController::class, 'update']);
             Route::post('/profile/password', [\App\Http\Controllers\Api\ProfileController::class, 'updatePassword']);
+            Route::post('/profile/2fa', [\App\Http\Controllers\Api\ProfileController::class, 'update2faMethod']);
+
+            // Staff 2FA Control (for Managers)
+            Route::patch('/staff/{id}/2fa', [StaffController::class, 'toggle2FA']);
 
             Route::post('/logout', [AuthController::class, 'logout']);
         });

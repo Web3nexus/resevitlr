@@ -10,7 +10,29 @@ class StaffController extends Controller
 {
     public function index()
     {
-        return response()->json(StaffProfile::all());
+        $staff = StaffProfile::all()->map(function($member) {
+            $user = \App\Models\User::where('email', $member->email)->first();
+            $member->two_factor_enabled = $user && $user->two_factor_method !== 'none';
+            return $member;
+        });
+        return response()->json($staff);
+    }
+
+    public function toggle2FA(Request $request, $id)
+    {
+        $staff = StaffProfile::findOrFail($id);
+        $user = \App\Models\User::where('email', $staff->email)->firstOrFail();
+        
+        $request->validate(['enabled' => 'required|boolean']);
+        
+        $user->update([
+            'two_factor_method' => $request->enabled ? 'email' : 'none'
+        ]);
+        
+        return response()->json([
+            'message' => 'Staff 2FA updated successfully.',
+            'two_factor_enabled' => $request->enabled
+        ]);
     }
 
     public function store(Request $request)

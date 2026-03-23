@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, Mail, Shield, MoreHorizontal, User, Loader2, Circle } from 'lucide-react'
 import api from '../services/api'
+import { CheckCircle2, XCircle } from 'lucide-react'
 
 export function StaffView() {
   const [loading, setLoading] = useState(true);
@@ -29,10 +30,19 @@ export function StaffView() {
       await api.post('/staff', newStaff);
       setShowModal(false);
       setNewStaff({ name: '', email: '', role: 'waiter', is_active: true });
-      fetchStaff();
     } catch (err) {
       console.error('Failed to add staff:', err);
       alert('Failed to register operator. Email might be in use.');
+    }
+  };
+
+  const toggle2FA = async (id, currentStatus) => {
+    try {
+      await api.patch(`/staff/${id}/2fa`, { enabled: !currentStatus });
+      fetchStaff();
+    } catch (err) {
+      console.error('Failed to toggle 2FA:', err);
+      alert('Failed to update 2FA status.');
     }
   };
 
@@ -65,6 +75,7 @@ export function StaffView() {
             <tr>
               <th className="px-8 py-5">Operator</th>
               <th className="px-8 py-5">Designation</th>
+              <th className="px-8 py-5">2FA Status</th>
               <th className="px-8 py-5">Status</th>
               <th className="px-8 py-5 text-right">Settings</th>
             </tr>
@@ -90,6 +101,19 @@ export function StaffView() {
                      <Shield size={14} className="text-slate-300 group-hover:text-blue-500 transition-colors" />
                      {member.role}
                    </div>
+                </td>
+                <td className="px-8 py-5">
+                   <button 
+                    onClick={() => toggle2FA(member.id, member.two_factor_enabled)}
+                    className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                     member.two_factor_enabled 
+                      ? 'bg-blue-50 text-blue-600 border border-blue-100' 
+                      : 'bg-slate-50 text-slate-400 border border-slate-100 opacity-60 hover:opacity-100'
+                    }`}
+                   >
+                     {member.two_factor_enabled ? <Shield size={10} fill="currentColor" /> : <Shield size={10} />}
+                     {member.two_factor_enabled ? 'Active' : 'Disabled'}
+                   </button>
                 </td>
                 <td className="px-8 py-5">
                    <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 w-fit ${
