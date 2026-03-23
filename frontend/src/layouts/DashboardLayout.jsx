@@ -58,7 +58,7 @@ export function DashboardLayout() {
               {settings.platform_logo_url ? (
                 <img src={settings.platform_logo_url} alt={settings.platform_name} className={`h-8 w-auto object-contain ${isSidebarCollapsed ? 'mx-auto' : ''}`} />
               ) : (
-                <div className="bg-blue-600 text-white p-1.5 rounded-xl shadow-lg shadow-blue-500/20 flex-shrink-0">
+                <div className="bg-blue-600 text-white p-1.5 rounded-xl shadow-lg shadow-blue-500/20 shrink-0">
                   <span className="font-black text-xl leading-none">{settings.platform_name?.charAt(0) || 'R'}</span>
                 </div>
               )}
@@ -320,3 +320,60 @@ function NotificationItem({ notification, onRead }) {
     </div>
   );
 }
+
+function SidebarItem({ to, icon: Icon, label, feature, alwaysOn, roleCheck = true }) {
+  const { user, isImpersonating } = useAuth();
+  const { t } = useTranslation();
+  const location = useLocation();
+
+  const hasFeature = (feat) => {
+    if (user?.role === 'admin') return true;
+    if (alwaysOn) return true;
+    if (!feat) return true;
+    
+    const features = user?.features || [];
+    if (Array.isArray(features)) return features.includes(feat);
+    if (typeof features === 'object') return !!features[feat];
+    return false;
+  };
+
+  const isLocked = !hasFeature(feature);
+  const isActive = location.pathname === to;
+
+  // If roleCheck is enabled, only owners can see gated features (even if locked)
+  // Staff should only see what they have access to and what's alwaysOn
+  if (roleCheck && user?.role !== 'owner' && !alwaysOn && isLocked) return null;
+
+  return (
+    <Link
+      to={isLocked ? '#' : to}
+      onClick={(e) => {
+        if (isLocked) {
+          e.preventDefault();
+        }
+      }}
+      className={`group flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 ${
+        isActive 
+          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 active:scale-95' 
+          : isLocked 
+            ? 'text-slate-600 opacity-60 cursor-not-allowed hover:bg-slate-800/30' 
+            : 'text-slate-400 hover:bg-slate-800/50 hover:text-white active:scale-95'
+      }`}
+    >
+      <div className="flex items-center gap-3 overflow-hidden">
+        <Icon size={20} className={`flex-shrink-0 ${isActive ? 'text-white' : isLocked ? 'text-slate-600' : 'text-slate-400 group-hover:text-blue-400'}`} />
+        {!isLocked || (label !== t('dashboard.insights') && label !== t('dashboard.reservations')) ? (
+           <span className="text-[10px] font-black uppercase tracking-widest truncate">{label}</span>
+        ) : (
+           <span className="text-[10px] font-black uppercase tracking-widest truncate">{label}</span>
+        )}
+      </div>
+      {isLocked && (
+        <div className="bg-amber-500/10 p-1 rounded-lg border border-amber-500/20">
+          <Shield size={12} className="text-amber-500" />
+        </div>
+      )}
+    </Link>
+  );
+}
+

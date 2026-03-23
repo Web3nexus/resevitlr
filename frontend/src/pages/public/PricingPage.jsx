@@ -144,13 +144,13 @@ export default function PricingPage() {
                             variants={fadeIn}
                             className={`relative rounded-3xl p-8 bg-slate-900/50 backdrop-blur-xl border transition-all duration-300 ${
                                 plan.popular || (i === 1 && plans.length === 3) 
-                                ? 'border-blue-500/50 shadow-2xl shadow-blue-900/20 scale-100 md:scale-105 z-10 bg-gradient-to-b from-slate-900 to-slate-950' 
+                                ? 'border-blue-500/50 shadow-2xl shadow-blue-900/20 scale-100 md:scale-105 z-10 bg-linear-to-b from-slate-900 to-slate-950' 
                                 : 'border-slate-800 hover:border-slate-700 hover:bg-slate-900'
                             }`}
                         >
                             {(plan.popular || (i === 1 && plans.length === 3)) && (
                                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                                    <div className="bg-gradient-to-r from-blue-600 to-indigo-500 text-white text-[10px] uppercase font-black tracking-widest px-4 py-1.5 rounded-full shadow-lg">
+                                    <div className="bg-linear-to-r from-blue-600 to-indigo-500 text-white text-[10px] uppercase font-black tracking-widest px-4 py-1.5 rounded-full shadow-lg">
                                         Most Popular
                                     </div>
                                 </div>
@@ -207,7 +207,7 @@ export default function PricingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="mt-32 max-w-4xl mx-auto bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between gap-8"
+                className="mt-32 max-w-4xl mx-auto bg-linear-to-r from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between gap-8"
             >
                 <div>
                     <h4 className="text-2xl font-bold text-white mb-2">Need a custom enterprise setup?</h4>
