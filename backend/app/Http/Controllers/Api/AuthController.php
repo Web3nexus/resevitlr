@@ -104,37 +104,56 @@ class AuthController extends Controller
                 $tenantId = $tenantId . '-' . rand(1000, 9999);
             }
 
-            // Create Tenant
-            $tenant = Tenant::create([
-                'id' => $tenantId,
-                'business_name' => $validated['business_name'],
-                'plan' => 'free',
-                'owner_email' => $validated['email'],
-                'owner_name' => $validated['name'],
-                'status' => 'active',
-                'data' => [
-                    'status' => 'active',
-                    'owner_name' => $validated['name'],
+            // Phase 1: Create Tenant
+            try {
+                $tenant = Tenant::create([
+                    'id' => $tenantId,
+                    'business_name' => $validated['business_name'],
+                    'plan' => 'free',
                     'owner_email' => $validated['email'],
-                ]
-            ]);
-
-            $centralDomain = config('tenancy.central_domains')[0] ?? 'localhost';
-            $tenant->domains()->create(['domain' => $tenantId . '.' . $centralDomain]);
-
-            // Create User associated with Tenant (MUST be inside tenant context)
-            $user = $tenant->run(function () use ($validated, $tenant) {
-                return User::create([
-                    'name' => $validated['name'],
-                    'email' => $validated['email'],
-                    'password' => Hash::make($validated['password']),
-                    'role' => 'owner',
-                    'tenant_id' => $tenant->id,
+                    'owner_name' => $validated['name'],
+                    'status' => 'active',
+                    'data' => [
+                        'status' => 'active',
+                        'owner_name' => $validated['name'],
+                        'owner_email' => $validated['email'],
+                    ]
                 ]);
-            });
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Registration failed at Phase 1 (Tenant Creation): ' . $e->getMessage()], 500);
+            }
 
-            // Send Welcome Email
-            $template = \App\Models\EmailTemplate::where('slug', 'welcome_email')->first();
+            // Phase 2: Create Domain
+            try {
+                $centralDomain = config('tenancy.central_domains')[0] ?? 'localhost';
+                $tenant->domains()->create(['domain' => $tenantId . '.' . $centralDomain]);
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Registration failed at Phase 2 (Domain Creation): ' . $e->getMessage()], 500);
+            }
+
+            // Phase 3: Create User
+            try {
+                $user = $tenant->run(function () use ($validated, $tenant) {
+                    return User::create([
+                        'name' => $validated['name'],
+                        'email' => $validated['email'],
+                        'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+                        'role' => 'owner',
+                        'tenant_id' => $tenant->id,
+                    ]);
+                });
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Registration failed at Phase 3 (User Creation): ' . $e->getMessage()], 500);
+            }
+
+            // Phase 4: Welcome Email
+            try {
+                // Ensure default connection is heavily forced back to central
+                \Illuminate\Support\Facades\DB::setDefaultConnection('mysql');
+                $template = \App\Models\EmailTemplate::where('slug', 'welcome_email')->first();
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Registration failed at Phase 4 (Email Template Fetch): ' . $e->getMessage()], 500);
+            }
             $subject = $template ? $template->subject : 'Welcome to Resevit';
             $content = $template ? $template->content : "Hello {name}, your account has been created successfully. Welcome to {platform_name}!";
             
