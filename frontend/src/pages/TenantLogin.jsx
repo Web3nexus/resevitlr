@@ -40,6 +40,7 @@ export default function TenantLogin() {
 
     if (domain) {
       localStorage.setItem('tenant_domain', domain);
+      const protocol = window.location.protocol;
       api.defaults.baseURL = protocol + '//' + domain + '/tenant-api';
     }
   }, [location]);

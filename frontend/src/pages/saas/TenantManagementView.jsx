@@ -73,6 +73,7 @@ export default function TenantManagementView() {
     try {
       await api.patch(`/saas/tenants/${tenantId}/staff/${userId}/2fa`, { enabled: !currentStatus });
       fetchTenantStaff(tenantId);
+      fetchTenants(); // Refresh main list to sync status in table
     } catch (error) {
       console.error("Failed to toggle staff 2FA", error);
       alert("Failed to update 2FA status.");
@@ -226,6 +227,7 @@ export default function TenantManagementView() {
               <th className="p-4 font-medium">Plan</th>
               <th className="p-4 font-medium text-center">Staff</th>
               <th className="p-4 font-medium">Status</th>
+              <th className="p-4 font-medium text-center">2FA</th>
               <th className="p-4 font-medium">Created</th>
               <th className="p-4 font-medium text-right">Actions</th>
             </tr>
@@ -233,14 +235,14 @@ export default function TenantManagementView() {
           <tbody className="divide-y divide-slate-700/50 text-sm">
             {isLoading ? (
               <tr>
-                <td colSpan="6" className="p-8 text-center text-slate-500">
+                <td colSpan="8" className="p-8 text-center text-slate-500">
                   <Activity className="w-6 h-6 animate-spin mx-auto mb-2" />
                   Loading tenants...
                 </td>
               </tr>
             ) : filteredTenants.length === 0 ? (
               <tr>
-                <td colSpan="6" className="p-8 text-center text-slate-500">
+                <td colSpan="8" className="p-8 text-center text-slate-500">
                   No tenants found.
                 </td>
               </tr>
@@ -286,13 +288,31 @@ export default function TenantManagementView() {
                     </button>
                   </td>
                   <td className="p-4">
-                    <div className="flex items-center gap-2">
-                        {tenant.status === 'active' ? (
-                            <><CheckCircle className="w-4 h-4 text-emerald-500" /> <span className="text-emerald-500">Active</span></>
-                        ) : (
-                            <><ShieldAlert className="w-4 h-4 text-red-400" /> <span className="text-red-400">Suspended</span></>
-                        )}
-                    </div>
+                    {tenant.status === 'active' ? (
+                      <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-wider border border-emerald-500/20">Active</span>
+                    ) : (
+                      <span className="px-2.5 py-1 rounded-lg bg-red-500/10 text-red-500 text-[10px] font-black uppercase tracking-wider border border-red-500/20">Suspended</span>
+                    )}
+                  </td>
+                  <td className="p-4">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (tenant.owner_user_id) {
+                          toggleStaff2FA(tenant.id, tenant.owner_user_id, tenant.two_factor_enabled);
+                        } else {
+                          alert("Owner account not found in tenant database. Please open Deep View to initialize.");
+                        }
+                      }}
+                      className={`p-1.5 rounded-lg border transition-all ${
+                        tenant.two_factor_enabled 
+                        ? 'bg-blue-600/10 border-blue-600/20 text-blue-400' 
+                        : 'bg-slate-800 border-slate-700 text-slate-600'
+                      }`}
+                      title={tenant.two_factor_enabled ? "2FA Enabled - Click to Disable" : "2FA Disabled - Click to Enable"}
+                    >
+                      <Shield size={16} fill={tenant.two_factor_enabled ? "currentColor" : "none"} />
+                    </button>
                   </td>
                   <td className="p-4 text-slate-400">
                     {tenant?.created_at ? new Date(tenant.created_at).toLocaleDateString() : 'N/A'}

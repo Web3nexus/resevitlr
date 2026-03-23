@@ -110,9 +110,12 @@ class SaaSController extends Controller
             ->map(function ($tenant) {
                 // Optional: for better performance in large systems, use a cached count or a dedicated column
                 $staffCount = 0;
+                $ownerUserId = null;
                 try {
                     tenancy()->initialize($tenant);
                     $staffCount = \App\Models\User::where('email', '!=', $tenant->owner_email)->count();
+                    $ownerUserId = \App\Models\User::where('email', $tenant->owner_email)->value('id');
+                    $twoFactorEnabled = \App\Models\User::where('email', $tenant->owner_email)->value('two_factor_method') !== 'none';
                     tenancy()->end();
                 } catch (\Exception $e) {
                     // Ignore if DB not ready
@@ -127,6 +130,8 @@ class SaaSController extends Controller
                     'status' => $tenant->status ?? 'active',
                     'owner_email' => $tenant->owner_email ?? 'unknown',
                     'owner_name' => $tenant->owner_name ?? 'unknown',
+                    'owner_user_id' => $ownerUserId,
+                    'two_factor_enabled' => $twoFactorEnabled ?? false,
                     'staff_count' => $staffCount
                 ];
             })
