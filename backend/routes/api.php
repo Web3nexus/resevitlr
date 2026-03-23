@@ -13,6 +13,15 @@ Route::post('/webhooks/stripe', [\App\Http\Controllers\Api\PaymentWebhookControl
 Route::post('/webhooks/paystack', [\App\Http\Controllers\Api\PaymentWebhookController::class, 'handlePaystack']);
 Route::post('/webhooks/flutterwave', [\App\Http\Controllers\Api\PaymentWebhookController::class, 'handleFlutterwave']);
 
+Route::get('/debug-config', function() {
+    return response()->json([
+        'connections' => array_keys(config('database.connections')),
+        'tenant_config_exists' => config()->has('database.connections.tenant'),
+        'default_connection' => config('database.default'),
+        'message' => 'If tenant is missing here, your server is strongly caching old code.'
+    ]);
+});
+
 // Public Tenant Auth (Central Domain Login)
 Route::middleware('throttle:6,1')->group(function () {
     Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
