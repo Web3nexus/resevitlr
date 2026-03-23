@@ -53,10 +53,17 @@ export default function Register() {
       });
       if (response.data.success) {
         setIsSuccess(true);
+        // Auto-login: store token and user from registration response
+        if (response.data.token) {
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('auth_user', JSON.stringify(response.data.user));
+          localStorage.setItem('tenant_domain', response.data.domain);
+        }
+        // Redirect directly to dashboard after a brief success animation
         setTimeout(() => {
           const protocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
-          window.location.href = `${protocol}//${response.data.domain}/login`;
-        }, 4000);
+          window.location.href = `${protocol}//${response.data.domain}/dashboard`;
+        }, 2000);
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed. Please check your details and try again.');

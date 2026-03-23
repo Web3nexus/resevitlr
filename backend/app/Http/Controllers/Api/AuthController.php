@@ -171,11 +171,18 @@ class AuthController extends Controller
                 \Illuminate\Support\Facades\Log::error("Failed to send welcome email: " . $e->getMessage());
             }
 
+            // Generate auth token for auto-login after registration
+            $authToken = $tenant->run(function () use ($userData) {
+                $freshUser = \App\Models\User::where('email', $userData['email'])->first();
+                return $freshUser ? $freshUser->createToken('auth-token')->plainTextToken : null;
+            });
+
             return response()->json([
                 'success' => true,
                 'message' => 'Registration successful',
                 'tenant_id' => $tenant->id,
                 'domain' => $tenant->domains()->first()->domain,
+                'token' => $authToken,
                 'user' => $userData
             ], 201);
         } catch (\Exception $e) {
