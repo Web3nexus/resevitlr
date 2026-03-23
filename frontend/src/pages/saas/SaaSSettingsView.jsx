@@ -4,14 +4,6 @@ import { Settings, Save, Globe, Shield, Mail, Database, Loader2, Bot, Layout, Fi
 import api from '../../services/centralApi';
 import ConfirmationModal from '../../components/common/ConfirmationModal';
 
-// These keys MUST match the exact strings used by hasFeature() in DashboardLayout.jsx
-// Only list features that are actually gated — alway-visible sidebar items are not here
-const SYSTEM_FEATURES = [
-  'social_integration',  // → Unified Chat / Messages (WhatsApp, Facebook, Instagram)
-  'financial_reports',   // → Financials (Revenue, Expenses, Net Profit)
-  'ai_automation',       // → AI Command Center
-];
-
 export default function SaaSSettingsView() {
   const [activeTab, setActiveTab] = useState('general');
   const [settings, setSettings] = useState({
@@ -56,12 +48,8 @@ export default function SaaSSettingsView() {
     turnstile_secret_key: '',
     sales_email: '',
   });
-  const [plans, setPlans] = useState([]);
-  const [editingPlan, setEditingPlan] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [planToDelete, setPlanToDelete] = useState(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -75,50 +63,8 @@ export default function SaaSSettingsView() {
       }
     };
 
-    const fetchPlans = async () => {
-      try {
-        const response = await api.get('/saas/plans');
-        setPlans(response.data);
-      } catch (error) {
-        console.error("Failed to fetch plans", error);
-      }
-    };
-
     fetchSettings();
-    fetchPlans();
   }, []);
-
-  const handleSavePlan = async (plan) => {
-    try {
-        await api.post('/saas/plans', plan);
-        const response = await api.get('/saas/plans');
-        setPlans(response.data);
-        setEditingPlan(null);
-        alert("Plan saved successfully!");
-    } catch (error) {
-        const msg = error.response?.data?.message || "Error saving plan.";
-        const errors = error.response?.data?.errors;
-        let detailedMsg = msg;
-        if (errors) {
-            detailedMsg += "\n" + Object.values(errors).flat().join("\n");
-        }
-        alert(detailedMsg);
-    }
-  };
-
-  const handleDeletePlan = async (id) => {
-    try {
-        await api.delete(`/saas/plans/${id}`);
-        setPlans((Array.isArray(plans) ? plans : []).filter(p => p.id !== id));
-    } catch (error) {
-        alert("Error deleting plan.");
-    }
-  };
-
-  const confirmDeletePlan = (id) => {
-    setPlanToDelete(id);
-    setIsDeleteModalOpen(true);
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -762,155 +708,24 @@ export default function SaaSSettingsView() {
             )}
 
             {activeTab === 'plans' && (
-              <div className="space-y-6">
-                 <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium text-white">Subscription Tiers</h3>
-                    <button 
-                        onClick={() => setEditingPlan({ id: null, name: '', slug: '', monthly_price: 0, yearly_price: 0, features: [], is_active: true })}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-medium flex items-center gap-2"
-                    >
-                        <Plus className="w-4 h-4" /> Add New Plan
-                    </button>
-                 </div>
-                 
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Array.isArray(plans) && plans.map(plan => (
-                        <div key={plan.id} className="bg-slate-900/50 border border-slate-800 rounded-2xl p-5 hover:border-blue-500/30 transition-all">
-                            <div className="flex justify-between items-start mb-4">
-                                <div>
-                                    <h4 className="text-white font-bold">{plan.name}</h4>
-                                    <p className="text-slate-500 text-xs font-mono">{plan.slug}</p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-xl font-bold text-white">${plan.monthly_price}<span className="text-xs text-slate-500 font-normal">/mo</span></p>
-                                    <p className="text-[10px] text-slate-500">${plan.yearly_price}/yr</p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2 mb-6">
-                                {(Array.isArray(plan.features) ? plan.features : []).map(f => (
-                                    <div key={f} className="flex items-center gap-2 text-xs text-slate-400">
-                                        <CheckCircle className="w-3 h-3 text-emerald-500" /> {f.replace(/_/g, ' ')}
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="flex items-center justify-between pt-4 border-t border-slate-800">
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${plan.is_active ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
-                                    {plan.is_active ? 'ACTIVE' : 'INACTIVE'}
-                                </span>
-                                <div className="flex items-center gap-2">
-                                    <button 
-                                        onClick={() => setEditingPlan(plan)}
-                                        className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-                                    >
-                                        <Settings className="w-4 h-4" />
-                                    </button>
-                                    <button 
-                                        onClick={() => confirmDeletePlan(plan.id)}
-                                        className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                 </div>
-              </div>
-            )}
-
-            {editingPlan && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-                    <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl p-8 shadow-2xl">
-                        <h3 className="text-xl font-bold text-white mb-6">{(editingPlan.id && editingPlan.id !== null) ? 'Edit' : 'Create'} Subscription Plan</h3>
-                        
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase">Plan Name</label>
-                                <input 
-                                    value={editingPlan.name}
-                                    onChange={e => setEditingPlan({...editingPlan, name: e.target.value})}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase">Slug (Internal)</label>
-                                <input 
-                                    value={editingPlan.slug}
-                                    onChange={e => setEditingPlan({...editingPlan, slug: e.target.value.toLowerCase().replace(/\s+/g, '-')})}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase">Monthly Price ($)</label>
-                                <input 
-                                    type="number"
-                                    value={editingPlan.monthly_price}
-                                    onChange={e => setEditingPlan({...editingPlan, monthly_price: e.target.value})}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-xs font-medium text-slate-500 mb-2 uppercase">Yearly Price ($)</label>
-                                <input 
-                                    type="number"
-                                    value={editingPlan.yearly_price}
-                                    onChange={e => setEditingPlan({...editingPlan, yearly_price: e.target.value})}
-                                    className="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-4 text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mb-6">
-                            <label className="block text-xs font-medium text-slate-500 mb-3 uppercase">Plan Features</label>
-                            <div className="grid grid-cols-2 gap-2">
-                                {SYSTEM_FEATURES.map(feat => {
-                                    // Support both old array format and new object format
-                                    const features = editingPlan.features;
-                                    const isEnabled = Array.isArray(features)
-                                        ? features.includes(feat)
-                                        : !!(features?.[feat]);
-                                    return (
-                                        <label key={feat} className="flex items-center gap-2 cursor-pointer group">
-                                            <input
-                                                type="checkbox"
-                                                checked={isEnabled}
-                                                onChange={e => {
-                                                    // Always save in new object format
-                                                    const currentFeatures = Array.isArray(features)
-                                                        ? Object.fromEntries(features.map(f => [f, true]))
-                                                        : (features || {});
-                                                    setEditingPlan({...editingPlan, features: { ...currentFeatures, [feat]: e.target.checked }});
-                                                }}
-                                                className="hidden"
-                                            />
-                                            <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isEnabled ? 'bg-blue-600 border-blue-600' : 'bg-slate-950 border-slate-800'}`}>
-                                                {isEnabled && <CheckCircle className="w-3 h-3 text-white" />}
-                                            </div>
-                                            <span className="text-xs text-slate-400 group-hover:text-white transition-colors">{feat.replace(/_/g, ' ')}</span>
-                                        </label>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        <div className="flex justify-between items-center pt-6 border-t border-slate-800">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input 
-                                    type="checkbox"
-                                    checked={editingPlan.is_active}
-                                    onChange={e => setEditingPlan({...editingPlan, is_active: e.target.checked})}
-                                />
-                                <span className="text-xs text-white">Active Tier</span>
-                            </label>
-                            <div className="flex gap-3">
-                                <button onClick={() => setEditingPlan(null)} className="text-slate-400 hover:text-white px-4 py-2 text-sm font-medium">Cancel</button>
-                                <button onClick={() => handleSavePlan(editingPlan)} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl text-sm font-medium">Save Plan</button>
-                            </div>
-                        </div>
-                    </div>
+              <div className="py-12 text-center space-y-6">
+                <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto text-blue-400">
+                  <Package className="w-10 h-10" />
                 </div>
+                <div className="max-w-xs mx-auto space-y-2">
+                  <h3 className="text-xl font-bold text-white">Advanced Plan Control</h3>
+                  <p className="text-sm text-slate-400">
+                    Subscription tiers and feature gating have moved to their own dedicated management area.
+                  </p>
+                </div>
+                <Link 
+                  to="/securegate/plans" 
+                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all group"
+                >
+                  Go to Plan Management
+                  <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                </Link>
+              </div>
             )}
 
             {activeTab === 'database' && (
