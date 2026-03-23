@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Settings, Save, Globe, Shield, Mail, Database, Loader2, Bot, Layout, FileText, CreditCard, Package, Plus, Trash2, CheckCircle, CircleX as XCircle, MessageSquare, Copy, ExternalLink, Sparkles } from 'lucide-react';
+import { Settings, Save, Globe, Shield, Mail, Database, Loader2, Bot, Layout, FileText, CreditCard, Trash2, CheckCircle, CircleX as XCircle, MessageSquare, Copy, ExternalLink, Sparkles } from 'lucide-react';
 import api from '../../services/centralApi';
 import ConfirmationModal from '../../components/common/ConfirmationModal';
 

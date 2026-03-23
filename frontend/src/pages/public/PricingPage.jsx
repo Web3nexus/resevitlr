@@ -37,7 +37,7 @@ export default function PricingPage() {
       monthly_price: 49,
       yearly_price: 39,
       popular: false,
-      features: ['basic_ordering', 'menu_management', 'customer_logs']
+      features: ['social_integration', 'menu_builder', 'floor_plan']
     },
     {
       name: 'Professional',
@@ -45,7 +45,7 @@ export default function PricingPage() {
       monthly_price: 99,
       yearly_price: 79,
       popular: true,
-      features: ['basic_ordering', 'menu_management', 'financial_reports', 'social_integration', 'staff_management']
+      features: ['social_integration', 'pos_terminal', 'menu_builder', 'floor_plan', 'staff_management', 'financial_reports']
     },
     {
       name: 'Enterprise',
@@ -53,7 +53,7 @@ export default function PricingPage() {
       monthly_price: 199,
       yearly_price: 159,
       popular: false,
-      features: ['basic_ordering', 'menu_management', 'financial_reports', 'social_integration', 'staff_management', 'ai_automation', 'multi_location', 'premium_support']
+      features: ['social_integration', 'pos_terminal', 'menu_builder', 'floor_plan', 'staff_management', 'financial_reports', 'ai_automation', 'online_ordering', 'inventory_tracking']
     }
   ];
 
