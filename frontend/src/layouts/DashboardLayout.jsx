@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, Calendar, MessageSquare, Component, Utensils, Table, Users, DollarSign, CreditCard, Bot, Settings, Plus, LogOut, User, Shield, Bell, CheckCircle, CircleX as XCircle, ShoppingBag, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Calendar, MessageSquare, Component, Utensils, Table, Users, DollarSign, CreditCard, Bot, Settings, Plus, LogOut, User, Shield, Bell, CheckCircle, CircleX as XCircle, ShoppingBag, Menu, X, Package } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 import { useAuth } from '../context/AuthContext';
 import { useInactivityLogout } from '../hooks/useInactivityLogout';
