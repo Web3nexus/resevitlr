@@ -14,7 +14,7 @@ export default function MessagesView() {
     const fetchInteractions = async () => {
         try {
             const response = await api.get('/automation/activity');
-            setInteractions(response.data.activity);
+            setInteractions(Array.isArray(response.data.activity) ? response.data.activity : []);
         } catch (error) {
             console.error("Failed to fetch interactions", error);
         } finally {
@@ -103,8 +103,7 @@ export default function MessagesView() {
                             <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-20" />
                             <p className="text-[10px] font-black uppercase tracking-widest">No active chats</p>
                         </div>
-                    ) : (
-                        sortedConversations.map(conv => (
+                    ) : (Array.isArray(sortedConversations) ? sortedConversations : []).map(conv => (
                             <button 
                                 key={conv.sender}
                                 onClick={() => setSelectedSender(conv.sender)}
@@ -131,7 +130,7 @@ export default function MessagesView() {
                                     <div className="absolute right-6 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
                                 )}
                             </button>
-                        ))
+                        )
                     )}
                 </div>
             </div>

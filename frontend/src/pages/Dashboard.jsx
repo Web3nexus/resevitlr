@@ -106,7 +106,7 @@ export function Dashboard() {
             </div>
          </div>
          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-            {stats.tables?.map(table => (
+            {(Array.isArray(stats.tables) ? stats.tables : []).map(table => (
                <div key={table.id} className={`p-4 rounded-2xl border-2 transition-all cursor-default flex flex-col items-center justify-center gap-3 active:scale-95 ${
                   table.status === 'available' ? 'bg-white border-slate-100 hover:border-emerald-200' :
                   table.status === 'occupied' ? 'bg-blue-50 border-blue-100' :
@@ -153,7 +153,7 @@ export function Dashboard() {
                  </tr>
                </thead>
                <tbody className="divide-y divide-slate-100">
-                 {recent_orders.length > 0 ? recent_orders.map(order => (
+                  {Array.isArray(recent_orders) && recent_orders.length > 0 ? recent_orders.map(order => (
                    <TableRow 
                      key={order.id}
                      id={`ORDER-${order.id}`} 
@@ -177,7 +177,7 @@ export function Dashboard() {
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
               <h3 className="font-black text-slate-800 mb-6 uppercase tracking-tight text-sm">{t('stats.highMargin')}</h3>
               <div className="space-y-6">
-                {top_items.map(item => (
+                {(Array.isArray(top_items) ? top_items : []) .map(item => (
                   <TopItem key={item.name} name={item.name} progress={item.progress} color={item.color} />
                 ))}
               </div>

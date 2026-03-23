@@ -200,7 +200,7 @@ export function DashboardLayout() {
                        <div className="space-y-2 max-h-72 overflow-y-auto">
                           {notifications.length === 0 ? (
                             <p className="text-center py-8 text-[10px] font-black text-slate-300 uppercase tracking-widest">{t('common.noNotifications')}</p>
-                          ) : notifications.map(n => (
+                          ) : (Array.isArray(notifications) ? notifications : []).map(n => (
                             <NotificationItem key={n.id} notification={n} onRead={() => markRead(n.id)} />
                           ))}
                        </div>

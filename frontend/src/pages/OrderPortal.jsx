@@ -238,7 +238,7 @@ export function OrderPortal() {
                <ChevronRight size={24} className="text-blue-200" />
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-               {filteredItems.length > 0 ? filteredItems.map(item => (
+               {Array.isArray(filteredItems) && filteredItems.length > 0 ? filteredItems.map(item => (
                  <div key={item.id} className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 transition-all flex justify-between items-center group cursor-pointer active:scale-95 relative overflow-hidden">
                     <div className="flex-1 pr-6">
                        <h3 className="text-lg font-black text-slate-900 mb-2 group-hover:text-blue-600 transition-colors uppercase tracking-tight leading-none">{item.name}</h3>

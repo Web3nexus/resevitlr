@@ -159,7 +159,7 @@ export function FinancialsView() {
                 </tr>
              </thead>
              <tbody className="divide-y divide-slate-100">
-                {data.list.length > 0 ? data.list.map(ex => {
+                {Array.isArray(data.list) && data.list.length > 0 ? data.list.map(ex => {
                   const Icon = getIcon(ex.category);
                   return (
                     <tr key={ex.id} className="hover:bg-slate-50/50 transition-colors group">
@@ -190,7 +190,7 @@ export function FinancialsView() {
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
            <h3 className="font-black text-slate-800 text-lg mb-6 uppercase tracking-tight">Expense Breakdown</h3>
            <div className="space-y-6">
-              {data.categories.length > 0 ? data.categories.map(item => (
+              {Array.isArray(data.categories) && data.categories.length > 0 ? data.categories.map(item => (
                 <div key={item.label} className="space-y-2 animate-in slide-in-from-bottom-2 duration-300">
                   <div className="flex justify-between text-[10px] font-black uppercase tracking-widest">
                     <span className="text-slate-500">{item.label}</span>

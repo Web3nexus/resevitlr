@@ -18,7 +18,7 @@ export default function BillingView() {
         api.get('/billing/plans'),
         api.get('/billing/status')
       ]);
-      setPlans(plansRes.data);
+      setPlans(Array.isArray(plansRes.data) ? plansRes.data : []);
       setStatus(statusRes.data);
       setCountry(statusRes.data.country || '');
     } catch (err) {
@@ -135,7 +135,7 @@ export default function BillingView() {
 
       {/* Plan Selection */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {plans.map((plan) => (
+        {(Array.isArray(plans) ? plans : []).map((plan) => (
           <div key={plan.id} className={`bg-slate-800/30 border-2 rounded-3xl p-8 flex flex-col transition-all group relative ${
             status?.plan_slug === plan.slug ? 'border-blue-500 bg-blue-500/5' : 'border-slate-700/50 hover:border-slate-600'
           }`}>
@@ -156,7 +156,7 @@ export default function BillingView() {
             <div className="space-y-4 mb-8 flex-1">
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">What's included</p>
               <ul className="space-y-3">
-                {plan.features?.map((feature, i) => (
+                {Array.isArray(plan.features) && plan.features.map((feature, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm text-slate-300">
                     <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                     <span className="capitalize">{feature.replace(/_/g, ' ')}</span>

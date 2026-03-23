@@ -113,7 +113,7 @@ export function SaaSAdminLayout() {
                                             <Bell className="w-8 h-8 text-slate-800 mx-auto mb-2 opacity-20" />
                                             <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Hub Clear</p>
                                         </div>
-                                    ) : notifications.map(n => (
+                                    ) : (Array.isArray(notifications) ? notifications : []).map(n => (
                                         <button 
                                             key={n.id} 
                                             onClick={() => { markRead(n.id); }}

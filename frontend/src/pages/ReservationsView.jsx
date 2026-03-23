@@ -143,7 +143,7 @@ export function ReservationsView() {
                   </tr>
                </thead>
                <tbody className="divide-y divide-slate-100">
-                  {reservations.length > 0 ? reservations.map(res => {
+                  {Array.isArray(reservations) && reservations.length > 0 ? reservations.map(res => {
                     const dateObj = new Date(res.reservation_time);
                     const dateStr = dateObj.toLocaleDateString();
                     const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

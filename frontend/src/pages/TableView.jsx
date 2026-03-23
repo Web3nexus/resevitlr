@@ -86,7 +86,7 @@ export function TableView() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-         {tables.length > 0 ? tables.map(table => (
+         {Array.isArray(tables) && tables.length > 0 ? tables.map(table => (
            <div key={table.id} className="bg-white p-8 rounded-[32px] shadow-sm border border-slate-200 flex flex-col items-center justify-center gap-4 group hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-500/5 transition-all text-center cursor-default relative overflow-hidden active:scale-95">
              
              <div className="absolute top-4 right-4 group-hover:block hidden animate-in fade-in">
