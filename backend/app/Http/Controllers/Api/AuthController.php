@@ -133,14 +133,16 @@ class AuthController extends Controller
 
             // Phase 3: Create User
             try {
-                $user = $tenant->run(function () use ($validated, $tenant) {
-                    return User::create([
+                $userData = $tenant->run(function () use ($validated, $tenant) {
+                    $u = User::create([
                         'name' => $validated['name'],
                         'email' => $validated['email'],
                         'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
                         'role' => 'owner',
                         'tenant_id' => $tenant->id,
                     ]);
+                    // Mathematically force timestamp and connection resolution BEFORE tenancy ends
+                    return $u->toArray();
                 });
             } catch (\Exception $e) {
                 return response()->json(['message' => 'Registration failed at Phase 3 (User Creation): ' . $e->getMessage()], 500);
@@ -160,8 +162,8 @@ class AuthController extends Controller
             $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
             
             try {
-                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SystemMail($subject, $content, [
-                    'name' => $user->name,
+                \Illuminate\Support\Facades\Mail::to($userData['email'])->send(new \App\Mail\SystemMail($subject, $content, [
+                    'name' => $userData['name'],
                     'platform_name' => $platformName,
                     'business_name' => $validated['business_name']
                 ]));
@@ -174,7 +176,7 @@ class AuthController extends Controller
                 'message' => 'Registration successful',
                 'tenant_id' => $tenant->id,
                 'domain' => $tenant->domains()->first()->domain,
-                'user' => $user
+                'user' => $userData
             ], 201);
         } catch (\Exception $e) {
             // Rollback: If anything fails after the tenant is created, delete the tenant completely to avoid orphaned/half-done businesses
