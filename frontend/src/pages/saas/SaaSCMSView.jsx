@@ -35,7 +35,7 @@ function LandingPageEditor() {
 
     useEffect(() => {
         centralApi.get('/saas/settings').then(res => {
-            setForm(prev => ({ ...prev, ...res.data }));
+            setForm(prev => ({ ...prev, ...(res.data || {}) }));
             setIsLoading(false);
         }).catch(() => setIsLoading(false));
     }, []);
@@ -320,7 +320,7 @@ export default function SaaSCMSView() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/50">
-                            {currentData.map(item => (
+                            {(Array.isArray(currentData) ? currentData : []).map(item => (
                                 <tr key={item.id} className="hover:bg-slate-800/20 transition-colors">
                                     <td className="px-6 py-5">
                                         <div className="font-bold text-white text-base mb-1">

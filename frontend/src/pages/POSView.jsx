@@ -26,9 +26,9 @@ export function POSView() {
       ]);
       
       setCategories(menuRes.data);
-      const flattenedItems = menuRes.data?.flatMap(cat => 
-        (cat.items || []).map(item => ({ ...item, category_name: cat.name }))
-      ) || [];
+      const flattenedItems = (Array.isArray(menuRes.data) ? menuRes.data : []).flatMap(cat => 
+        (Array.isArray(cat.items) ? cat.items : []).map(item => ({ ...item, category_name: cat.name }))
+      );
       setItems(flattenedItems);
       setTables(tablesRes.data);
       if (tablesRes.data.length > 0) setSelectedTable(tablesRes.data[0].id);

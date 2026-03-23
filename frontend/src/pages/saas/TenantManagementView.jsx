@@ -86,7 +86,7 @@ export default function TenantManagementView() {
       await api.patch(`/saas/tenants/${selectedTenant.id}/features`, { features });
       
       // Update local state
-      const updatedTenants = tenants.map(t => 
+      const updatedTenants = (Array.isArray(tenants) ? tenants : []).map(t => 
         t.id === selectedTenant.id ? { ...t, features } : t
       );
       setTenants(updatedTenants);
@@ -595,7 +595,7 @@ export default function TenantManagementView() {
                     ) : (tenantStaff || []).length === 0 ? (
                         <p className="p-8 text-center text-slate-600 text-sm border-2 border-dashed border-slate-800 rounded-3xl">No staff records found in tenant database.</p>
                     ) : (
-                        (tenantStaff || []).map(staff => (
+                        (Array.isArray(tenantStaff) ? tenantStaff : []).map(staff => (
                            <div key={staff.id} className="p-4 rounded-2xl bg-slate-800/10 border border-slate-800 flex items-center gap-4 group hover:bg-slate-800/30 transition-colors">
                               <div className="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center text-blue-400 uppercase font-black text-xs border border-blue-600/20">
                                  {staff?.name?.substring(0,2) || '??'}

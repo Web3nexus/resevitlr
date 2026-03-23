@@ -114,7 +114,7 @@ export default function SaaSSettingsView() {
   const handleDeletePlan = async (id) => {
     try {
         await api.delete(`/saas/plans/${id}`);
-        setPlans(plans.filter(p => p.id !== id));
+        setPlans((Array.isArray(plans) ? plans : []).filter(p => p.id !== id));
     } catch (error) {
         alert("Error deleting plan.");
     }
@@ -793,7 +793,7 @@ export default function SaaSSettingsView() {
                             </div>
 
                             <div className="space-y-2 mb-6">
-                                {plan.features?.map(f => (
+                                {(Array.isArray(plan.features) ? plan.features : []).map(f => (
                                     <div key={f} className="flex items-center gap-2 text-xs text-slate-400">
                                         <CheckCircle className="w-3 h-3 text-emerald-500" /> {f.replace(/_/g, ' ')}
                                     </div>

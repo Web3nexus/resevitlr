@@ -65,8 +65,8 @@ export function MenuView() {
   };
 
   // Flatten items for the 'Items' tab
-  const allItems = (categories || []).flatMap(cat => 
-    (cat.items || []).map(item => ({ ...item, category_name: cat.name }))
+  const allItems = (Array.isArray(categories) ? categories : []).flatMap(cat => 
+    (Array.isArray(cat.items) ? cat.items : []).map(item => ({ ...item, category_name: cat.name }))
   );
 
   return (

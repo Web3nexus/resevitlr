@@ -20,10 +20,10 @@ export function OrderPortal() {
     try {
       const res = await api.get('/menu');
       const categoriesData = res.data || [];
-      const flattenedItems = categoriesData.flatMap(cat => 
-        (cat.items || []).map(item => ({ ...item, category: { name: cat.name } }))
+      const flattenedItems = (Array.isArray(categoriesData) ? categoriesData : []).flatMap(cat => 
+        (Array.isArray(cat.items) ? cat.items : []).map(item => ({ ...item, category_name: cat.name }))
       );
-      setCategories(['All', ...categoriesData.map(c => c.name)]);
+      setCategories(['All', ...(Array.isArray(categoriesData) ? categoriesData : []).map(c => c.name)]);
       setItems(flattenedItems);
     } catch (err) {
       console.error('Menu Sync Failed:', err);
@@ -71,9 +71,10 @@ export function OrderPortal() {
     }
   };
 
-  const filteredItems = activeCategory === 'All' 
-    ? items 
-    : items.filter(item => item.category?.name === activeCategory);
+  const filteredItems = (Array.isArray(items) ? items : []).filter(item => {
+    if (activeCategory === 'All') return true;
+    return item.category_name === activeCategory;
+  });
 
   if (loading) {
     return (
@@ -216,7 +217,7 @@ export function OrderPortal() {
       {/* Menu Sections */}
       <main className="max-w-5xl mx-auto px-4 py-12">
          <div className="flex gap-4 overflow-x-auto pb-8 scrollbar-hide py-2">
-            {categories.map((cat) => (
+            {(Array.isArray(categories) ? categories : []).map((cat) => (
                <button 
                  key={cat} 
                  onClick={() => setActiveCategory(cat)}

@@ -98,10 +98,10 @@ export default function SaaSDashboard() {
             <div className="h-64 border-b border-l border-slate-700/30 flex items-end justify-between px-6 pb-2 gap-2">
                 {isLoading ? (
                     <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs italic">
-                        Calculated growth trajectories...
+                        Fetching revenue data...
                     </div>
                 ) : (
-                    (stats?.revenue_growth || [0,0,0,0,0,0,0]).map((data, i) => {
+                    (Array.isArray(stats?.revenue_growth) ? stats.revenue_growth : [0,0,0,0,0,0,0]).map((data, i) => {
                         const h = Math.min(Math.max((data.value / (stats.monthly_mrr || 1000)) * 50, 10), 100);
                         return (
                             <div key={i} className="flex-1 max-w-[40px] bg-blue-600/20 hover:bg-blue-600/40 transition-colors rounded-t-lg relative group shadow-[0_-8px_20px_-10px_rgba(37,99,235,0.5)]" style={{ height: `${h}%` }}>
@@ -123,10 +123,10 @@ export default function SaaSDashboard() {
             <div className="space-y-6">
                 {isLoading ? (
                     <p className="text-slate-500 text-sm italic">Filing system status...</p>
-                ) : !Array.isArray(recentTenants) || recentTenants.length === 0 ? (
-                    <p className="text-slate-500 text-sm italic">No recent tenant activity.</p>
-                ) : (
-                    recentTenants.map((tenant) => (
+                ) : (Array.isArray(recentTenants) && recentTenants.length === 0) ? (
+                    <div className="text-center py-10 text-slate-500 italic text-sm">No recent signups detected.</div>
+                  ) : (
+                    (Array.isArray(recentTenants) ? recentTenants : []).map((tenant) => (
                     <div key={tenant.id} className="flex items-center gap-4 group">
                         <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center border border-teal-500/20 group-hover:bg-teal-500/20 transition-colors">
                             <Activity className="w-5 h-5 text-teal-400" />
