@@ -22,6 +22,7 @@ export default function TenantLogin() {
   const [twoFactorMethod, setTwoFactorMethod] = useState('email');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAutoLogging, setIsAutoLogging] = useState(false);
   const [businessName, setBusinessName] = useState('');
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function TenantLogin() {
     const impersonate = params.get('impersonate');
 
     if (token) {
+        setIsAutoLogging(true);
         handleAutoLogin(token, domain);
     } else {
         fetchBusinessInfo();
@@ -137,6 +139,18 @@ export default function TenantLogin() {
       setIsLoading(false);
     }
   };
+
+  // Show fullscreen loader during auto-login (token in URL)
+  if (isAutoLogging) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-400 text-sm font-medium">Signing you in...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden selection:bg-blue-500/30 selection:text-blue-200">

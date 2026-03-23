@@ -21,40 +21,70 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Distinguish between Super Admin and Tenant/Staff login
+        // Super Admin login via /central-api/saas/login
         if ($request->is('central-api/saas/*')) {
             $user = \App\Models\Admin::where('email', $request->email)->first();
-        } else {
-            // This now correctly handles /central-api/login and /api/login
-            $user = User::where('email', $request->email)->first();
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
+            }
+            return $this->issueToken($user);
         }
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        // Tenant user login: look up their tenant by email, then auth against tenant DB
+        $tenant = Tenant::where('owner_email', $request->email)->first();
+        
+        if (!$tenant) {
+            // Also check if this email belongs to a staff member in any tenant
+            // We need to find which tenant this staff belongs to — search by email in all tenants
+            $allTenants = Tenant::all();
+            foreach ($allTenants as $t) {
+                $found = $t->run(function() use ($request) {
+                    return User::where('email', $request->email)->first();
+                });
+                if ($found) {
+                    $tenant = $t;
+                    break;
+                }
+            }
+        }
+
+        if (!$tenant) {
             return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
         }
+
+        // Authenticate within the tenant's database
+        $result = $tenant->run(function() use ($request, $tenant) {
+            $user = User::where('email', $request->email)->first();
+            if (!$user || !Hash::check($request->password, $user->password)) {
+                return null;
+            }
+            return $user;
+        });
+
+        if (!$result) {
+            return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
+        }
+
+        $user = $result;
 
         // Check 2FA preference
         if ($user->two_factor_method !== 'none') {
             if ($user->two_factor_method === 'email') {
                 $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-                $user->update([
-                    'two_factor_code' => $code,
-                    'two_factor_expires_at' => now()->addMinutes(10),
-                ]);
+                $tenant->run(function() use ($user, $code) {
+                    User::where('id', $user->id)->update([
+                        'two_factor_code' => $code,
+                        'two_factor_expires_at' => now()->addMinutes(10),
+                    ]);
+                });
 
-                // Fetch template
-                $template = \App\Models\EmailTemplate::where('slug', '2fa_code')->first();
-                $subject = $template ? $template->subject : 'Your Security Code';
-                $content = $template ? $template->content : "Your security verification code is: {code}";
-                $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
-
-                // Send Email via SystemMail
                 try {
-                    \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SystemMail($subject, $content, [
-                        'name' => $user->name,
-                        'code' => $code,
-                        'platform_name' => $platformName
-                    ]));
+                    $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
+                    \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SystemMail(
+                        'Your Security Code',
+                        'Your security verification code is: {code}',
+                        ['name' => $user->name, 'code' => $code, 'platform_name' => $platformName]
+                    ));
                 } catch (\Exception $e) {
                     \Illuminate\Support\Facades\Log::error("Failed to send 2FA email: " . $e->getMessage());
                 }
@@ -67,8 +97,21 @@ class AuthController extends Controller
             ]);
         }
 
-        return $this->issueToken($user);
+        // Issue token within tenant context and return tenant domain for redirect
+        $tokenData = $tenant->run(function() use ($user) {
+            $token = $user->createToken('auth-token')->plainTextToken;
+            return $token;
+        });
+
+        $tenantDomain = $tenant->domains()->first()?->domain;
+
+        return response()->json([
+            'token'         => $tokenData,
+            'user'          => $user->toArray(),
+            'tenant_domain' => $tenantDomain,
+        ]);
     }
+
 
     /**
      * Register a new tenant owner and verify Turnstile CAPTCHA.
