@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             TranslationSeeder::class,
+            SubscriptionPlanSeeder::class,
         ]);
     }
 }

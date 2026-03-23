@@ -573,16 +573,20 @@ class SaaSController extends Controller
     {
         $id = $request->id;
         $validated = $request->validate([
-            'name' => 'required|string',
-            'slug' => 'required|string|unique:subscription_plans,slug,' . ($id ? $id : 'NULL'),
-            'monthly_price' => 'nullable|numeric',
-            'yearly_price' => 'nullable|numeric',
-            'features' => 'nullable|array',
-            'is_active' => 'boolean',
+            'name'               => 'required|string',
+            'slug'               => 'required|string|unique:subscription_plans,slug,' . ($id ? $id : 'NULL'),
+            'monthly_price'      => 'nullable|numeric',
+            'yearly_price'       => 'nullable|numeric',
+            'features'           => 'nullable|array',
+            'reservation_limit'  => 'nullable|integer|min:0',
+            'max_staff'          => 'nullable|integer|min:0',
+            'is_active'          => 'boolean',
         ]);
 
         $data = array_merge($validated, [
-            'is_active' => $request->boolean('is_active', true)
+            'is_active'         => $request->boolean('is_active', true),
+            'reservation_limit' => $request->filled('reservation_limit') ? (int) $request->reservation_limit : null,
+            'max_staff'         => $request->filled('max_staff') ? (int) $request->max_staff : null,
         ]);
 
         if ($id) {

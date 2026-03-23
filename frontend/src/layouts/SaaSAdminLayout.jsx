@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { LayoutDashboard, Building2, CreditCard, MessageSquare, Mail, Shield, BookOpen, Globe, Settings, Users, LogOut, Bell, AlertTriangle, CheckCircle, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Building2, CreditCard, PackageOpen, MessageSquare, Mail, Shield, BookOpen, Globe, Settings, Users, LogOut, Bell, AlertTriangle, CheckCircle, Menu, X } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 import { useInactivityLogout } from '../hooks/useInactivityLogout';
 import { useBranding } from '../hooks/useBranding';
@@ -23,6 +23,7 @@ export function SaaSAdminLayout() {
     { name: t('admin.overview'), path: '/securegate/dashboard', icon: LayoutDashboard },
     { name: t('admin.tenants'), path: '/securegate/tenants', icon: Building2 },
     { name: t('admin.subscriptions'), path: '/securegate/subscriptions', icon: CreditCard },
+    { name: 'Plan Management', path: '/securegate/plans', icon: PackageOpen },
     { name: t('admin.support'), path: '/securegate/tickets', icon: MessageSquare },
     { name: t('admin.emailHub'), path: '/securegate/email-templates', icon: Mail },
     { name: 'Admin Management', path: '/securegate/admins', icon: Shield },

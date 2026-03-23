@@ -28,6 +28,7 @@ import SupportTicketsView from './pages/saas/SupportTicketsView'
 import EmailManagementView from './pages/saas/EmailManagementView'
 import SaaSCMSView from './pages/saas/SaaSCMSView'
 import TranslationManagementView from './pages/saas/TranslationManagementView'
+import PlanManagementView from './pages/saas/PlanManagementView'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import { PublicLayout } from './layouts/PublicLayout'
@@ -83,6 +84,7 @@ function App() {
                 <Route path="dashboard" element={<SaaSDashboard />} />
                 <Route path="tenants" element={<TenantManagementView />} />
                 <Route path="subscriptions" element={<SaaSSubscriptionsView />} />
+                <Route path="plans" element={<PlanManagementView />} />
                 <Route path="tickets" element={<SupportTicketsView />} />
                 <Route path="email-templates" element={<EmailManagementView />} />
                 <Route path="admins" element={<AdminManagementView />} />

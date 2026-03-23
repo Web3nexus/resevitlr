@@ -13,11 +13,15 @@ class SubscriptionPlan extends Model
         'monthly_price',
         'yearly_price',
         'features',
+        'reservation_limit',
+        'max_staff',
         'is_active',
     ];
 
     protected $casts = [
-        'features' => 'array',
-        'is_active' => 'boolean',
+        'features'           => 'array',
+        'is_active'          => 'boolean',
+        'reservation_limit'  => 'integer',
+        'max_staff'          => 'integer',
     ];
 }
