@@ -36,7 +36,8 @@ export default function BillingView() {
 
   const handleSubscribe = async (planSlug, interval = 'monthly') => {
     if (!country) {
-      alert("Please select your country first to determine the best payment gateway.");
+      setError("Please select your country first to determine the best payment gateway.");
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -145,7 +146,7 @@ export default function BillingView() {
             <div className="mt-6 pt-6 border-t border-white/10">
               <div className="flex justify-between items-end mb-2">
                 <div className="text-[10px] font-black text-blue-200 uppercase tracking-widest">Base Credits Used</div>
-                <div className="text-xs font-bold text-white">{status?.ai_credits_used || 0} / {status?.ai_credits_limit || '∞'}</div>
+                <div className="text-xs font-bold text-white">{status?.ai_credits_used || 0} / {status?.ai_credits_limit ?? '∞'}</div>
               </div>
               <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
                 <div 
@@ -243,7 +244,7 @@ export default function BillingView() {
                 {/* AI Credits Feature Item */}
                 <li className="flex items-center gap-3 text-sm font-bold text-blue-600 pt-2 border-t border-slate-100 mt-2">
                   <Zap className="w-4 h-4 text-blue-500 shrink-0" />
-                  <span>{plan.ai_credits_limit ? `${plan.ai_credits_limit.toLocaleString()} AI Credits/mo` : 'Unlimited AI Credits'}</span>
+                  <span>{plan.ai_credits_limit !== null && plan.ai_credits_limit !== undefined ? `${plan.ai_credits_limit.toLocaleString()} AI Credits/mo` : 'Unlimited AI Credits'}</span>
                 </li>
               </ul>
             </div>
