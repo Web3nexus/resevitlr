@@ -5,16 +5,17 @@ const getBaseURL = () => {
   const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
   const isCentral = hostname === 'resevit.com' || hostname === 'www.resevit.com' || (hostname.includes('.test') && !hostname.includes('.'));
 
+  const protocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
+
   if (domain && domain !== 'no-domain') {
-    const protocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
     return `${protocol}//${domain}/tenant-api`;
   }
 
   if (isCentral) {
-    return import.meta.env.VITE_CENTRAL_API_BASE_URL || '/central-api';
+    return import.meta.env.VITE_CENTRAL_API_BASE_URL || `${protocol}//${hostname}/central-api`;
   }
 
-  return import.meta.env.VITE_API_BASE_URL || '/tenant-api';
+  return import.meta.env.VITE_API_BASE_URL || `${protocol}//${hostname}/tenant-api`;
 };
 
 const api = axios.create({
