@@ -88,6 +88,11 @@ class PaymentService
             'cancel_url' => config('app.url') . "/dashboard/billing?canceled=true",
             'client_reference_id' => $tenant->id,
             'customer_email' => $tenant->data['email'] ?? null,
+            'metadata' => [
+                'plan_slug' => $plan->slug,
+                'tenant_id' => $tenant->id,
+                'interval'  => $interval
+            ],
         ]);
 
         if ($response->failed()) {

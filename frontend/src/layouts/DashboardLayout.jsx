@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LayoutDashboard, Calendar, MessageSquare, Component, Utensils, Table, Users, DollarSign, CreditCard, Bot, Settings, Plus, LogOut, User, Shield, Bell, CheckCircle, CircleX as XCircle, ShoppingBag, Menu, X, Package } from 'lucide-react';
@@ -17,8 +17,12 @@ export function DashboardLayout() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications(15000);
-  const { user, logout, isImpersonating, stopImpersonating } = useAuth();
+  const { user, logout, isImpersonating, stopImpersonating, refreshUser } = useAuth();
   const settings = useBranding();
+  
+  useEffect(() => {
+    if (refreshUser) refreshUser();
+  }, []);
   
   // Register inactivity logout monitoring
   useInactivityLogout();

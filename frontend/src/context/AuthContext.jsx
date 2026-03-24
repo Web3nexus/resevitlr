@@ -135,6 +135,37 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('admin_token');
   };
 
+  const refreshUser = async () => {
+    try {
+      // Determine context and token based on impersonation and auth type
+      const isSaaSPath = window.location.pathname.startsWith('/securegate');
+      const token = isSaaSPath ? localStorage.getItem('admin_token') : localStorage.getItem('token');
+      const baseURL = isSaaSPath || isImpersonating ? '/central-api' : api.defaults.baseURL;
+      
+      if (!token) return { success: false, error: 'No token found' };
+
+      const response = await api.get('/user', {
+        baseURL,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const userData = response.data;
+      setUser(userData);
+      
+      if (isSaaSPath) {
+        localStorage.setItem('admin_user', JSON.stringify(userData));
+      } else {
+        localStorage.setItem('auth_user', JSON.stringify(userData));
+      }
+      return { success: true };
+    } catch (error) {
+      console.error('Failed to refresh user profile:', error);
+      return { success: false, error: 'Refresh failed' };
+    }
+  };
+
   const stopImpersonating = () => {
     // Clear tenant-side only
     localStorage.removeItem('token');
@@ -165,7 +196,8 @@ export function AuthProvider({ children }) {
       login, 
       verify2FA, 
       logout,
-      stopImpersonating
+      stopImpersonating,
+      refreshUser
     }}>
       {children}
     </AuthContext.Provider>

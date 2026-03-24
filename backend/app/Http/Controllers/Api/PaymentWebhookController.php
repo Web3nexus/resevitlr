@@ -34,11 +34,12 @@ class PaymentWebhookController extends Controller
             
             if ($event->type === 'checkout.session.completed') {
                 $session = $event->data->object;
-                $tenantId = $session->client_reference_id;
+                $tenantId = $session->metadata->tenant_id ?? $session->client_reference_id;
+                $planSlug = $session->metadata->plan_slug ?? null;
                 $subscriptionId = $session->subscription;
                 
-                if ($tenantId) {
-                    $this->updateTenantSubscription($tenantId, 'stripe', $subscriptionId);
+                if ($tenantId && $planSlug) {
+                    $this->updateTenantSubscription($tenantId, 'stripe', $subscriptionId, $planSlug);
                 }
             }
 
@@ -71,10 +72,11 @@ class PaymentWebhookController extends Controller
         if ($event === 'charge.success') {
             $data = $request->input('data');
             $tenantId = $data['metadata']['tenant_id'] ?? null;
+            $planSlug = $data['metadata']['plan_slug'] ?? null;
             $reference = $data['reference'];
             
-            if ($tenantId) {
-                $this->updateTenantSubscription($tenantId, 'paystack', $reference);
+            if ($tenantId && $planSlug) {
+                $this->updateTenantSubscription($tenantId, 'paystack', $reference, $planSlug);
             }
         }
 
@@ -94,36 +96,35 @@ class PaymentWebhookController extends Controller
         if ($status === 'successful') {
             $data = $request->input('data');
             $tenantId = $data['meta']['tenant_id'] ?? null;
+            $planSlug = $data['meta']['plan_slug'] ?? null;
             $txRef = $data['tx_ref'];
             
-            if ($tenantId) {
-                $this->updateTenantSubscription($tenantId, 'flutterwave', $txRef);
+            if ($tenantId && $planSlug) {
+                $this->updateTenantSubscription($tenantId, 'flutterwave', $txRef, $planSlug);
             }
         }
 
         return response()->json(['status' => 'success']);
     }
 
-    private function updateTenantSubscription($tenantId, $provider, $subscriptionId)
+    private function updateTenantSubscription($tenantId, $provider, $subscriptionId, $planSlug)
     {
         $tenant = Tenant::find($tenantId);
         if ($tenant) {
+            $tenant->plan = $planSlug;
             $tenant->subscription_id = $subscriptionId;
             $tenant->subscription_provider = $provider;
             $tenant->subscription_status = 'active';
             $tenant->subscription_ends_at = now()->addMonth(); // Simplified
             $tenant->save();
             
-            Log::info("Tenant {$tenantId} subscription updated via {$provider}");
+            Log::info("Tenant {$tenantId} subscription updated via {$provider} to plan {$planSlug}");
 
             // Send Payment Success Email
             $template = \App\Models\EmailTemplate::where('slug', 'payment_success')->first();
             if ($template) {
                 $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
-                $plan = \App\Models\SubscriptionPlan::where('stripe_plan_id', $subscriptionId)
-                    ->orWhere('paystack_plan_id', $subscriptionId)
-                    ->orWhere('flutterwave_plan_id', $subscriptionId)
-                    ->first();
+                $plan = \App\Models\SubscriptionPlan::where('slug', $planSlug)->first();
                 
                 $planName = $plan ? $plan->name : 'Premium';
 
