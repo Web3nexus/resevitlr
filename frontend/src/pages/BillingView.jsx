@@ -15,14 +15,17 @@ export default function BillingView() {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
-    
+    let plansLoaded = false;
+
     // Fetch Plans (Public)
     try {
       const plansRes = await api.get('/billing/plans');
-      setPlans(Array.isArray(plansRes.data) ? plansRes.data : []);
+      if (Array.isArray(plansRes.data)) {
+        setPlans(plansRes.data);
+        if (plansRes.data.length > 0) plansLoaded = true;
+      }
     } catch (err) {
       console.error("Failed to fetch plans", err);
-      // We don't block the whole page if just plans fail, but we log it
     }
 
     // Fetch Status (Protected)
@@ -32,8 +35,8 @@ export default function BillingView() {
       setCountry(statusRes.data.country || '');
     } catch (err) {
       console.error("Failed to fetch billing status", err);
-      // Only show error if both failed or if user specifically needs status
-      if (plans.length === 0) {
+      // Only show error if BOTH failed.
+      if (!plansLoaded) {
         setError("Unable to load billing information. Please try again later.");
       }
     } finally {
