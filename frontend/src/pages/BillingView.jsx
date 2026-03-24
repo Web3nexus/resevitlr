@@ -182,41 +182,14 @@ export default function BillingView() {
         <CreditCard className="absolute -bottom-10 -right-10 w-64 h-64 text-white/5 rotate-12" />
       </div>
 
-      {/* AI Credit Top-Up Section */}
-      <div className="bg-white border text-center border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center space-y-6 shadow-sm mb-8 animate-in fade-in slide-in-from-bottom-4">
-        <div>
-           <h3 className="text-xl font-black text-slate-900 flex items-center justify-center gap-2">
-              <Zap className="w-6 h-6 text-amber-500" /> Top Up AI Credits
-           </h3>
-           <p className="text-slate-500 text-sm mt-2 max-w-lg mx-auto">
-             Need more capacity before your cycle resets? Buy non-expiring AI credits that carry over until you use them all.
-           </p>
-        </div>
-        
-        <div className="flex flex-wrap justify-center gap-4">
-           {[ {amount: 250, price: 10}, {amount: 1000, price: 35}, {amount: 5000, price: 150} ].map(pack => (
-              <button
-                 key={pack.amount}
-                 disabled={purchasingTopup}
-                 onClick={() => handleTopUp(pack.amount)}
-                 className="flex flex-col items-center p-4 bg-white border-2 border-slate-200 rounded-2xl hover:border-amber-500 hover:bg-amber-50 transition-all min-w-[140px] focus:outline-none focus:ring-4 focus:ring-amber-500/20 active:scale-95 disabled:opacity-50"
-              >
-                 <span className="text-2xl font-black text-slate-900">{pack.amount.toLocaleString()}</span>
-                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1 mb-3">Credits</span>
-                 <div className="px-3 py-1 bg-slate-100 text-slate-700 font-bold text-sm rounded-lg w-full group-hover:bg-amber-100 transition-colors">
-                    ${pack.price}
-                 </div>
-              </button>
-           ))}
-        </div>
-        {purchasingTopup && <p className="text-sm font-medium text-amber-600 flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin"/> Provisioning credits...</p>}
-      </div>
       {/* Plan Selection — MUST come before Top Up so scroll-to works correctly */}
       <div id="plans-selection" className="scroll-mt-6">
         <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-2">
           <CreditCard className="w-6 h-6 text-blue-600" /> Choose Your Plan
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        {/* Responsive Plans Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {(Array.isArray(plans) ? plans : []).map((plan) => (
             <div key={plan.id} className={`bg-white border-2 rounded-3xl p-8 flex flex-col transition-all group relative shadow-sm ${
               status?.plan_slug === plan.slug ? 'border-blue-500 bg-blue-50/50 shadow-md' : 'border-slate-200 hover:border-slate-300'
@@ -254,7 +227,6 @@ export default function BillingView() {
                         </li>
                       ))
                   }
-                  {/* AI Credits Feature Item */}
                   <li className="flex items-center gap-3 text-sm font-bold text-blue-600 pt-2 border-t border-slate-100 mt-2">
                     <Zap className="w-4 h-4 text-blue-500 shrink-0" />
                     <span>{plan.ai_credits_limit !== null && plan.ai_credits_limit !== undefined ? `${plan.ai_credits_limit.toLocaleString()} AI Credits/mo` : 'Unlimited AI Credits'}</span>
@@ -283,25 +255,25 @@ export default function BillingView() {
               </button>
             </div>
           ))}
+        </div>
 
-          {/* Custom Corporate Box */}
-          <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4">
-            <Zap className="w-10 h-10 text-amber-500" />
-            <div>
-              <h3 className="text-lg font-bold text-slate-900">Enterprise Flex</h3>
-              <p className="text-slate-500 text-sm mt-1">Need a specialized setup for 50+ locations?</p>
-            </div>
-            <a 
-              href={`mailto:${status?.sales_email || 'sales@resevit.com'}?subject=Enterprise%20Flex%20Inquiry`}
-              className="text-blue-400 font-bold text-xs uppercase tracking-widest hover:text-blue-300 transition-colors"
-            >
-              Contact Sales Team
-            </a>
+        {/* Enterprise Flex — Now explicitly UNDER the pricing plans */}
+        <div className="max-w-xl mx-auto bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center text-center space-y-4 mb-12">
+          <Zap className="w-10 h-10 text-amber-500" />
+          <div>
+            <h3 className="text-lg font-bold text-slate-900">Enterprise Flex</h3>
+            <p className="text-slate-500 text-sm mt-1">Need a specialized setup for 50+ locations?</p>
           </div>
+          <button 
+            onClick={() => window.location.href = `mailto:${status?.sales_email || 'sales@resevit.com'}?subject=Enterprise%20Flex%20Inquiry`}
+            className="px-8 py-3 bg-white border border-slate-200 text-blue-600 font-black text-xs uppercase tracking-widest rounded-xl hover:bg-blue-50 transition-colors shadow-sm"
+          >
+            Contact Sales Team
+          </button>
         </div>
       </div>
 
-      {/* AI Credit Top-Up Section — placed AFTER plans so scroll works correctly */}
+      {/* AI Credit Top-Up Section — Final placement at bottom */}
       <div className="bg-white border text-center border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center space-y-6 shadow-sm animate-in fade-in slide-in-from-bottom-4">
         <div>
            <h3 className="text-xl font-black text-slate-900 flex items-center justify-center gap-2">
