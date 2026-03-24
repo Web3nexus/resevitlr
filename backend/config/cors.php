@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'tenant-api/*', 'central-api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
@@ -26,7 +26,9 @@ return [
     ],
 
     'allowed_origins_patterns' => [
-        '#^http://.*\.resevitlr\.test(:\d+)?$#',
+        '#^https?://.*\.resevitweb\.test(:\d+)?$#',
+        '#^https?://.*\.resevit\.com(:\d+)?$#',
+        '#^https?://.*\.resevitlr\.test(:\d+)?$#',
     ],
 
     'allowed_headers' => ['*'],
@@ -35,6 +37,6 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
 ];
