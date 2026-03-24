@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const STANDARD_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+const STANDARD_TIMEOUT = 60 * 60 * 1000; // 60 minutes (1 hour)
 const POS_TIMEOUT = 12 * 60 * 60 * 1000; // 12 hours
 
 export const useInactivityLogout = () => {

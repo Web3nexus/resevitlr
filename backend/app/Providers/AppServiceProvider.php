@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \App\Models\Tenant::observe(\App\Observers\TenantObserver::class);
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('saas_settings')) {
                 $settings = \App\Models\SaaSSetting::all()->pluck('value', 'key')->toArray();
