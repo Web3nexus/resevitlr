@@ -14,4 +14,4 @@ Route::get('/{any}', function () {
             'Expires'       => '0',
         ]
     );
-})->where('any', '^(?!(api|central-api|sanctum|_debugbar)).*$');
+})->where('any', '^(?!(api|central-api|tenant-api|sanctum|_debugbar)).*$');

@@ -27,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
         $middleware->append(\App\Http\Middleware\LocaleMiddleware::class);
         $middleware->redirectGuestsTo(function ($request) {
-            if ($request->is('api/*') || $request->is('central-api/*')) {
+            if ($request->is('api/*') || $request->is('central-api/*') || $request->is('tenant-api/*')) {
                 return null; // Return 401 JSON for API
             }
             return route('login');
