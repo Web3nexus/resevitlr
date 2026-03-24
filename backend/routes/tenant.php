@@ -55,6 +55,17 @@ Route::middleware([
             Route::post('/reset-password', [AuthController::class, 'resetPassword']);
         });
         
+        // Billing & Subscription (Public Plans, Protected Status)
+        Route::prefix('billing')->group(function () {
+            Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, 'getPlans']);
+            
+            Route::middleware('auth:sanctum')->group(function () {
+                Route::get('/status', [\App\Http\Controllers\Api\SubscriptionController::class, 'currentStatus']);
+                Route::post('/subscribe', [\App\Http\Controllers\Api\SubscriptionController::class, 'subscribe']);
+                Route::post('/purchase-credits', [\App\Http\Controllers\Api\SubscriptionController::class, 'purchaseCredits']);
+            });
+        });
+
         // Protected Routes
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('/user', function (\Illuminate\Http\Request $request) {
@@ -125,13 +136,7 @@ Route::middleware([
             // Dashboard Stats
             Route::get('/dashboard/stats', [\App\Http\Controllers\Api\DashboardController::class, 'stats']);
 
-            // Billing & Subscription
-            Route::prefix('billing')->group(function () {
-                Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, 'getPlans']);
-                Route::get('/status', [\App\Http\Controllers\Api\SubscriptionController::class, 'currentStatus']);
-                Route::post('/subscribe', [\App\Http\Controllers\Api\SubscriptionController::class, 'subscribe']);
-                Route::post('/purchase-credits', [\App\Http\Controllers\Api\SubscriptionController::class, 'purchaseCredits']);
-            });
+
 
             // Notifications
             Route::get('/notifications', [NotificationController::class, 'index']);
