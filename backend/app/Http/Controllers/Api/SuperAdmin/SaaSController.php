@@ -580,6 +580,7 @@ class SaaSController extends Controller
             'features'           => 'nullable|array',
             'reservation_limit'  => 'nullable|integer|min:0',
             'max_staff'          => 'nullable|integer|min:0',
+            'ai_credits_limit'   => 'nullable|integer|min:0',
             'is_active'          => 'boolean',
         ]);
 
@@ -587,6 +588,7 @@ class SaaSController extends Controller
             'is_active'         => $request->boolean('is_active', true),
             'reservation_limit' => $request->filled('reservation_limit') ? (int) $request->reservation_limit : null,
             'max_staff'         => $request->filled('max_staff') ? (int) $request->max_staff : null,
+            'ai_credits_limit'  => $request->filled('ai_credits_limit') ? (int) $request->ai_credits_limit : null,
         ]);
 
         if ($id) {
