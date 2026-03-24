@@ -44,6 +44,7 @@ import AboutUsPage from './pages/public/AboutUsPage'
 import CommunityPage from './pages/public/CommunityPage'
 import BlogDetailPage from './pages/public/BlogDetailPage'
 import CustomerStoryDetailPage from './pages/public/CustomerStoryDetailPage'
+import PrivacyPolicyPage from './pages/public/PrivacyPolicyPage'
 import Register from './pages/Register'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
@@ -69,6 +70,7 @@ function App() {
               <Route path="/help" element={<HelpCenterPage />} />
               <Route path="/about" element={<AboutUsPage />} />
               <Route path="/community" element={<CommunityPage />} />
+              <Route path="/privacy" element={<PrivacyPolicyPage />} />
             </Route>
             
             {/* Tenant Login / Register */}

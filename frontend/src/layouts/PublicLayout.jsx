@@ -301,8 +301,8 @@ export function PublicLayout() {
             </p>
             <div className="flex gap-6">
               <Link to="/about" className="text-xs text-slate-600 hover:text-white transition-colors">About Us</Link>
-              <a href="#" className="text-xs text-slate-600 hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="text-xs text-slate-600 hover:text-white transition-colors">Terms of Service</a>
+              <Link to="/privacy" className="text-xs text-slate-600 hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/help" className="text-xs text-slate-600 hover:text-white transition-colors">Terms of Service</Link>
             </div>
           </div>
         </div>
