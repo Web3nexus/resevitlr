@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Settings, Save, Globe, Shield, Mail, Database, Loader2, Bot, Layout, FileText, CreditCard, Trash2, CheckCircle, CircleX as XCircle, MessageSquare, Copy, ExternalLink, Sparkles } from 'lucide-react';
+import { Settings, Save, Globe, Shield, Mail, Database, Loader2, Bot, Layout, FileText, CreditCard, CheckCircle, CircleX as XCircle, MessageSquare, Copy, ExternalLink, Sparkles } from 'lucide-react';
 import api from '../../services/centralApi';
-import ConfirmationModal from '../../components/common/ConfirmationModal';
 
 export default function SaaSSettingsView() {
   const [activeTab, setActiveTab] = useState('general');
@@ -1095,16 +1094,6 @@ export default function SaaSSettingsView() {
           </div>
         </div>
       </div>
-
-      <ConfirmationModal 
-        isOpen={isDeleteModalOpen}
-        onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={() => handleDeletePlan(planToDelete)}
-        title="Delete Subscription Plan?"
-        message="Are you sure you want to delete this plan? This could potentially disrupt billing for existing tenants on this tier."
-        confirmText="Delete Plan"
-        type="danger"
-      />
     </div>
   );
 }
