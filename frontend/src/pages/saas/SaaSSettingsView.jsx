@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Settings, Save, Globe, Shield, Mail, Database, Loader2, Bot, Layout, FileText, CreditCard, CheckCircle, CircleX as XCircle, MessageSquare, Copy, ExternalLink, Sparkles } from 'lucide-react';
 import api from '../../services/centralApi';
+import StatusModal from '../../components/common/StatusModal';
 
 export default function SaaSSettingsView() {
   const [activeTab, setActiveTab] = useState('general');
@@ -49,6 +50,11 @@ export default function SaaSSettingsView() {
   });
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'success' });
+
+  const showModal = (title, message, type = 'success') => {
+    setModal({ isOpen: true, title, message, type });
+  };
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -69,10 +75,10 @@ export default function SaaSSettingsView() {
     setIsSaving(true);
     try {
       await api.post('/saas/settings', settings);
-      alert("Settings saved successfully!");
+      showModal("Success", "All system configurations have been saved successfully.", "success");
     } catch (error) {
       console.error("Failed to save settings", error);
-      alert("Error saving settings.");
+      showModal("Save Error", error.response?.data?.message || "There was a problem saving your changes. Please try again.", "error");
     } finally {
       setIsSaving(false);
     }
@@ -193,8 +199,9 @@ export default function SaaSSettingsView() {
                               try {
                                 const res = await api.post('/saas/settings/upload-branding', formData);
                                 setSettings({ ...settings, platform_logo_url: res.data.url });
+                                showModal("Logo Uploaded", "Your platform logo has been updated.", "success");
                               } catch (err) {
-                                alert("Failed to upload logo");
+                                showModal("Upload Failed", "Failed to upload platform logo.", "error");
                               }
                             }}
                           />
@@ -239,8 +246,9 @@ export default function SaaSSettingsView() {
                               try {
                                 const res = await api.post('/saas/settings/upload-branding', formData);
                                 setSettings({ ...settings, platform_favicon_url: res.data.url });
+                                showModal("Favicon Uploaded", "Your browser favicon has been updated.", "success");
                               } catch (err) {
-                                alert("Failed to upload favicon");
+                                showModal("Upload Failed", "Failed to upload favicon.", "error");
                               }
                             }}
                           />
@@ -442,12 +450,12 @@ export default function SaaSSettingsView() {
                         </div>
                         <button 
                             onClick={async () => {
-                                if(!settings.test_recipient) return alert("Please enter a test recipient email.");
+                                if(!settings.test_recipient) return showModal("Missing Recipient", "Please enter a test recipient email.", "error");
                                 try {
                                     const res = await api.post('/saas/settings/test-email', { email: settings.test_recipient });
-                                    alert(res.data.message);
+                                    showModal("Email Sent", res.data.message, "success");
                                 } catch (err) {
-                                    alert(err.response?.data?.message || "Failed to send test email.");
+                                    showModal("Email Failed", err.response?.data?.message || "Failed to send test email.", "error");
                                 }
                             }}
                             className="bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 px-6 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 border border-blue-600/20 h-[42px]"
@@ -554,9 +562,9 @@ export default function SaaSSettingsView() {
                                       claude_api_key: settings.claude_api_key,
                                       ai_provider: settings.ai_provider
                                   });
-                                  alert(res.data.message);
+                                  showModal("AI Connected", res.data.message, "success");
                               } catch (err) {
-                                  alert(err.response?.data?.message || "AI Connection Failed.");
+                                  showModal("Connection Failed", err.response?.data?.message || "AI Connection Failed.", "error");
                               }
                           }}
                           className="bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 px-4 py-2 rounded-xl text-xs font-medium transition-colors flex items-center gap-2 border border-blue-600/20"
@@ -613,9 +621,9 @@ export default function SaaSSettingsView() {
                             <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Master Webhook URL</label>
                             <button 
                                 onClick={() => {
-                                    const url = `${window.location.origin}/api/social/webhook`;
+                                    const url = `${window.location.origin}/central-api/social/webhook`;
                                     navigator.clipboard.writeText(url);
-                                    alert("Copied to clipboard!");
+                                    showModal("URL Copied", "The master webhook URL has been copied to your clipboard. Paste this into your Meta Developer Portal.", "info");
                                 }}
                                 className="text-[10px] font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
                             >
@@ -623,8 +631,8 @@ export default function SaaSSettingsView() {
                                 Copy URL
                             </button>
                         </div>
-                        <div className="bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 font-mono text-sm text-white break-all">
-                            {window.location.origin}/api/social/webhook
+                        <div className="bg-slate-950 border border-slate-800 rounded-xl py-3 px-4 font-mono text-xs text-blue-400 break-all">
+                            {window.location.origin}/central-api/social/webhook
                         </div>
                         <p className="text-[10px] text-slate-500 mt-2 italic">Copy this URL to the "Webhook URL" field in your Meta Developer Portal.</p>
                     </div>
@@ -1094,6 +1102,14 @@ export default function SaaSSettingsView() {
           </div>
         </div>
       </div>
+
+      <StatusModal 
+        isOpen={modal.isOpen}
+        onClose={() => setModal({ ...modal, isOpen: false })}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+      />
     </div>
   );
 }
