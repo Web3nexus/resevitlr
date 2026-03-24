@@ -16,7 +16,9 @@ class SubscriptionController extends Controller
      */
     public function getPlans()
     {
-        return response()->json(SubscriptionPlan::where('is_active', true)->get());
+        return response()->json(tenancy()->central(fn() => 
+            SubscriptionPlan::where('is_active', true)->get()
+        ));
     }
 
     /**
