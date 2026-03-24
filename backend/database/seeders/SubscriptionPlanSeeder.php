@@ -17,7 +17,7 @@ class SubscriptionPlanSeeder extends Seeder
                 'yearly_price'      => 0,
                 'reservation_limit' => 50,
                 'max_staff'         => 2,
-                'ai_credits_limit'  => 10,
+                'ai_credits_limit'  => 0,
                 'features'          => [
                     'insights'          => true,
                     'reservations'      => true,
