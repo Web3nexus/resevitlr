@@ -21,30 +21,37 @@ class SubscriptionController extends Controller
 
     /**
      * Get the current subscription status for the authenticated user's tenant.
+     * Uses tenant() helper because Auth::user() in a tenant context has no central tenant_id.
      */
     public function currentStatus(Request $request)
     {
-        $user = Auth::user();
-        if (!$user->tenant_id) {
-            return response()->json(['message' => 'No tenant associated with this user.'], 404);
+        // Get the active tenant from the tenancy context (set by domain middleware).
+        $currentTenant = tenant();
+
+        if (!$currentTenant) {
+            return response()->json(['message' => 'Could not identify tenant context.'], 422);
         }
 
-        $tenant = Tenant::find($user->tenant_id);
-        $plan = SubscriptionPlan::where('slug', $tenant->plan)->first();
+        // SubscriptionPlan lives in the central DB — query it there.
+        $plan = tenancy()->central(fn() =>
+            SubscriptionPlan::where('slug', $currentTenant->plan)->first()
+        );
 
-        $salesEmail = \App\Models\SaaSSetting::where('key', 'sales_email')->first()?->value ?? 'sales@resevit.com';
+        $salesEmail = tenancy()->central(fn() =>
+            \App\Models\SaaSSetting::where('key', 'sales_email')->value('value') ?? 'sales@resevit.com'
+        );
 
         return response()->json([
-            'plan_name' => $plan ? $plan->name : 'Free',
-            'plan_slug' => $tenant->plan,
-            'status' => $tenant->subscription_status,
-            'provider' => $tenant->subscription_provider,
-            'ends_at' => $tenant->subscription_ends_at,
-            'country' => $tenant->country,
-            'ai_credits_limit' => $plan ? $plan->ai_credits_limit : 10, // Default 10 for Free if not set
-            'ai_credits_used' => $tenant->ai_credits_used ?? 0,
-            'ai_credits_topup' => $tenant->ai_credits_topup ?? 0,
-            'sales_email' => $salesEmail,
+            'plan_name'         => $plan ? $plan->name : 'Free',
+            'plan_slug'         => $currentTenant->plan ?? 'free',
+            'status'            => $currentTenant->subscription_status ?? 'active',
+            'provider'          => $currentTenant->subscription_provider ?? null,
+            'ends_at'           => $currentTenant->subscription_ends_at ?? null,
+            'country'           => $currentTenant->country ?? null,
+            'ai_credits_limit'  => $plan?->ai_credits_limit,          // null = Unlimited
+            'ai_credits_used'   => $currentTenant->ai_credits_used ?? 0,
+            'ai_credits_topup'  => $currentTenant->ai_credits_topup ?? 0,
+            'sales_email'       => $salesEmail,
         ]);
     }
 
@@ -55,27 +62,30 @@ class SubscriptionController extends Controller
     {
         $request->validate([
             'plan_slug' => 'required|exists:subscription_plans,slug',
-            'interval' => 'required|in:monthly,yearly',
-            'country' => 'nullable|string|size:2',
+            'interval'  => 'required|in:monthly,yearly',
+            'country'   => 'nullable|string|size:2',
         ]);
 
-        $user = Auth::user();
-        $tenant = Tenant::find($user->tenant_id);
+        // tenant() gives us the central Tenant model from the tenancy context.
+        $currentTenant = tenant();
 
-        if (!$tenant) {
+        if (!$currentTenant) {
             return response()->json(['message' => 'Tenant not found.'], 404);
         }
 
-        // Update country if provided
-        if ($request->has('country')) {
-            $tenant->country = strtoupper($request->country);
-            $tenant->save();
+        // Update country if provided (stored on central Tenant model).
+        if ($request->filled('country')) {
+            $currentTenant->country = strtoupper($request->country);
+            $currentTenant->save();
         }
 
-        $plan = SubscriptionPlan::where('slug', $request->plan_slug)->first();
+        // SubscriptionPlan lives in the central DB.
+        $plan = tenancy()->central(fn() =>
+            SubscriptionPlan::where('slug', $request->plan_slug)->first()
+        );
 
         try {
-            $paymentInfo = $paymentService->initializePayment($tenant, $plan, $request->interval);
+            $paymentInfo = $paymentService->initializePayment($currentTenant, $plan, $request->interval);
             return response()->json($paymentInfo);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
@@ -91,19 +101,18 @@ class SubscriptionController extends Controller
             'amount' => 'required|integer|min:1',
         ]);
 
-        $user = Auth::user();
-        $tenant = Tenant::find($user->tenant_id);
+        $currentTenant = tenant();
 
-        if (!$tenant) {
+        if (!$currentTenant) {
             return response()->json(['message' => 'Tenant not found.'], 404);
         }
 
         // Logic here would normally involve a payment check
-        $tenant->increment('ai_credits_topup', $request->amount);
+        $currentTenant->increment('ai_credits_topup', $request->amount);
 
         return response()->json([
-            'message' => "Successfully purchased {$request->amount} AI credits.",
-            'ai_credits_topup' => $tenant->ai_credits_topup
+            'message'          => "Successfully purchased {$request->amount} AI credits.",
+            'ai_credits_topup' => $currentTenant->ai_credits_topup
         ]);
     }
 }

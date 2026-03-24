@@ -235,12 +235,22 @@ export default function BillingView() {
             <div className="space-y-4 mb-8 flex-1">
               <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">What's included</p>
               <ul className="space-y-3">
-                {Array.isArray(plan.features) && plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
-                    <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                    <span className="capitalize">{feature.replace(/_/g, ' ')}</span>
-                  </li>
-                ))}
+                {plan.features && typeof plan.features === 'object' && !Array.isArray(plan.features)
+                  ? Object.entries(plan.features)
+                      .filter(([, v]) => v === true)
+                      .map(([key]) => (
+                        <li key={key} className="flex items-center gap-3 text-sm text-slate-600">
+                          <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                          <span className="capitalize">{key.replace(/_/g, ' ')}</span>
+                        </li>
+                      ))
+                  : Array.isArray(plan.features) && plan.features.map((feature, i) => (
+                      <li key={i} className="flex items-center gap-3 text-sm text-slate-600">
+                        <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                        <span className="capitalize">{feature.replace(/_/g, ' ')}</span>
+                      </li>
+                    ))
+                }
                 {/* AI Credits Feature Item */}
                 <li className="flex items-center gap-3 text-sm font-bold text-blue-600 pt-2 border-t border-slate-100 mt-2">
                   <Zap className="w-4 h-4 text-blue-500 shrink-0" />
