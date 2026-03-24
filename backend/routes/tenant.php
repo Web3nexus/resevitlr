@@ -125,6 +125,14 @@ Route::middleware([
             // Dashboard Stats
             Route::get('/dashboard/stats', [\App\Http\Controllers\Api\DashboardController::class, 'stats']);
 
+            // Billing & Subscription
+            Route::prefix('billing')->group(function () {
+                Route::get('/plans', [\App\Http\Controllers\Api\SubscriptionController::class, 'getPlans']);
+                Route::get('/status', [\App\Http\Controllers\Api\SubscriptionController::class, 'currentStatus']);
+                Route::post('/subscribe', [\App\Http\Controllers\Api\SubscriptionController::class, 'subscribe']);
+                Route::post('/purchase-credits', [\App\Http\Controllers\Api\SubscriptionController::class, 'purchaseCredits']);
+            });
+
             // Notifications
             Route::get('/notifications', [NotificationController::class, 'index']);
             Route::post('/notifications/settings', [NotificationController::class, 'updateSettings']);

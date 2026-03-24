@@ -43,6 +43,7 @@ class SubscriptionController extends Controller
             'country' => $tenant->country,
             'ai_credits_limit' => $plan ? $plan->ai_credits_limit : 10, // Default 10 for Free if not set
             'ai_credits_used' => $tenant->ai_credits_used ?? 0,
+            'ai_credits_topup' => $tenant->ai_credits_topup ?? 0,
             'sales_email' => $salesEmail,
         ]);
     }
@@ -79,5 +80,30 @@ class SubscriptionController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 400);
         }
+    }
+
+    /**
+     * Purchase additional AI credits (Top-up).
+     */
+    public function purchaseCredits(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|integer|min:1',
+        ]);
+
+        $user = Auth::user();
+        $tenant = Tenant::find($user->tenant_id);
+
+        if (!$tenant) {
+            return response()->json(['message' => 'Tenant not found.'], 404);
+        }
+
+        // Logic here would normally involve a payment check
+        $tenant->increment('ai_credits_topup', $request->amount);
+
+        return response()->json([
+            'message' => "Successfully purchased {$request->amount} AI credits.",
+            'ai_credits_topup' => $tenant->ai_credits_topup
+        ]);
     }
 }

@@ -8,6 +8,7 @@ export default function BillingView() {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [subscribing, setSubscribing] = useState(null);
+  const [purchasingTopup, setPurchasingTopup] = useState(false);
   const [error, setError] = useState(null);
   const [country, setCountry] = useState('');
 
@@ -57,6 +58,19 @@ export default function BillingView() {
       setError(err.response?.data?.message || "Failed to start payment process.");
     } finally {
       setSubscribing(null);
+    }
+  };
+
+  const handleTopUp = async (amount) => {
+    setPurchasingTopup(true);
+    setError(null);
+    try {
+      await api.post('/billing/purchase-credits', { amount });
+      await fetchData(); // Refresh the credit count
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to purchase credits.");
+    } finally {
+      setPurchasingTopup(false);
     }
   };
 
@@ -130,14 +144,19 @@ export default function BillingView() {
             {/* AI Credits Usage Indicator */}
             <div className="mt-6 pt-6 border-t border-white/10">
               <div className="flex justify-between items-end mb-2">
-                <div className="text-[10px] font-black text-blue-200 uppercase tracking-widest">AI Credit Usage</div>
+                <div className="text-[10px] font-black text-blue-200 uppercase tracking-widest">Base Credits Used</div>
                 <div className="text-xs font-bold text-white">{status?.ai_credits_used || 0} / {status?.ai_credits_limit || '∞'}</div>
               </div>
-              <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-4">
                 <div 
                   className="h-full bg-blue-300 transition-all duration-500" 
                   style={{ width: `${Math.min(((status?.ai_credits_used || 0) / (status?.ai_credits_limit || 1)) * 100, 100)}%` }}
                 />
+              </div>
+              
+              <div className="flex justify-between items-end mb-2">
+                <div className="text-[10px] font-black hover:text-amber-300 text-amber-400 uppercase tracking-widest">Rollover Top-Up Balance</div>
+                <div className="text-xs font-bold text-amber-400">{status?.ai_credits_topup || 0} left</div>
               </div>
             </div>
           </div>
@@ -160,6 +179,36 @@ export default function BillingView() {
         
         {/* Background Decorative Element */}
         <CreditCard className="absolute -bottom-10 -right-10 w-64 h-64 text-white/5 rotate-12" />
+      </div>
+
+      {/* AI Credit Top-Up Section */}
+      <div className="bg-white border text-center border-slate-200 rounded-3xl p-8 flex flex-col items-center justify-center space-y-6 shadow-sm mb-8 animate-in fade-in slide-in-from-bottom-4">
+        <div>
+           <h3 className="text-xl font-black text-slate-900 flex items-center justify-center gap-2">
+              <Zap className="w-6 h-6 text-amber-500" /> Top Up AI Credits
+           </h3>
+           <p className="text-slate-500 text-sm mt-2 max-w-lg mx-auto">
+             Need more capacity before your cycle resets? Buy non-expiring AI credits that carry over until you use them all.
+           </p>
+        </div>
+        
+        <div className="flex flex-wrap justify-center gap-4">
+           {[ {amount: 250, price: 10}, {amount: 1000, price: 35}, {amount: 5000, price: 150} ].map(pack => (
+              <button
+                 key={pack.amount}
+                 disabled={purchasingTopup}
+                 onClick={() => handleTopUp(pack.amount)}
+                 className="flex flex-col items-center p-4 bg-white border-2 border-slate-200 rounded-2xl hover:border-amber-500 hover:bg-amber-50 transition-all min-w-[140px] focus:outline-none focus:ring-4 focus:ring-amber-500/20 active:scale-95 disabled:opacity-50"
+              >
+                 <span className="text-2xl font-black text-slate-900">{pack.amount.toLocaleString()}</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 mt-1 mb-3">Credits</span>
+                 <div className="px-3 py-1 bg-slate-100 text-slate-700 font-bold text-sm rounded-lg w-full group-hover:bg-amber-100 transition-colors">
+                    ${pack.price}
+                 </div>
+              </button>
+           ))}
+        </div>
+        {purchasingTopup && <p className="text-sm font-medium text-amber-600 flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin"/> Provisioning credits...</p>}
       </div>
 
       {/* Plan Selection */}

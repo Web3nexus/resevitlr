@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Upload, Scan, FileText, CheckCircle, Loader2, X, AlertCircle } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import api from '../services/api'
 
 export function AIScanner({ onUploadSuccess, onClose }) {
@@ -30,7 +31,11 @@ export function AIScanner({ onUploadSuccess, onClose }) {
       // We don't call onUploadSuccess yet, wait for user to "Confirm"
     } catch (err) {
       console.error('Scan Error:', err);
-      setError("Failed to digitize receipt. AI might be overwhelmed or the file is too large.")
+      if (err.response?.status === 403 && err.response?.data?.error) {
+          setError(err.response.data.error);
+      } else {
+          setError("Failed to digitize receipt. AI might be overwhelmed or the file is too large.");
+      }
     } finally {
       setScanning(false)
     }
@@ -85,8 +90,16 @@ export function AIScanner({ onUploadSuccess, onClose }) {
               </div>
 
               {error && (
-                <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-xl text-xs font-black uppercase tracking-tight animate-pulse border border-red-100">
-                   <AlertCircle size={18} /> {error}
+                <div className="flex flex-col items-start gap-2 text-red-600 bg-red-50 p-4 rounded-xl text-left border border-red-100 shadow-sm animate-in slide-in-from-top-2">
+                   <div className="flex items-center gap-2 text-xs font-black uppercase tracking-tight">
+                       <AlertCircle size={18} /> Error Processing
+                   </div>
+                   <p className="text-xs font-bold text-red-500 leading-relaxed mt-1">{error}</p>
+                   {error.includes('AI Credit Limit') && (
+                      <Link to="/saas/billing" className="text-[10px] font-black text-white bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg uppercase tracking-widest transition-colors mt-2 inline-block shadow-md">
+                          Buy More Credits
+                      </Link>
+                   )}
                 </div>
               )}
 

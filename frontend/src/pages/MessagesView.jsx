@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Send, Instagram, Facebook, Bot, User, Search, Filter, Loader2, ArrowLeft, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 export default function MessagesView() {
     const [interactions, setInteractions] = useState([]);
+    const [credits, setCredits] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedSender, setSelectedSender] = useState(null);
     const [replyText, setReplyText] = useState('');
@@ -15,6 +17,9 @@ export default function MessagesView() {
         try {
             const response = await api.get('/automation/activity');
             setInteractions(Array.isArray(response.data.activity) ? response.data.activity : []);
+            if (response.data.stats?.credits) {
+                setCredits(response.data.stats.credits);
+            }
         } catch (error) {
             console.error("Failed to fetch interactions", error);
         } finally {
@@ -73,6 +78,9 @@ export default function MessagesView() {
     };
 
     const activeChatMessages = selectedSender ? conversations[selectedSender].messages.slice().reverse() : [];
+
+    const isOutOfCredits = credits && (credits.used >= credits.limit) && (credits.topup <= 0);
+    const isLowOnCredits = credits && !isOutOfCredits && ((credits.limit + credits.topup - credits.used) / (credits.limit + credits.topup) <= 0.1);
 
     return (
         <div className="h-[calc(100vh-120px)] flex gap-6 animate-in fade-in duration-500">
@@ -231,9 +239,20 @@ export default function MessagesView() {
                                     {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                                 </button>
                             </form>
-                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-3 text-center">
-                                Tip: Sending a manual reply will pause autonomous AI for this session.
-                            </p>
+                            
+                            {isOutOfCredits ? (
+                                <p className="text-xs font-bold text-red-500 mt-3 text-center">
+                                    You have exceeded your AI credit limit. Auto-replies are paused. <Link to="/saas/billing" className="underline hover:text-red-600">Buy more credits</Link>
+                                </p>
+                            ) : isLowOnCredits ? (
+                                <p className="text-xs font-bold text-amber-500 mt-3 text-center">
+                                    You are running low on AI credits (less than 10% remaining). <Link to="/saas/billing" className="underline hover:text-amber-600">Top up now</Link>
+                                </p>
+                            ) : (
+                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-3 text-center">
+                                    Tip: Sending a manual reply will pause autonomous AI for this session.
+                                </p>
+                            )}
                         </div>
                     </>
                 ) : (
@@ -246,15 +265,36 @@ export default function MessagesView() {
                             Monitor and manage all communications from WhatsApp, Facebook, Instagram, and Web. Select a conversation to begin.
                         </p>
                         <div className="mt-8 grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
-                                <CheckCircle className="text-emerald-500 w-5 h-5" />
-                                <span className="text-[10px] font-black text-slate-600 uppercase">AI Monitoring Active</span>
+                            <div className={`p-4 bg-white rounded-2xl border ${isOutOfCredits ? 'border-red-200' : 'border-slate-100'} shadow-sm flex items-center gap-3`}>
+                                {isOutOfCredits ? <AlertCircle className="text-red-500 w-5 h-5" /> : <CheckCircle className="text-emerald-500 w-5 h-5" />}
+                                <span className={`text-[10px] items-center font-black uppercase ${isOutOfCredits ? 'text-red-500' : 'text-slate-600'}`}>
+                                    {isOutOfCredits ? 'AI Paused (No Credits)' : 'AI Monitoring Active'}
+                                </span>
                             </div>
                             <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center gap-3">
                                 <Clock className="text-blue-500 w-5 h-5" />
                                 <span className="text-[10px] font-black text-slate-600 uppercase">Real-time Sync</span>
                             </div>
                         </div>
+
+                        {isOutOfCredits && (
+                            <Link to="/saas/billing" className="mt-6 p-4 bg-red-50 border border-red-100 hover:border-red-200 rounded-2xl w-full max-w-sm flex items-center gap-3 transition-colors group">
+                                <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
+                                <div className="text-left flex-1">
+                                    <p className="text-xs font-bold text-red-600">AI Features Disabled</p>
+                                    <p className="text-[10px] font-black text-red-400 uppercase tracking-widest mt-0.5 group-hover:text-red-500 transition-colors">Click here to Top Up Credits →</p>
+                                </div>
+                            </Link>
+                        )}
+                        {isLowOnCredits && (
+                            <Link to="/saas/billing" className="mt-6 p-4 bg-amber-50 border border-amber-100 hover:border-amber-200 rounded-2xl w-full max-w-sm flex items-center gap-3 transition-colors group">
+                                <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
+                                <div className="text-left flex-1">
+                                    <p className="text-xs font-bold text-amber-600">AI Credits Low</p>
+                                    <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest mt-0.5 group-hover:text-amber-600 transition-colors">Top Up Now to avoid interruption →</p>
+                                </div>
+                            </Link>
+                        )}
                     </div>
                 )}
             </div>

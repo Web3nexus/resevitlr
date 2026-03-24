@@ -23,10 +23,7 @@ class AutomationController extends Controller
         $tenant = tenant();
         if (!$tenant) return true; // Central context
 
-        $planSlug = $tenant->plan ?? 'free';
-        $plan = \App\Models\SubscriptionPlan::where('slug', $planSlug)->first();
-        
-        // Handle monthly reset if needed (simplified: reset if month changed)
+        // Handle monthly reset
         if ($tenant->ai_credits_reset_at && $tenant->ai_credits_reset_at->isPast()) {
             $tenant->ai_credits_used = 0;
             $tenant->ai_credits_reset_at = now()->addMonth()->startOfMonth();
@@ -34,14 +31,51 @@ class AutomationController extends Controller
             $tenant->ai_credits_reset_at = now()->addMonth()->startOfMonth();
         }
 
-        $limit = $plan ? $plan->ai_credits_limit : 10; // Default 10 for Free
+        $planSlug = $tenant->plan ?? 'free';
+        $plan = \App\Models\SubscriptionPlan::where('slug', $planSlug)->first();
+        $monthlyLimit = $plan ? $plan->ai_credits_limit : 10;
+        $topupLimit = $tenant->ai_credits_topup ?? 0;
+        $totalLimit = $monthlyLimit + $topupLimit;
         
-        if ($limit !== null && $tenant->ai_credits_used >= $limit) {
-            throw new \Exception("AI Credit Limit Reached ({$limit}/month). Please upgrade your plan.");
+        $usageBefore = ($tenant->ai_credits_used ?? 0) + ($tenant->ai_credits_topup_initial_balance_dummy ?? 0); // Not tracked yet but logic skeleton
+
+        if ($tenant->ai_credits_used < $monthlyLimit) {
+            $tenant->increment('ai_credits_used');
+        } elseif ($tenant->ai_credits_topup > 0) {
+            $tenant->decrement('ai_credits_topup');
+        } else {
+            $this->notifyCreditStatus($tenant, 'empty');
+            throw new \Exception("AI Credit Limit Reached. Please top-up to continue using AI features.");
         }
 
-        $tenant->increment('ai_credits_used');
+        // Check for 10% remaining (10% to finish)
+        $remaining = ($monthlyLimit - $tenant->ai_credits_used) + $tenant->ai_credits_topup;
+        if ($totalLimit > 0 && ($remaining / $totalLimit) <= 0.1) {
+            $this->notifyCreditStatus($tenant, 'low');
+        }
+
         return true;
+    }
+
+    private function notifyCreditStatus($tenant, $status)
+    {
+        // Simple throttler: don't notify more than once every 24 hours for same status
+        $cacheKey = "ai_notify_{$tenant->id}_{$status}";
+        if (\Illuminate\Support\Facades\Cache::has($cacheKey)) return;
+
+        $title = $status === 'low' ? "AI Credits Low (10%)" : "AI Credits Exhausted";
+        $message = $status === 'low' 
+            ? "You have less than 10% of your AI credits remaining. Click here to top up and avoid interruption."
+            : "Your AI credits have run out. Auto-replies and scanning are paused. Top up to resume.";
+        
+        \App\Http\Controllers\Api\NotificationController::dispatch(
+            'ai_limit',
+            $title,
+            $message,
+            'bot'
+        );
+
+        \Illuminate\Support\Facades\Cache::put($cacheKey, true, now()->addDay());
     }
 
     /**
@@ -387,7 +421,8 @@ class AutomationController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'expense' => $expense
+                'expense' => $expense,
+                'credits' => $this->getCreditsArray()
             ]);
 
         } catch (\Exception $e) {
@@ -548,7 +583,23 @@ class AutomationController extends Controller
                 'sentiment_score' => $sentimentScore,
                 'auto_replies' => $autoReplies,
                 'accuracy' => '99%',
+                'credits' => $this->getCreditsArray(),
             ]
         ]);
+    }
+
+    private function getCreditsArray()
+    {
+        $tenant = tenant();
+        if (!$tenant) return null;
+
+        $planSlug = $tenant->plan ?? 'free';
+        $plan = \App\Models\SubscriptionPlan::where('slug', $planSlug)->first();
+
+        return [
+            'used' => $tenant->ai_credits_used ?? 0,
+            'limit' => $plan ? $plan->ai_credits_limit : 10,
+            'topup' => $tenant->ai_credits_topup ?? 0,
+        ];
     }
 }
