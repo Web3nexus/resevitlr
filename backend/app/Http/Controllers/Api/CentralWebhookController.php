@@ -43,34 +43,54 @@ class CentralWebhookController extends Controller
         // 1. Identify the platform and the platform-specific ID
         $platform = 'Web';
         $platformId = null;
+        $tenant = null;
 
         // WhatsApp Business Payload
         if (isset($payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'])) {
             $platform = 'WhatsApp';
-            $platformId = $payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'];
+            $phoneNumberId = $payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'];
+            $wabaId = $payload['entry'][0]['id'] ?? null;
+            $displayPhoneNumber = $payload['entry'][0]['changes'][0]['value']['metadata']['display_phone_number'] ?? null;
+            
+            $platformId = $phoneNumberId; // keep for logging
+
+            // Try to match tenant against any of the possible WhatsApp identifiers user might have entered
+            $tenant = Tenant::where('data->whatsapp_id', $phoneNumberId)
+                ->when($wabaId, function($q) use ($wabaId) {
+                    $q->orWhere('data->whatsapp_id', $wabaId);
+                })
+                ->when($displayPhoneNumber, function($q) use ($displayPhoneNumber) {
+                    // sometimes display numbers have '+' and sometimes they don't, check exact and without +
+                    $q->orWhere('data->whatsapp_id', $displayPhoneNumber)
+                      ->orWhere('data->whatsapp_id', str_replace('+', '', $displayPhoneNumber))
+                      ->orWhere('data->whatsapp_id', '+' . str_replace('+', '', $displayPhoneNumber));
+                })
+                ->first();
         } 
         // Facebook/Instagram Page Payload
         elseif (isset($payload['entry'][0]['id'])) {
             $platformId = $payload['entry'][0]['id'];
-            // Distinguish between FB and IG if possible from payload
-            $platform = isset($payload['entry'][0]['messaging']) ? 'Facebook' : 'Instagram';
+            $platform = (isset($payload['object']) && $payload['object'] === 'instagram') ? 'Instagram' : 'Facebook';
+            
+            $tenant = Tenant::where('data->facebook_page_id', $platformId)
+                ->orWhere('data->instagram_id', $platformId)
+                // Just in case they pasted the ID in the wrong social box
+                ->orWhere('data->whatsapp_id', $platformId)
+                // Handle cases where user might have pasted a URL containing the ID
+                ->orWhere('data->facebook_page_id', 'LIKE', '%' . $platformId . '%')
+                ->orWhere('data->instagram_id', 'LIKE', '%' . $platformId . '%')
+                ->first();
         }
         // Fallback for custom/simulated payloads
         elseif (isset($payload['message']['platform_id'])) {
             $platformId = $payload['message']['platform_id'];
             $platform = $payload['message']['platform'] ?? 'Web';
+            
+            $tenant = Tenant::where('data->whatsapp_id', $platformId)
+                ->orWhere('data->facebook_page_id', $platformId)
+                ->orWhere('data->instagram_id', $platformId)
+                ->first();
         }
-
-        if (!$platformId) {
-            return response()->json(['status' => 'error', 'message' => 'Platform ID not found in payload'], 400);
-        }
-
-        // 2. Find the tenant associated with this platform ID
-        // Note: Stancl Tenancy stores custom data in the 'data' JSON column
-        $tenant = Tenant::where('data->whatsapp_id', $platformId)
-            ->orWhere('data->facebook_page_id', $platformId)
-            ->orWhere('data->instagram_id', $platformId)
-            ->first();
 
         if (!$tenant) {
             Log::warning('Social Webhook: No tenant found for ID ' . $platformId);
