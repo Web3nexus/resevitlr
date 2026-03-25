@@ -16,127 +16,152 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
+        try {
+            \Illuminate\Support\Facades\Log::info('DEBUG: Login attempt started', [
+                'email' => $request->email,
+                'path' => $request->path(),
+                'method' => $request->method(),
+            ]);
 
-        // 1. Identify if this is an Admin (SaaS) login attempt.
-        // We check path segments and route names to be robust across different environments.
-        $isAdminPath = $request->is('central-api/saas/*') || 
-                       $request->is('*/saas/*') || 
-                       str_contains($request->path(), 'saas/');
+            $request->validate([
+                'email'    => 'required|email',
+                'password' => 'required',
+            ]);
 
-        // 2. Cross-check for known admin emails if NOT an admin path (Safety net)
-        if (!$isAdminPath) {
-            $isAdminEmail = \App\Models\Admin::where('email', $request->email)->exists();
-            if ($isAdminEmail) {
-                $isAdminPath = true;
+            // 1. Identify if this is an Admin (SaaS) login attempt.
+            $isAdminPath = $request->is('central-api/saas/*') || 
+                           $request->is('*/saas/*') || 
+                           str_contains($request->path(), 'saas/');
+
+            if (!$isAdminPath) {
+                $isAdminEmail = \App\Models\Admin::where('email', $request->email)->exists();
+                if ($isAdminEmail) {
+                    $isAdminPath = true;
+                    \Illuminate\Support\Facades\Log::info('DEBUG: Admin email detected on non-admin path', ['email' => $request->email]);
+                }
             }
-        }
 
-        if ($isAdminPath) {
-            $user = \App\Models\Admin::where('email', $request->email)->first();
-            if (!$user || !Hash::check($request->password, $user->password)) {
+            if ($isAdminPath) {
+                $user = \App\Models\Admin::where('email', $request->email)->first();
+                if (!$user) {
+                    \Illuminate\Support\Facades\Log::warning('DEBUG: Admin user not found', ['email' => $request->email]);
+                    return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
+                }
+                
+                if (!Hash::check($request->password, $user->password)) {
+                    \Illuminate\Support\Facades\Log::warning('DEBUG: Admin password mismatch', ['email' => $request->email]);
+                    return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
+                }
+
+                \Illuminate\Support\Facades\Log::info('DEBUG: Admin authenticated successfully', ['email' => $request->email]);
+
+                // Handle 2FA for Super Admin
+                $twoFactorMethod = $user->two_factor_method ?: 'none';
+                if ($twoFactorMethod !== 'none') {
+                    return $this->sendTwoFactorCode($user, $twoFactorMethod);
+                }
+
+                return $this->issueToken($user);
+            }
+
+            // Tenant user login
+            $tenant = Tenant::where('owner_email', $request->email)->first();
+            
+            if (!$tenant) {
+                \Illuminate\Support\Facades\Log::info('DEBUG: Tenant owner not found, searching staff', ['email' => $request->email]);
+                $allTenants = Tenant::all();
+                foreach ($allTenants as $t) {
+                    $found = $t->run(function() use ($request) {
+                        return User::where('email', $request->email)->first();
+                    });
+                    if ($found) {
+                        $tenant = $t;
+                        break;
+                    }
+                }
+            }
+
+            if (!$tenant) {
+                \Illuminate\Support\Facades\Log::warning('DEBUG: No tenant found for user', ['email' => $request->email]);
                 return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
             }
 
-            // Handle 2FA for Super Admin
-            $twoFactorMethod = $user->two_factor_method ?: 'none';
+            // Authenticate within the tenant's database
+            $authData = $tenant->run(function() use ($request) {
+                $user = User::where('email', $request->email)->first();
+                if (!$user || !Hash::check($request->password, $user->password)) {
+                    return null;
+                }
+                return [
+                    'id' => $user->id,
+                    'email' => $user->email,
+                    'name' => $user->name,
+                    'two_factor_method' => $user->two_factor_method ?: 'none',
+                    'array_data' => $user->toArray()
+                ];
+            });
+
+            if (!$authData) {
+                \Illuminate\Support\Facades\Log::warning('DEBUG: Tenant user authentication failed', ['email' => $request->email]);
+                return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
+            }
+
+            // Check 2FA preference
+            $twoFactorMethod = $authData['two_factor_method'];
             if ($twoFactorMethod !== 'none') {
-                return $this->sendTwoFactorCode($user, $twoFactorMethod);
-            }
+                \Illuminate\Support\Facades\Log::info('DEBUG: Tenant user requires 2FA', ['email' => $request->email, 'method' => $twoFactorMethod]);
+                if ($twoFactorMethod === 'email') {
+                    $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                    $tenant->run(function() use ($authData, $code) {
+                        User::where('id', $authData['id'])->update([
+                            'two_factor_code' => $code,
+                            'two_factor_expires_at' => now()->addMinutes(10),
+                        ]);
+                    });
 
-            return $this->issueToken($user);
-        }
-
-        // Tenant user login: look up their tenant by email, then auth against tenant DB
-        $tenant = Tenant::where('owner_email', $request->email)->first();
-        
-        if (!$tenant) {
-            // Also check if this email belongs to a staff member in any tenant
-            // We need to find which tenant this staff belongs to — search by email in all tenants
-            $allTenants = Tenant::all();
-            foreach ($allTenants as $t) {
-                $found = $t->run(function() use ($request) {
-                    return User::where('email', $request->email)->first();
-                });
-                if ($found) {
-                    $tenant = $t;
-                    break;
+                    try {
+                        $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
+                        \Illuminate\Support\Facades\Mail::to($authData['email'])->send(new \App\Mail\SystemMail(
+                            'Your Security Code',
+                            'Your security verification code is: {code}',
+                            ['name' => $authData['name'], 'code' => $code, 'platform_name' => $platformName]
+                        ));
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error("DEBUG: Failed to send 2FA email: " . $e->getMessage());
+                    }
                 }
+
+                return response()->json([
+                    'requires_2fa' => true,
+                    'method'       => $twoFactorMethod,
+                    'email'        => $authData['email'],
+                ]);
             }
-        }
 
-        if (!$tenant) {
-            return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
-        }
+            \Illuminate\Support\Facades\Log::info('DEBUG: Tenant user authenticated successfully', ['email' => $request->email]);
+            
+            // Issue token
+            $tokenData = $tenant->run(function() use ($authData) {
+                $user = User::find($authData['id']);
+                $token = $user->createToken('auth-token')->plainTextToken;
+                return $token;
+            });
 
-        // Authenticate within the tenant's database
-        $authData = $tenant->run(function() use ($request) {
-            $user = User::where('email', $request->email)->first();
-            if (!$user || !Hash::check($request->password, $user->password)) {
-                return null;
-            }
-            return [
-                'id' => $user->id,
-                'email' => $user->email,
-                'name' => $user->name,
-                'two_factor_method' => $user->two_factor_method ?: 'none',
-                'array_data' => $user->toArray()
-            ];
-        });
-
-        if (!$authData) {
-            return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
-        }
-
-        // Check 2FA preference (handle null or empty string as 'none')
-        $twoFactorMethod = $authData['two_factor_method'];
-        
-        if ($twoFactorMethod !== 'none') {
-            if ($twoFactorMethod === 'email') {
-                $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-                $tenant->run(function() use ($authData, $code) {
-                    User::where('id', $authData['id'])->update([
-                        'two_factor_code' => $code,
-                        'two_factor_expires_at' => now()->addMinutes(10),
-                    ]);
-                });
-
-                try {
-                    $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
-                    \Illuminate\Support\Facades\Mail::to($authData['email'])->send(new \App\Mail\SystemMail(
-                        'Your Security Code',
-                        'Your security verification code is: {code}',
-                        ['name' => $authData['name'], 'code' => $code, 'platform_name' => $platformName]
-                    ));
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error("Failed to send 2FA email: " . $e->getMessage());
-                }
-            }
+            $tenantDomain = $tenant->domains()->first()?->domain;
 
             return response()->json([
-                'requires_2fa' => true,
-                'method'       => $twoFactorMethod,
-                'email'        => $authData['email'],
+                'token'         => $tokenData,
+                'user'          => $authData['array_data'],
+                'tenant_domain' => $tenantDomain,
             ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('DEBUG: Critical login failure', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['message' => 'An internal error occurred during login.'], 500);
         }
-
-        // Issue token within tenant context and return tenant domain for redirect
-        $tokenData = $tenant->run(function() use ($authData) {
-            $user = User::find($authData['id']);
-            $token = $user->createToken('auth-token')->plainTextToken;
-            return $token;
-        });
-
-        $tenantDomain = $tenant->domains()->first()?->domain;
-
-        return response()->json([
-            'token'         => $tokenData,
-            'user'          => $authData['array_data'],
-            'tenant_domain' => $tenantDomain,
-        ]);
     }
 
 
