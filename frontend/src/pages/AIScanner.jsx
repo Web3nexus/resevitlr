@@ -23,7 +23,7 @@ export function AIScanner({ onUploadSuccess, onClose }) {
     formData.append('receipt', file);
 
     try {
-      const response = await api.post('/automation/scan-receipt', formData, {
+      const response = await api.post('automation/scan-receipt', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       

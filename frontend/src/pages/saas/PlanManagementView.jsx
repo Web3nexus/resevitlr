@@ -50,7 +50,7 @@ export default function PlanManagementView() {
   const fetchPlans = async () => {
     setIsLoading(true);
     try {
-      const res = await api.get('/saas/plans');
+      const res = await api.get('saas/plans');
       setPlans(Array.isArray(res.data) ? res.data : []);
     } catch (e) {
       console.error('Failed to fetch plans', e);
@@ -80,7 +80,7 @@ export default function PlanManagementView() {
         max_staff: editingPlan.max_staff === '' ? null : parseInt(editingPlan.max_staff, 10),
         ai_credits_limit: editingPlan.ai_credits_limit === '' ? null : parseInt(editingPlan.ai_credits_limit, 10),
       };
-      await api.post('/saas/plans', payload);
+      await api.post('saas/plans', payload);
       setMessage({ type: 'success', text: 'Plan saved successfully!' });
       setEditingPlan(null);
       fetchPlans();

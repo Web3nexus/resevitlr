@@ -15,7 +15,7 @@ export default function OnboardingView() {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.post('/tenants', formData);
+      await api.post('tenants', formData);
       setSuccess(true);
     } catch (err) {
       console.error('Onboarding Error:', err);

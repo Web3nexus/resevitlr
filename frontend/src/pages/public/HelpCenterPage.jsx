@@ -16,7 +16,7 @@ export default function HelpCenterPage() {
 
     const fetchArticles = async () => {
         try {
-            const res = await centralApi.get('/public/help');
+            const res = await centralApi.get('public/help');
             setArticles(res.data);
         } catch (error) {
             console.error('Failed to fetch help articles', error);

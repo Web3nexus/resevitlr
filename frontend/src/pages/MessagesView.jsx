@@ -15,7 +15,7 @@ export default function MessagesView() {
 
     const fetchInteractions = async () => {
         try {
-            const response = await api.get('/automation/activity');
+            const response = await api.get('automation/activity');
             setInteractions(Array.isArray(response.data.activity) ? response.data.activity : []);
             if (response.data.stats?.credits) {
                 setCredits(response.data.stats.credits);

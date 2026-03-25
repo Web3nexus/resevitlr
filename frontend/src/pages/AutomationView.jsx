@@ -36,7 +36,7 @@ export default function AutomationView() {
 
   const fetchActivity = async () => {
     try {
-      const res = await api.get('/automation/activity');
+      const res = await api.get('automation/activity');
       setData(res.data);
     } catch (err) {
       console.error('Automation Sync Error:', err);
@@ -47,7 +47,7 @@ export default function AutomationView() {
 
   const fetchSettings = async () => {
     try {
-      const res = await api.get('/automation/settings');
+      const res = await api.get('automation/settings');
       setAiSettings(res.data);
     } catch (err) {
       console.error('Failed to fetch AI Settings:', err);
@@ -56,7 +56,7 @@ export default function AutomationView() {
 
   const fetchKnowledge = async () => {
     try {
-      const res = await api.get('/automation/knowledge');
+      const res = await api.get('automation/knowledge');
       setKnowledge(res.data);
     } catch (err) {
       console.error('Failed to fetch Knowledge:', err);
@@ -66,7 +66,7 @@ export default function AutomationView() {
   const saveSettings = async () => {
     setSavingSettings(true);
     try {
-      await api.post('/automation/settings', aiSettings);
+      await api.post('automation/settings', aiSettings);
       alert('AI Configuration saved successfully!');
     } catch (err) {
       console.error('Failed to save AI settings:', err);
@@ -80,7 +80,7 @@ export default function AutomationView() {
     e.preventDefault();
     setIsAddingKnowledge(true);
     try {
-      await api.post('/automation/knowledge', newKnowledge);
+      await api.post('automation/knowledge', newKnowledge);
       setNewKnowledge({ title: '', content: '', type: 'note' });
       fetchKnowledge();
     } catch (err) {
@@ -94,7 +94,7 @@ export default function AutomationView() {
     if (aiSettings[platform.id]) {
       const newSettings = { ...aiSettings, [platform.id]: false };
       setAiSettings(newSettings);
-      api.post('/automation/settings', newSettings);
+      api.post('automation/settings', newSettings);
     } else {
       setLinkingChannel(platform);
       setPlatformId(aiSettings[platform.id.replace('social_', '') + '_id'] || '');
@@ -109,9 +109,9 @@ export default function AutomationView() {
     const idKey = platformKey.replace('social_', '') + '_id';
 
     try {
-        await api.patch('/automation/social-links', { [idKey]: platformId });
+        await api.patch('automation/social-links', { [idKey]: platformId });
         const newSettings = { ...aiSettings, [platformKey]: true };
-        await api.post('/automation/settings', newSettings);
+        await api.post('automation/settings', newSettings);
         setAiSettings(newSettings);
         setIsLinkingModalOpen(false);
         setPlatformId('');
@@ -142,7 +142,7 @@ export default function AutomationView() {
     }));
 
     try {
-      await api.post('/automation/webhook/social', {
+      await api.post('automation/webhook/social', {
         message: { text: newInteraction.content, sender: newInteraction.sender, platform: newInteraction.platform },
         user: { name: newInteraction.sender }
       });

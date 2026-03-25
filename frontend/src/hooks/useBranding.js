@@ -11,7 +11,7 @@ export function useBranding() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await api.get('/public/branding');
+        const res = await api.get('public/branding');
         const data = res.data;
         setSettings({
           platform_name: data.platform_name || 'Resevit',

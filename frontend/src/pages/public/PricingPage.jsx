@@ -13,7 +13,7 @@ export default function PricingPage() {
     // Attempt to fetch public plans, or fallback to dummy ones
     const fetchPlans = async () => {
       try {
-        const response = await api.get('/saas/plans');
+        const response = await api.get('saas/plans');
         // Filter out inactive ones
         const activePlans = (response.data || []).filter(p => p.is_active);
         if (activePlans.length > 0) {

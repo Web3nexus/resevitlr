@@ -35,8 +35,8 @@ export default function AdminManagementView() {
     setLoading(true);
     try {
       const [adminsRes, profileRes] = await Promise.all([
-        api.get('/saas/admins'),
-        api.get('/profile')
+        api.get('saas/admins'),
+        api.get('profile')
       ]);
       setAdmins(adminsRes.data);
       setCurrentUser(profileRes.data);
@@ -89,7 +89,7 @@ export default function AdminManagementView() {
       if (formData.id) {
         await api.put(`/saas/admins/${formData.id}`, formData);
       } else {
-        await api.post('/saas/admins', formData);
+        await api.post('saas/admins', formData);
       }
       setIsModalOpen(false);
       fetchAdmins();

@@ -33,7 +33,7 @@ export function AuthProvider({ children }) {
       setIsImpersonating(true);
       const baseURL = type === 'admin' ? '/central-api' : api.defaults.baseURL;
       try {
-        const response = await api.get('/user', {
+        const response = await api.get('user', {
           baseURL,
           headers: {
             'Authorization': `Bearer ${credentials.token}`
@@ -52,9 +52,9 @@ export function AuthProvider({ children }) {
       }
     }
 
-    const endpoint = type === 'admin' ? '/saas/login' : '/login';
+    const endpoint = type === 'admin' ? 'saas/login' : 'login';
     try {
-      const baseURL = type === 'admin' ? '/central-api' : api.defaults.baseURL;
+      const baseURL = type === 'admin' ? '/central-api/' : api.defaults.baseURL;
 
       const response = await api.post(endpoint, credentials, {
         baseURL,
@@ -92,8 +92,8 @@ export function AuthProvider({ children }) {
 
   const verify2FA = async (email, code, method = 'email', type = 'admin') => {
     try {
-      const endpoint = type === 'admin' ? '/saas/login/verify-2fa' : '/login/verify-2fa';
-      const baseURL = type === 'admin' ? '/central-api' : api.defaults.baseURL;
+      const endpoint = type === 'admin' ? 'saas/login/verify-2fa' : 'login/verify-2fa';
+      const baseURL = type === 'admin' ? '/central-api/' : api.defaults.baseURL;
 
       const response = await api.post(endpoint, { email, code, method }, {
         baseURL,
@@ -144,7 +144,7 @@ export function AuthProvider({ children }) {
       
       if (!token) return { success: false, error: 'No token found' };
 
-      const response = await api.get('/user', {
+      const response = await api.get('user', {
         baseURL,
         headers: {
           'Authorization': `Bearer ${token}`

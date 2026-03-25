@@ -14,7 +14,7 @@ export function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await api.get('/dashboard/stats');
+      const res = await api.get('dashboard/stats');
       setStats(res.data);
     } catch (err) {
       console.error('Stats Sync Error:', err);

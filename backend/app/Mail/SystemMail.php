@@ -35,22 +35,14 @@ class SystemMail extends Mailable
         return $text;
     }
 
-    public function envelope(): Envelope
+    public function build()
     {
         $fromAddress = \App\Models\SaaSSetting::get('from_address') ?? 'noreply@resevit.com';
         $platformName = \App\Models\SaaSSetting::get('platform_name') ?? 'Resevit';
-
-        return new Envelope(
-            from: new Address($fromAddress, $platformName),
-            subject: $this->subjectStr,
-        );
-    }
-
-    public function content(): Content
-    {
-        return new Content(
-            htmlString: $this->contentHtml,
-        );
+        
+        return $this->from($fromAddress, $platformName)
+                    ->subject($this->subjectStr)
+                    ->html($this->contentHtml);
     }
 
     /**

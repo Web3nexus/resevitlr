@@ -18,7 +18,7 @@ export function OrderPortal() {
 
   const fetchMenu = async () => {
     try {
-      const res = await api.get('/menu');
+      const res = await api.get('menu');
       const categoriesData = res.data || [];
       const flattenedItems = (Array.isArray(categoriesData) ? categoriesData : []).flatMap(cat => 
         (Array.isArray(cat.items) ? cat.items : []).map(item => ({ ...item, category_name: cat.name }))
@@ -52,7 +52,7 @@ export function OrderPortal() {
   const handleCheckout = async () => {
     setSubmitting(true);
     try {
-      await api.post('/orders', {
+      await api.post('orders', {
         customer_name: 'Online Guest',
         total_amount: cartTotal,
         status: 'pending',

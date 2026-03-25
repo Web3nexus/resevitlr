@@ -21,12 +21,32 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Super Admin login via /central-api/saas/login
-        if ($request->is('central-api/saas/*')) {
+        // 1. Identify if this is an Admin (SaaS) login attempt.
+        // We check path segments and route names to be robust across different environments.
+        $isAdminPath = $request->is('central-api/saas/*') || 
+                       $request->is('*/saas/*') || 
+                       str_contains($request->path(), 'saas/');
+
+        // 2. Cross-check for known admin emails if NOT an admin path (Safety net)
+        if (!$isAdminPath) {
+            $isAdminEmail = \App\Models\Admin::where('email', $request->email)->exists();
+            if ($isAdminEmail) {
+                $isAdminPath = true;
+            }
+        }
+
+        if ($isAdminPath) {
             $user = \App\Models\Admin::where('email', $request->email)->first();
             if (!$user || !Hash::check($request->password, $user->password)) {
                 return response()->json(['message' => 'The provided credentials are incorrect.'], 401);
             }
+
+            // Handle 2FA for Super Admin
+            $twoFactorMethod = $user->two_factor_method ?: 'none';
+            if ($twoFactorMethod !== 'none') {
+                return $this->sendTwoFactorCode($user, $twoFactorMethod);
+            }
+
             return $this->issueToken($user);
         }
 
@@ -522,5 +542,36 @@ class AuthController extends Controller
             ->delete();
 
         return response()->json(['message' => 'Password reset successfully. You can now log in.']);
+    }
+
+    /**
+     * Helper to send 2FA code and return the required response.
+     */
+    protected function sendTwoFactorCode($user, $method)
+    {
+        if ($method === 'email') {
+            $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $user->update([
+                'two_factor_code' => $code,
+                'two_factor_expires_at' => now()->addMinutes(10),
+            ]);
+
+            try {
+                $platformName = \App\Models\SaaSSetting::get('platform_name', 'Resevit');
+                \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\SystemMail(
+                    'Your Security Code',
+                    'Your security verification code is: {code}',
+                    ['name' => $user->name, 'code' => $code, 'platform_name' => $platformName]
+                ));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to send 2FA email: " . $e->getMessage());
+            }
+        }
+
+        return response()->json([
+            'requires_2fa' => true,
+            'method'       => $method,
+            'email'        => $user->email,
+        ]);
     }
 }

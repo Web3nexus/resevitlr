@@ -147,7 +147,7 @@ export default function AccountSettingsView() {
     if (isSaaS && profile.email !== originalEmail) {
         try {
             setSaving(true);
-            await centralApi.post('/profile/email-otp', { email: profile.email });
+            await centralApi.post('profile/email-otp', { email: profile.email });
             setIsVerifyModalOpen(true);
             setNewEmail(profile.email);
             return;
@@ -177,7 +177,7 @@ export default function AccountSettingsView() {
     setVerifying(true);
     setError(null);
     try {
-        await centralApi.post('/profile/verify-email', { code: verificationCode });
+        await centralApi.post('profile/verify-email', { code: verificationCode });
         setIsVerifyModalOpen(false);
         setOriginalEmail(newEmail);
         setProfile(prev => ({ ...prev, email: newEmail, email_verified_at: new Date().toISOString() }));

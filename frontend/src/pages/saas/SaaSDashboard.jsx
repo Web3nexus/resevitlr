@@ -17,14 +17,14 @@ export default function SaaSDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const statsRes = await api.get('/saas/stats');
+        const statsRes = await api.get('saas/stats');
         if (statsRes.data?.stats) setStats(statsRes.data.stats);
         if (statsRes.data?.recent_tenants) setRecentTenants(statsRes.data.recent_tenants);
 
-        const healthRes = await api.get('/saas/health');
+        const healthRes = await api.get('saas/health');
         if (healthRes.data) setHealth(healthRes.data);
 
-        const ticketsRes = await api.get('/saas/tickets');
+        const ticketsRes = await api.get('saas/tickets');
         if (Array.isArray(ticketsRes.data)) setTickets(ticketsRes.data);
       } catch (error) {
         console.error("Failed to fetch SaaS dashboard data", error);

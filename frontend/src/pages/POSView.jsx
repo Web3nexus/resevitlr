@@ -21,8 +21,8 @@ export function POSView() {
     setLoading(true);
     try {
       const [menuRes, tablesRes] = await Promise.all([
-        api.get('/menu'),
-        api.get('/tables')
+        api.get('menu'),
+        api.get('tables')
       ]);
       
       setCategories(menuRes.data);
@@ -64,7 +64,7 @@ export function POSView() {
         }))
       };
       
-      const response = await api.post('/orders', payload);
+      const response = await api.post('orders', payload);
       setOrderSuccess(response.data);
       setCart([]);
       

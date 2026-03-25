@@ -15,7 +15,7 @@ export function StaffView() {
 
   const fetchStaff = async () => {
     try {
-      const res = await api.get('/staff');
+      const res = await api.get('staff');
       setStaff(res.data || []);
     } catch (err) {
       console.error('Staff Sync Error:', err);
@@ -27,7 +27,7 @@ export function StaffView() {
   const handleAddStaff = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/staff', newStaff);
+      await api.post('staff', newStaff);
       setShowModal(false);
       setNewStaff({ name: '', email: '', role: 'waiter', is_active: true });
     } catch (err) {

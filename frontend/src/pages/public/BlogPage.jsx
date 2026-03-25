@@ -11,7 +11,7 @@ export default function BlogPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await api.get('/public/blogs');
+        const response = await api.get('public/blogs');
         setPosts(response.data || []);
       } catch (error) {
         console.error("Failed to load blogs", error);

@@ -30,7 +30,7 @@ export default function SettingsView() {
 
   const fetchSettings = async () => {
     try {
-      const res = await api.get('/branding');
+      const res = await api.get('branding');
       if (Object.keys(res.data).length > 0) {
          // Merge with defaults
          setSettings(prev => ({ ...prev, ...res.data }));
@@ -45,7 +45,7 @@ export default function SettingsView() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.post('/branding', settings);
+      await api.post('branding', settings);
       // Optional: show toast or success state
     } catch (err) {
       console.error('Save Failed:', err);

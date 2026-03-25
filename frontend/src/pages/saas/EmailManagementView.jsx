@@ -23,7 +23,7 @@ export default function EmailManagementView() {
 
   const fetchTemplates = async () => {
     try {
-      const response = await api.get('/saas/email-templates');
+      const response = await api.get('saas/email-templates');
       setTemplates(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to fetch templates", error);
@@ -35,7 +35,7 @@ export default function EmailManagementView() {
   const handleSave = async (template) => {
     setIsSaving(true);
     try {
-      await api.post('/saas/email-templates', template);
+      await api.post('saas/email-templates', template);
       fetchTemplates();
       setEditingTemplate(null);
     } catch (error) {

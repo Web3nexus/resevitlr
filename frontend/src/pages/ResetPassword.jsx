@@ -50,7 +50,7 @@ export default function ResetPassword() {
       
       const baseURL = isCentral ? '/central-api' : api.defaults.baseURL;
       
-      const response = await api.post('/reset-password', {
+      const response = await api.post('reset-password', {
         token,
         email,
         password,

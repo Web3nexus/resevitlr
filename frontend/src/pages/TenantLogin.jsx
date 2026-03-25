@@ -72,7 +72,7 @@ export default function TenantLogin() {
       api.defaults.baseURL = `${protocol}//${targetDomain}/tenant-api`;
       
       // POST to the dedicated token-based login endpoint
-      const { data } = await api.post('/login/token', { token });
+      const { data } = await api.post('login/token', { token });
       
       if (data?.user) {
         // Store under 'token' key — that's what api.js interceptor reads for tenant requests

@@ -15,7 +15,7 @@ export function TableView() {
 
   const fetchTables = async () => {
     try {
-      const res = await api.get('/tables');
+      const res = await api.get('tables');
       setTables(res.data);
     } catch (err) {
       console.error('Table Sync Error:', err);
@@ -36,7 +36,7 @@ export function TableView() {
   const handleAddTable = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/tables', newTable);
+      await api.post('tables', newTable);
       setShowModal(false);
       setNewTable({ table_number: '', capacity: 2 });
       fetchTables();

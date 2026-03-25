@@ -24,7 +24,7 @@ export function ReservationsView() {
   const fetchReservations = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/reservations');
+      const res = await api.get('reservations');
       const reservationData = res.data || [];
       setReservations(reservationData);
       
@@ -61,7 +61,7 @@ export function ReservationsView() {
     try {
       // Combine date and time for backend
       const combinedTime = `${newReservation.reservation_date} ${newReservation.reservation_time}:00`;
-      await api.post('/reservations', {
+      await api.post('reservations', {
         ...newReservation,
         reservation_time: combinedTime
       });

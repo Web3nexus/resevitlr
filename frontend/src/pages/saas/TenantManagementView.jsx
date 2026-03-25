@@ -28,7 +28,7 @@ export default function TenantManagementView() {
   const fetchTenants = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get('/saas/tenants');
+      const response = await api.get('saas/tenants');
       setTenants(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to fetch tenants", error);
@@ -39,7 +39,7 @@ export default function TenantManagementView() {
 
   const fetchPlans = async () => {
     try {
-      const response = await api.get('/saas/plans');
+      const response = await api.get('saas/plans');
       setPlans(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to fetch plans", error);
@@ -101,7 +101,7 @@ export default function TenantManagementView() {
   const handleCreateTenant = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/saas/tenants', newTenant);
+      await api.post('saas/tenants', newTenant);
       setIsModalOpen(false);
       const defaultPlan = plans[0]?.slug || 'free';
       setNewTenant({ id: '', business_name: '', domain: '', plan: defaultPlan, owner_email: '', owner_name: '' });

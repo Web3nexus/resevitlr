@@ -8,14 +8,14 @@ const getBaseURL = () => {
   const protocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
 
   if (domain && domain !== 'no-domain') {
-    return `${protocol}//${domain}/tenant-api`;
+    return `${protocol}//${domain}/tenant-api/`;
   }
 
   if (isCentral) {
-    return import.meta.env.VITE_CENTRAL_API_BASE_URL || `${protocol}//${hostname}/central-api`;
+    return import.meta.env.VITE_CENTRAL_API_BASE_URL || `${protocol}//${hostname}/central-api/`;
   }
 
-  return import.meta.env.VITE_API_BASE_URL || `${protocol}//${hostname}/tenant-api`;
+  return import.meta.env.VITE_API_BASE_URL || `${protocol}//${hostname}/tenant-api/`;
 };
 
 const api = axios.create({

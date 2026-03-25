@@ -24,7 +24,7 @@ export default function ForgotPassword() {
       
       const baseURL = isCentral ? '/central-api' : api.defaults.baseURL;
       
-      const response = await api.post('/forgot-password', { email }, { baseURL });
+      const response = await api.post('forgot-password', { email }, { baseURL });
       
       setStatus('success');
       setMessage(response.data.message || 'If your email is in our system, you will receive a reset link shortly.');

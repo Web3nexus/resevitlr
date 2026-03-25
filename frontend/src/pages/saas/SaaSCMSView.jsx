@@ -34,7 +34,7 @@ function LandingPageEditor() {
     const [saved, setSaved] = useState(false);
 
     useEffect(() => {
-        centralApi.get('/saas/settings').then(res => {
+        centralApi.get('saas/settings').then(res => {
             setForm(prev => ({ ...prev, ...(res.data || {}) }));
             setIsLoading(false);
         }).catch(() => setIsLoading(false));
@@ -43,7 +43,7 @@ function LandingPageEditor() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await centralApi.post('/saas/settings', form);
+            await centralApi.post('saas/settings', form);
             setSaved(true);
             setTimeout(() => setSaved(false), 2500);
         } catch (e) {
@@ -185,9 +185,9 @@ export default function SaaSCMSView() {
         setIsLoading(true);
         try {
             const [blogsRes, storiesRes, docsRes] = await Promise.all([
-                centralApi.get('/saas/cms/blogs'),
-                centralApi.get('/saas/cms/stories'),
-                centralApi.get('/saas/cms/docs')
+                centralApi.get('saas/cms/blogs'),
+                centralApi.get('saas/cms/stories'),
+                centralApi.get('saas/cms/docs')
             ]);
             setData({ blogs: blogsRes.data, stories: storiesRes.data, docs: docsRes.data });
         } catch (error) {

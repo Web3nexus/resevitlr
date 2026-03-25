@@ -20,7 +20,7 @@ export default function DocumentationPage() {
 
     const fetchDocs = async () => {
         try {
-            const res = await centralApi.get('/public/docs');
+            const res = await centralApi.get('public/docs');
             setDocs(res.data);
             if (res.data.length > 0) {
                 setSelectedDoc(res.data[0]);
@@ -34,7 +34,7 @@ export default function DocumentationPage() {
 
     const fetchSettings = async () => {
         try {
-            const res = await centralApi.get('/saas/settings');
+            const res = await centralApi.get('saas/settings');
             setSettings(res.data);
         } catch (error) {
             console.error('Failed to fetch settings', error);

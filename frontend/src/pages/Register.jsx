@@ -47,7 +47,7 @@ export default function Register() {
     setError('');
 
     try {
-      const response = await api.post('/auth/register', { 
+      const response = await api.post('auth/register', { 
         ...formData, 
         turnstile_token: turnstileToken 
       });

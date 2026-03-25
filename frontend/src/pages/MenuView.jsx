@@ -23,7 +23,7 @@ export function MenuView() {
   const fetchMenuData = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/menu');
+      const response = await api.get('menu');
       setCategories(response.data);
       setError(null);
     } catch (err) {
@@ -37,7 +37,7 @@ export function MenuView() {
   const handleAddCategory = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/menu/categories', newCategory);
+      await api.post('menu/categories', newCategory);
       setShowCategoryModal(false);
       setNewCategory({ name: '', description: '' });
       fetchMenuData();
@@ -54,7 +54,7 @@ export function MenuView() {
         alert('Please select a category first. If none exist, create one.');
         return;
       }
-      await api.post('/menu/items', newItem);
+      await api.post('menu/items', newItem);
       setShowItemModal(false);
       setNewItem({ menu_category_id: '', name: '', description: '', price: '0.00', is_available: true });
       fetchMenuData(); // Refresh the overarching data

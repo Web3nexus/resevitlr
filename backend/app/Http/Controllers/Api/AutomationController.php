@@ -255,6 +255,7 @@ class AutomationController extends Controller
 
         AiInteraction::create([
             'platform' => $platform,
+            'platform_account_id' => ($platform === 'WhatsApp') ? ($payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'] ?? null) : null,
             'sender' => $sender,
             'content' => $messageText,
             'reply' => $reply,
@@ -537,8 +538,9 @@ class AutomationController extends Controller
         // Logic here calls the actual platform API
         $messenger = new SocialMessengerService();
         $metaData = [];
-        // Re-extract phone_number_id if needed, or store it in AiInteraction
-        // For now, we attempt dynamic dispatch based on stored platform/sender
+        if ($interaction->platform === 'WhatsApp' && $interaction->platform_account_id) {
+            $metaData['phone_number_id'] = $interaction->platform_account_id;
+        }
         $sent = $messenger->sendMessage($interaction->platform, $interaction->sender, $replyText, $metaData);
         
         $interaction->update([

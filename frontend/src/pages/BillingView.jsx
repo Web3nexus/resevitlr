@@ -19,7 +19,7 @@ export default function BillingView() {
 
     // Fetch Plans (Public)
     try {
-      const plansRes = await api.get('/billing/plans');
+      const plansRes = await api.get('billing/plans');
       if (Array.isArray(plansRes.data)) {
         setPlans(plansRes.data);
         if (plansRes.data.length > 0) plansLoaded = true;
@@ -30,7 +30,7 @@ export default function BillingView() {
 
     // Fetch Status (Protected)
     try {
-      const statusRes = await api.get('/billing/status');
+      const statusRes = await api.get('billing/status');
       setStatus(statusRes.data);
       setCountry(statusRes.data.country || '');
     } catch (err) {
@@ -58,7 +58,7 @@ export default function BillingView() {
     setSubscribing(planSlug);
     setError(null);
     try {
-      const res = await api.post('/billing/subscribe', {
+      const res = await api.post('billing/subscribe', {
         plan_slug: planSlug,
         interval: interval,
         country: country
@@ -80,7 +80,7 @@ export default function BillingView() {
     setPurchasingTopup(true);
     setError(null);
     try {
-      await api.post('/billing/purchase-credits', { amount });
+      await api.post('billing/purchase-credits', { amount });
       await fetchData(); // Refresh the credit count
     } catch (err) {
       setError(err.response?.data?.message || "Failed to purchase credits.");

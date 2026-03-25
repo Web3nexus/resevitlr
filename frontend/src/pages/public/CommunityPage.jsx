@@ -9,7 +9,7 @@ export default function CommunityPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await centralApi.get('/saas/settings');
+        const res = await centralApi.get('saas/settings');
         setSettings(res.data);
       } catch (error) {
         console.error('Failed to load settings', error);

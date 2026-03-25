@@ -16,8 +16,8 @@ export function FinancialsView() {
     setLoading(true);
     try {
       const [ordersRes, expensesRes] = await Promise.all([
-        api.get('/orders'),
-        api.get('/expenses')
+        api.get('orders'),
+        api.get('expenses')
       ]);
 
       const orders = ordersRes.data || [];

@@ -32,7 +32,7 @@ export default function TranslationManagementView() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await api.get('/saas/translations', {
+      const response = await api.get('saas/translations', {
         params: { locale: selectedLocale }
       });
       setTranslations(Array.isArray(response.data) ? response.data : []);
@@ -53,7 +53,7 @@ export default function TranslationManagementView() {
     setIsSaving(true);
     setError(null);
     try {
-      await api.post('/saas/translations', newTranslation);
+      await api.post('saas/translations', newTranslation);
       setIsModalOpen(false);
       setNewTranslation({ locale: selectedLocale, group: '', key: '', value: '' });
       fetchTranslations();

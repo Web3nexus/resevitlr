@@ -38,58 +38,76 @@ class CentralWebhookController extends Controller
     public function handle(Request $request)
     {
         $payload = $request->all();
-        Log::info('Central Social Webhook Received', ['payload' => $payload]);
+        Log::info('Incoming Meta Webhook', [
+            'url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'payload' => $payload
+        ]);
 
-        // 1. Identify the platform and the platform-specific ID
-        $platform = 'Web';
-        $platformId = null;
-        $tenant = null;
-
+        // 1. Collect all potential identifiers from the payload
+        $potentialIds = [];
+        
         // WhatsApp Business Payload
         if (isset($payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'])) {
             $platform = 'WhatsApp';
-            $phoneNumberId = $payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'];
-            $wabaId = $payload['entry'][0]['id'] ?? null;
-            $displayPhoneNumber = $payload['entry'][0]['changes'][0]['value']['metadata']['display_phone_number'] ?? null;
-            
-            $platformId = $phoneNumberId; // keep for logging
-
-            // Try to match tenant against any of the possible WhatsApp identifiers user might have entered
-            $tenant = Tenant::where('data->whatsapp_id', $phoneNumberId)
-                ->when($wabaId, function($q) use ($wabaId) {
-                    $q->orWhere('data->whatsapp_id', $wabaId);
-                })
-                ->when($displayPhoneNumber, function($q) use ($displayPhoneNumber) {
-                    // sometimes display numbers have '+' and sometimes they don't, check exact and without +
-                    $q->orWhere('data->whatsapp_id', $displayPhoneNumber)
-                      ->orWhere('data->whatsapp_id', str_replace('+', '', $displayPhoneNumber))
-                      ->orWhere('data->whatsapp_id', '+' . str_replace('+', '', $displayPhoneNumber));
-                })
-                ->first();
+            $potentialIds[] = $payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'];
+            if (isset($payload['entry'][0]['id'])) $potentialIds[] = $payload['entry'][0]['id'];
+            if (isset($payload['entry'][0]['changes'][0]['value']['metadata']['display_phone_number'])) {
+                $potentialIds[] = $payload['entry'][0]['changes'][0]['value']['metadata']['display_phone_number'];
+            }
         } 
         // Facebook/Instagram Page Payload
         elseif (isset($payload['entry'][0]['id'])) {
-            $platformId = $payload['entry'][0]['id'];
             $platform = (isset($payload['object']) && $payload['object'] === 'instagram') ? 'Instagram' : 'Facebook';
-            
-            $tenant = Tenant::where('data->facebook_page_id', $platformId)
-                ->orWhere('data->instagram_id', $platformId)
-                // Just in case they pasted the ID in the wrong social box
-                ->orWhere('data->whatsapp_id', $platformId)
-                // Handle cases where user might have pasted a URL containing the ID
-                ->orWhere('data->facebook_page_id', 'LIKE', '%' . $platformId . '%')
-                ->orWhere('data->instagram_id', 'LIKE', '%' . $platformId . '%')
-                ->first();
+            $potentialIds[] = $payload['entry'][0]['id'];
         }
         // Fallback for custom/simulated payloads
         elseif (isset($payload['message']['platform_id'])) {
-            $platformId = $payload['message']['platform_id'];
             $platform = $payload['message']['platform'] ?? 'Web';
-            
-            $tenant = Tenant::where('data->whatsapp_id', $platformId)
-                ->orWhere('data->facebook_page_id', $platformId)
-                ->orWhere('data->instagram_id', $platformId)
-                ->first();
+            $potentialIds[] = $payload['message']['platform_id'];
+        }
+
+        $platformId = $potentialIds[0] ?? 'unknown';
+
+        // 2. Perform Robust/Fuzzy matching against Tenants
+        $tenant = Tenant::all()->first(function ($t) use ($potentialIds) {
+            $storedIds = [
+                $t->whatsapp_id,
+                $t->facebook_page_id,
+                $t->instagram_id
+            ];
+
+            foreach ($potentialIds as $incomingId) {
+                foreach ($storedIds as $storedId) {
+                    if (empty($storedId) || empty($incomingId)) continue;
+                    
+                    // Exact match
+                    if ($storedId == $incomingId) return true;
+                    
+                    // Numeric normalization match (strip +, -, spaces)
+                    $normIncoming = preg_replace('/\D/', '', (string)$incomingId);
+                    $normStored = preg_replace('/\D/', '', (string)$storedId);
+                    
+                    if (!empty($normIncoming) && !empty($normStored)) {
+                        if ($normIncoming === $normStored) return true;
+                        
+                        // Last 10 digits match (handles international prefix variations)
+                        if (strlen($normIncoming) >= 10 && strlen($normStored) >= 10) {
+                            if (substr($normIncoming, -10) === substr($normStored, -10)) return true;
+                        }
+                    }
+
+                    // Partial match for URLs (case insensitive)
+                    if (stripos((string)$storedId, (string)$incomingId) !== false) return true;
+                }
+            }
+            return false;
+        });
+
+        if (!$tenant) {
+            // TEMPORARY CATCH-ALL FOR DEBUGGING (Force to vincentv if unsure)
+            $tenant = Tenant::find('vincentv'); 
+            Log::info('Social Webhook: NO MATCH - Using Catch-All (vincentv)', ['platformId' => $platformId]);
         }
 
         if (!$tenant) {

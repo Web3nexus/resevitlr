@@ -11,7 +11,7 @@ export default function CustomerStoriesPage() {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const response = await api.get('/public/customer-stories');
+        const response = await api.get('public/customer-stories');
         setStories(response.data || []);
       } catch (error) {
         setStories([]);

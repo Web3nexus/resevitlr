@@ -9,7 +9,7 @@ export default function SaaSSubscriptionsView() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const res = await api.get('/saas/billing/metrics');
+        const res = await api.get('saas/billing/metrics');
         setData(res.data);
       } catch (error) {
         console.error("Failed to fetch billing metrics", error);

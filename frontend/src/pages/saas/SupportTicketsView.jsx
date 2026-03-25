@@ -12,7 +12,7 @@ export default function SupportTicketsView() {
   const fetchTickets = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get('/saas/tickets');
+      const response = await api.get('saas/tickets');
       setTickets(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to fetch tickets", error);

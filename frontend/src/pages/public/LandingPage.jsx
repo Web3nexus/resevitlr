@@ -12,7 +12,7 @@ export default function LandingPage() {
   const [s, setS] = useState({});
 
   useEffect(() => {
-    api.get('/saas/settings').then(res => {
+    api.get('saas/settings').then(res => {
       if (res.data) setS(res.data);
     }).catch(() => {});
   }, []);

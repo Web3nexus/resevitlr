@@ -59,7 +59,7 @@ export default function SaaSSettingsView() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await api.get('/saas/settings');
+        const response = await api.get('saas/settings');
         setSettings(prev => ({ ...prev, ...(response.data || {}) }));
       } catch (error) {
         console.error("Failed to fetch SaaS settings", error);
@@ -74,7 +74,7 @@ export default function SaaSSettingsView() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await api.post('/saas/settings', settings);
+      await api.post('saas/settings', settings);
       showModal("Success", "All system configurations have been saved successfully.", "success");
     } catch (error) {
       console.error("Failed to save settings", error);
@@ -197,7 +197,7 @@ export default function SaaSSettingsView() {
                               formData.append('file', file);
                               formData.append('type', 'logo');
                               try {
-                                const res = await api.post('/saas/settings/upload-branding', formData);
+                                const res = await api.post('saas/settings/upload-branding', formData);
                                 setSettings({ ...settings, platform_logo_url: res.data.url });
                                 showModal("Logo Uploaded", "Your platform logo has been updated.", "success");
                               } catch (err) {
@@ -244,7 +244,7 @@ export default function SaaSSettingsView() {
                               formData.append('file', file);
                               formData.append('type', 'favicon');
                               try {
-                                const res = await api.post('/saas/settings/upload-branding', formData);
+                                const res = await api.post('saas/settings/upload-branding', formData);
                                 setSettings({ ...settings, platform_favicon_url: res.data.url });
                                 showModal("Favicon Uploaded", "Your browser favicon has been updated.", "success");
                               } catch (err) {
@@ -452,7 +452,7 @@ export default function SaaSSettingsView() {
                             onClick={async () => {
                                 if(!settings.test_recipient) return showModal("Missing Recipient", "Please enter a test recipient email.", "error");
                                 try {
-                                    const res = await api.post('/saas/settings/test-email', { email: settings.test_recipient });
+                                    const res = await api.post('saas/settings/test-email', { email: settings.test_recipient });
                                     showModal("Email Sent", res.data.message, "success");
                                 } catch (err) {
                                     showModal("Email Failed", err.response?.data?.message || "Failed to send test email.", "error");
@@ -557,7 +557,7 @@ export default function SaaSSettingsView() {
                         <button 
                           onClick={async () => {
                               try {
-                                  const res = await api.post('/saas/settings/test-ai', { 
+                                  const res = await api.post('saas/settings/test-ai', { 
                                       openai_api_key: settings.openai_api_key,
                                       claude_api_key: settings.claude_api_key,
                                       ai_provider: settings.ai_provider

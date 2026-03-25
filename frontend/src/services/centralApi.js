@@ -6,7 +6,7 @@ import axios from 'axios';
  * to avoid CORS issues during development.
  */
 const centralApi = axios.create({
-  baseURL: '/central-api',
+  baseURL: '/central-api/',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',

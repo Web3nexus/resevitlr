@@ -130,6 +130,7 @@ Route::middleware([
                 Route::post('/settings', [AutomationController::class, 'updateSettings']);
                 Route::patch('/social-links', [AutomationController::class, 'updateSocialLinks']);
                 Route::post('/social/webhook', [AutomationController::class, 'handleSocialWebhook']);
+                Route::post('/interactions/{id}/reply', [AutomationController::class, 'postReply']);
                 Route::post('/scan-receipt', [AutomationController::class, 'scanReceipt']);
             });
 

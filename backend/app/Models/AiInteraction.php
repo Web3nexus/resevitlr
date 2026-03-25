@@ -11,6 +11,7 @@ class AiInteraction extends Model
 
     protected $fillable = [
         'platform',
+        'platform_account_id',
         'sender',
         'content',
         'reply',
