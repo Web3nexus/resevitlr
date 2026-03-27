@@ -119,6 +119,15 @@ class CentralWebhookController extends Controller
         try {
             tenancy()->initialize($tenant);
             
+            // Auto-update technical IDs for non-technical users
+            if ($platform === 'WhatsApp' && isset($payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'])) {
+                $technicalId = $payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'];
+                if ($tenant->whatsapp_technical_id !== $technicalId) {
+                    $tenant->whatsapp_technical_id = $technicalId;
+                    $tenant->save();
+                }
+            }
+            
             // We can directly call the existing AutomationController@handleSocialWebhook
             // OR we can manually trigger the logic here while in tenant context.
             $controller = new \App\Http\Controllers\Api\AutomationController();

@@ -242,7 +242,7 @@ class AutomationController extends Controller
             $messenger = new SocialMessengerService();
             $metaData = [];
             if ($platform === 'WhatsApp') {
-                $metaData['phone_number_id'] = $payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'] ?? null;
+                $metaData['phone_number_id'] = ($payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'] ?? null) ?: (tenant('whatsapp_technical_id') ?: tenant('whatsapp_id'));
             }
             
             $sent = $messenger->sendMessage($platform, $sender, $reply, $metaData);
@@ -255,7 +255,7 @@ class AutomationController extends Controller
 
         AiInteraction::create([
             'platform' => $platform,
-            'platform_account_id' => ($platform === 'WhatsApp') ? ($payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'] ?? null) : null,
+            'platform_account_id' => ($platform === 'WhatsApp') ? (($payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'] ?? null) ?: (tenant('whatsapp_technical_id') ?: tenant('whatsapp_id'))) : null,
             'sender' => $sender,
             'content' => $messageText,
             'reply' => $reply,
@@ -538,8 +538,8 @@ class AutomationController extends Controller
         // Logic here calls the actual platform API
         $messenger = new SocialMessengerService();
         $metaData = [];
-        if ($interaction->platform === 'WhatsApp' && $interaction->platform_account_id) {
-            $metaData['phone_number_id'] = $interaction->platform_account_id;
+        if ($interaction->platform === 'WhatsApp') {
+            $metaData['phone_number_id'] = $interaction->platform_account_id ?: (tenant('whatsapp_technical_id') ?: tenant('whatsapp_id'));
         }
         $sent = $messenger->sendMessage($interaction->platform, $interaction->sender, $replyText, $metaData);
         
