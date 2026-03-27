@@ -38,6 +38,21 @@ class CentralWebhookController extends Controller
     public function handle(Request $request)
     {
         $payload = $request->all();
+        $signature = $request->header('X-Hub-Signature-256');
+        
+        // 0. Validate Webhook Signature
+        $settings = \App\Models\SaaSSetting::all()->pluck('value', 'key');
+        $appSecret = $settings['meta_app_secret'] ?? env('META_APP_SECRET');
+        
+        if ($appSecret) {
+            if (!$signature || !hash_equals('sha256=' . hash_hmac('sha256', $request->getContent(), $appSecret), $signature)) {
+                Log::warning('Social Webhook: Invalid or Missing Signature');
+                return response()->json(['error' => 'Invalid signature'], 403);
+            }
+        } else {
+            Log::info('Social Webhook: Missing META_APP_SECRET - Bypassing validation (NOT RECOMMENDED for production)');
+        }
+
         Log::info('Incoming Meta Webhook', [
             'url' => $request->fullUrl(),
             'method' => $request->method(),
@@ -115,10 +130,8 @@ class CentralWebhookController extends Controller
             return response()->json(['status' => 'ignored', 'message' => 'No matching tenant found'], 200);
         }
 
-        // 3. Initialize Tenancy and hand off to the tenant's controller
+        // 3. Prepare Tenant Data and Dispatch Background Job
         try {
-            tenancy()->initialize($tenant);
-            
             // Auto-update technical IDs for non-technical users
             if ($platform === 'WhatsApp' && isset($payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'])) {
                 $technicalId = $payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'];
@@ -128,16 +141,13 @@ class CentralWebhookController extends Controller
                 }
             }
             
-            // We can directly call the existing AutomationController@handleSocialWebhook
-            // OR we can manually trigger the logic here while in tenant context.
-            $controller = new \App\Http\Controllers\Api\AutomationController();
-            $response = $controller->handleSocialWebhook($request);
+            \App\Jobs\ProcessSocialWebhook::dispatch($tenant, $payload);
             
-            tenancy()->end();
-            return $response;
+            // Instantly return 200 OK to Meta
+            return response()->json(['status' => 'EVENT_RECEIVED'], 200);
         } catch (\Exception $e) {
-            Log::error('Central Webhook Handoff Failed', ['error' => $e->getMessage()]);
-            return response()->json(['status' => 'error', 'message' => 'Internal processing error'], 500);
+            Log::error('Central Webhook Dispatch Failed', ['error' => $e->getMessage()]);
+            return response()->json(['status' => 'error', 'message' => 'Internal scheduling error'], 500);
         }
     }
 }

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MessageSquare, Send, Instagram, Facebook, Bot, User, Search, Filter, Loader2, ArrowLeft, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
+import echo from '../lib/echo';
+import { useAuth } from '../context/AuthContext';
 
 export default function MessagesView() {
     const [interactions, setInteractions] = useState([]);
@@ -27,11 +29,28 @@ export default function MessagesView() {
         }
     };
 
+    const { user } = useAuth();
+
     useEffect(() => {
         fetchInteractions();
-        const interval = setInterval(fetchInteractions, 10000); // Poll every 10s
-        return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        if (user?.tenant_id) {
+            const channel = echo.private(`tenant.${user.tenant_id}`)
+                .listen('NewMessageReceived', (e) => {
+                    setInteractions(prev => {
+                        // Prevent duplicates
+                        if (prev.find(i => i.id === e.interaction.id)) return prev;
+                        return [e.interaction, ...prev];
+                    });
+                });
+
+            return () => {
+                echo.leave(`tenant.${user.tenant_id}`);
+            };
+        }
+    }, [user?.tenant_id]);
 
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });

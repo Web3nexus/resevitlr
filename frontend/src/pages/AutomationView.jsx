@@ -31,7 +31,14 @@ export default function AutomationView() {
     fetchActivity();
     fetchSettings();
     fetchKnowledge();
-    // In a real app, we'd have an endpoint for this, but for now we'll simulate or fetch from others
+    // Check for OAuth results in URL
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('oauth') === 'success') {
+        alert("Account connected successfully via Meta OAuth!");
+        fetchSettings(); // Refresh to show connected status
+    } else if (params.get('oauth') === 'error') {
+        alert("Meta authentication failed. Please try again.");
+    }
   }, []);
 
   const fetchActivity = async () => {
@@ -96,9 +103,16 @@ export default function AutomationView() {
       setAiSettings(newSettings);
       api.post('automation/settings', newSettings);
     } else {
-      setLinkingChannel(platform);
-      setPlatformId(aiSettings[platform.id.replace('social_', '') + '_id'] || '');
-      setIsLinkingModalOpen(true);
+      // Use OAuth for Meta platforms
+      if (['social_facebook', 'social_instagram', 'social_whatsapp'].includes(platform.id)) {
+        const domain = localStorage.getItem('tenant_domain') || window.location.hostname;
+        const protocol = window.location.protocol;
+        window.location.href = `${protocol}//${domain}/tenant-api/auth/facebook`;
+      } else {
+        setLinkingChannel(platform);
+        setPlatformId(aiSettings[platform.id.replace('social_', '') + '_id'] || '');
+        setIsLinkingModalOpen(true);
+      }
     }
   };
 

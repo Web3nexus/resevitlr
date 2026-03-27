@@ -253,7 +253,7 @@ class AutomationController extends Controller
             $interactionStatus = 'pending_manual'; // Logged but not sent
         }
 
-        AiInteraction::create([
+        $interaction = \App\Models\AiInteraction::create([
             'platform' => $platform,
             'platform_account_id' => ($platform === 'WhatsApp') ? (($payload['entry'][0]['changes'][0]['value']['metadata']['phone_number_id'] ?? null) ?: (tenant('whatsapp_technical_id') ?: tenant('whatsapp_id'))) : null,
             'sender' => $sender,
@@ -263,6 +263,9 @@ class AutomationController extends Controller
             'sentiment' => $sentiment,
             'is_reservation' => ($intent['type'] === 'reservation'),
         ]);
+
+        // Broadcast the new message to the unified inbox
+        event(new \App\Events\NewMessageReceived($interaction, tenant('id')));
 
         return response()->json([
             'status' => $interactionStatus,

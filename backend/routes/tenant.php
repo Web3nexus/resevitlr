@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\AutomationController;
 use App\Http\Controllers\Api\BrandingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SocialiteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,6 +55,10 @@ Route::middleware([
             Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
             Route::post('/reset-password', [AuthController::class, 'resetPassword']);
         });
+
+        // Meta/Facebook OAuth
+        Route::get('/auth/facebook', [SocialiteController::class, 'redirectToFacebook']);
+        Route::get('/auth/facebook/callback', [SocialiteController::class, 'handleFacebookCallback']);
         
         // Billing & Subscription (Public Plans, Protected Status)
         Route::prefix('billing')->group(function () {
